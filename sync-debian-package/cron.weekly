@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-cd /var/archive-kit/ynchrotron/sync-debian-package/
+cd /var/archive-kit/synchrotron/sync-debian-package/
 
 # fetch stuff from Debian and Tanglu archives
 ./prepare-sync.sh
