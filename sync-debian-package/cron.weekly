@@ -13,3 +13,7 @@ sync-debian-package -a testing aequorea non-free
 # update archive
 dak generate-packages-sources2
 dak generate-releases
+
+# update jenkins
+maintain-jenkins-jobs --update
+maintain-jenkins-jobs --checkbuild
