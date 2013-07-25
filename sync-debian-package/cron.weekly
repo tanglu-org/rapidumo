@@ -1,5 +1,10 @@
 #!/bin/sh
 set -e
+
+# import the general variable set.
+export SCRIPTVARS=/srv/dak/config/tanglu/vars
+. $SCRIPTVARS
+
 cd /var/archive-kit/synchrotron/sync-debian-package/
 
 # fetch stuff from Debian and Tanglu archives
@@ -13,6 +18,8 @@ sync-debian-package -a testing aequorea non-free
 # update archive
 dak generate-packages-sources2
 dak generate-releases
+# sync the public ftp mirror (by syncing dists, the pool/ dir is symlinked)
+rsync -aqH --delete $ftpdir/dists $public_ftpdir/
 
 # update jenkins
 maintain-jenkins-jobs --update
