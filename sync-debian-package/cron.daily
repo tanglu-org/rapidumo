@@ -11,9 +11,9 @@ cd /var/archive-kit/synchrotron/sync-debian-package/
 ./prepare-sync.sh
 
 # sync packages
-sync-debian-package -a testing aequorea main
-sync-debian-package -a testing aequorea contrib
-sync-debian-package -a testing aequorea non-free
+sync-debian-package -a testing staging main
+sync-debian-package -a testing staging contrib
+sync-debian-package -a testing staging non-free
 
 # update archive
 dak generate-packages-sources2

@@ -32,6 +32,7 @@ class SyncPackage:
         parser.read(['/srv/dak/sync-debian.conf', 'sync-debian.conf'])
         self._momArchivePath = parser.get('MOM', 'path')
         self._destDistro = parser.get('SyncTarget', 'distro_name')
+        self._extra_suite = parser.get('SyncTarget', 'devel_suite')
 
         self._supportedArchs = parser.get('SyncTarget', 'archs').split (" ")
         self._unsupportedArchs = parser.get('SyncSource', 'archs').split (" ")
@@ -44,6 +45,7 @@ class SyncPackage:
         self._target_suite = target_suite
         pkginfo_src = PackageInfoRetriever(self._momArchivePath, "debian", source_suite)
         pkginfo_dest = PackageInfoRetriever(self._momArchivePath, self._destDistro, target_suite)
+        pkginfo_dest.extra_suite = self._extra_suite
         self._pkgs_src = pkginfo_src.get_packages_dict(component)
         self._pkgs_dest = pkginfo_dest.get_packages_dict(component)
         self._pkg_blacklist = self._read_blacklist()

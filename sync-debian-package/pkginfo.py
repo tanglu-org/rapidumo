@@ -39,6 +39,7 @@ class PackageInfo():
         self.info = ""
         self.installedArchs = []
         self.directory = directory
+        self.extra_suite = ""
 
     def getVersionNoEpoch(self):
         return noEpoch(self.version)
@@ -52,8 +53,8 @@ class PackageInfoRetriever():
         self._distroName = distro
         self._suiteName = suite
 
-    def _get_packages_for(self, component):
-        source_path = self._archivePath + "/dists/%s-%s/%s/source/Sources.gz" % (self._distroName, self._suiteName, component)
+    def _get_packages_for(self, suite, component):
+        source_path = self._archivePath + "/dists/%s-%s/%s/source/Sources.gz" % (self._distroName, suite, component)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile (f)
         packageList = []
@@ -63,14 +64,18 @@ class PackageInfoRetriever():
             pkgversion = section['Version']
             pkgname = section['Package']
             directory = section['Directory']
-            pkg = PackageInfo(pkgname, pkgversion, self._suiteName, component, archs, directory)
+            pkg = PackageInfo(pkgname, pkgversion, suite, component, archs, directory)
 
             packageList.append(pkg)
+
+        if suite == "staging":
+            if self.extra_suite != "":
+                packageList.extend(self._get_packages_for(self.extra_suite, component))
 
         return packageList
 
     def get_packages_dict(self, component):
-        packageList = self._get_packages_for(component)
+        packageList = self._get_packages_for(self._suiteName, component)
         packages_dict = {}
         for pkg in packageList:
             pkgname = pkg.pkgname
