@@ -39,7 +39,6 @@ class PackageInfo():
         self.info = ""
         self.installedArchs = []
         self.directory = directory
-        self.extra_suite = ""
 
     def getVersionNoEpoch(self):
         return noEpoch(self.version)
@@ -52,6 +51,7 @@ class PackageInfoRetriever():
         self._archivePath = path
         self._distroName = distro
         self._suiteName = suite
+        self.extra_suite = ""
 
     def _get_packages_for(self, suite, component):
         source_path = self._archivePath + "/dists/%s-%s/%s/source/Sources.gz" % (self._distroName, suite, component)
