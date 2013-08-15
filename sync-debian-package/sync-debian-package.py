@@ -147,6 +147,17 @@ class SyncPackage:
         ret = self._import_debian_package(src_pkg)
         return ret
 
+    def sync_package_regex(self, package_regex, force=False):
+        for src_pkg in self._pkgs_src.values():
+            # check if source-package matches regex, if yes, sync package
+            if re.match(package_regex, src_pkg):
+                if not src_pkg.pkgname in self._pkgs_dest:
+                    if self._can_sync_package(src_pkg, None, True):
+                        self._import_debian_package(src_pkg)
+                    continue
+                if self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], quiet=True, forceSync=force):
+                    self._import_debian_package(src_pkg)
+
     def sync_all_packages(self):
         for src_pkg in self._pkgs_src.values():
             if not src_pkg.pkgname in self._pkgs_dest:
@@ -184,6 +195,9 @@ def main():
     parser.add_option("-i",
                   action="store_true", dest="import_pkg", default=False,
                   help="import a package")
+    parser.add_option("-r",
+                  action="store_true", dest="import_pkg_regex", default=False,
+                  help="import package(s) by regular expression")
     parser.add_option("--force",
                   action="store_true", dest="force_import", default=False,
                   help="enforce the import of a package")
@@ -209,7 +223,11 @@ def main():
         component = args[2]
         package_name = args[3]
         sync.initialize(source_suite, target_suite, component)
-        ret = sync.sync_package(package_name, force=options.force_import)
+        ret = False
+        if options.import_pkg_regex:
+            ret = sync.sync_package_regex(package_name, force=options.force_import)
+        else:
+            ret = sync.sync_package(package_name, force=options.force_import)
         if not ret:
             sys.exit(2)
     elif options.sync_everything:
