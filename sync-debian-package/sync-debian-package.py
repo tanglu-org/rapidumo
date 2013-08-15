@@ -20,6 +20,7 @@ import os
 import sys
 import apt_pkg
 import subprocess
+import re
 from optparse import OptionParser
 
 from pkginfo import *
@@ -148,11 +149,13 @@ class SyncPackage:
             return False
 
         # we can now sync the package
-        if dryRun:
-            print("Import: %s (%s)" % (src_pkg.pkgname, src_pkg.version))
-            ret = True
-        else:
-            ret = self._import_debian_package(src_pkg)
+        dest_pkg = self._pkgs_dest[src_pkg.pkgname]
+        if self._can_sync_package(src_pkg, dest_pkg, quiet=True, forceSync=force):
+            if dryRun:
+                print("Import: %s (%s -> %s)" % (src_pkg.pkgname, dest_pkg.version, src_pkg.version))
+                ret = True
+            else:
+                ret = self._import_debian_package(src_pkg)
         return ret
 
     def sync_package_regex(self, package_regex, force=False, dryRun=False):
@@ -167,9 +170,10 @@ class SyncPackage:
                         else:
                             self._import_debian_package(src_pkg)
                     continue
-                if self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], quiet=True, forceSync=force):
+                dest_pkg = self._pkgs_dest[src_pkg.pkgname]
+                if self._can_sync_package(src_pkg, dest_pkg, quiet=True, forceSync=force):
                     if dryRun:
-                        print("Import: %s (%s)" % (src_pkg.pkgname, src_pkg.version))
+                        print("Import: %s (%s -> %s)" % (src_pkg.pkgname, dest_pkg.version, src_pkg.version))
                         ret = True
                     else:
                         self._import_debian_package(src_pkg)
