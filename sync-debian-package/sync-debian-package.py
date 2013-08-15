@@ -161,7 +161,7 @@ class SyncPackage:
     def sync_package_regex(self, package_regex, force=False, dryRun=False):
         for src_pkg in self._pkgs_src.values():
             # check if source-package matches regex, if yes, sync package
-            if re.match(package_regex, src_pkg):
+            if re.match(package_regex, src_pkg.pkgname):
                 if not src_pkg.pkgname in self._pkgs_dest:
                     if self._can_sync_package(src_pkg, None, True):
                         if dryRun:
