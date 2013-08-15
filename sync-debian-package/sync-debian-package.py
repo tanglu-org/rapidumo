@@ -126,7 +126,7 @@ class SyncPackage:
 
         return True
 
-    def sync_package(self, package_name, force=False):
+    def sync_package(self, package_name, force=False, dryRun=False):
         if not package_name in self._pkgs_src:
             print("Cannot sync %s, package doesn't exist in Debian (%s/%s)!" % (package_name, self._sourceSuite, self._component))
             return False
@@ -135,7 +135,11 @@ class SyncPackage:
         if not package_name in self._pkgs_dest:
             ret = False
             if self._can_sync_package(src_pkg, None):
-                ret = self._import_debian_package(src_pkg)
+                if dryRun:
+                    print("Import: %s (%s) [new!]" % (src_pkg.pkgname, src_pkg.version))
+                    ret = True
+                else:
+                    ret = self._import_debian_package(src_pkg)
             return ret
 
         dest_pkg = self._pkgs_dest[package_name]
@@ -144,19 +148,31 @@ class SyncPackage:
             return False
 
         # we can now sync the package
-        ret = self._import_debian_package(src_pkg)
+        if dryRun:
+            print("Import: %s (%s)" % (src_pkg.pkgname, src_pkg.version))
+            ret = True
+        else:
+            ret = self._import_debian_package(src_pkg)
         return ret
 
-    def sync_package_regex(self, package_regex, force=False):
+    def sync_package_regex(self, package_regex, force=False, dryRun=False):
         for src_pkg in self._pkgs_src.values():
             # check if source-package matches regex, if yes, sync package
             if re.match(package_regex, src_pkg):
                 if not src_pkg.pkgname in self._pkgs_dest:
                     if self._can_sync_package(src_pkg, None, True):
-                        self._import_debian_package(src_pkg)
+                        if dryRun:
+                            print("Import: %s (%s) [new!]" % (src_pkg.pkgname, src_pkg.version))
+                            ret = True
+                        else:
+                            self._import_debian_package(src_pkg)
                     continue
                 if self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], quiet=True, forceSync=force):
-                    self._import_debian_package(src_pkg)
+                    if dryRun:
+                        print("Import: %s (%s)" % (src_pkg.pkgname, src_pkg.version))
+                        ret = True
+                    else:
+                        self._import_debian_package(src_pkg)
 
     def sync_all_packages(self):
         for src_pkg in self._pkgs_src.values():
@@ -204,8 +220,8 @@ def main():
     parser.add_option("-a", "--import-all",
                   action="store_true", dest="sync_everything", default=False,
                   help="sync all packages with newer versions")
-    parser.add_option("-l", "--list-syncs",
-                  action="store_true", dest="list_syncs", default=False,
+    parser.add_option("-d", "--dry-run",
+                  action="store_true", dest="dry_run", default=False,
                   help="list all packages which would be synced")
     parser.add_option("--list-not-in-debian",
                   action="store_true", dest="list_nodebian", default=False,
@@ -225,9 +241,9 @@ def main():
         sync.initialize(source_suite, target_suite, component)
         ret = False
         if options.import_pkg_regex:
-            ret = sync.sync_package_regex(package_name, force=options.force_import)
+            ret = sync.sync_package_regex(package_name, force=options.force_import, dryRun=options.dry_run)
         else:
-            ret = sync.sync_package(package_name, force=options.force_import)
+            ret = sync.sync_package(package_name, force=options.force_import, dryRun=options.dry_run)
         if not ret:
             sys.exit(2)
     elif options.sync_everything:
@@ -239,17 +255,10 @@ def main():
         target_suite = args[1]
         component = args[2]
         sync.initialize(source_suite, target_suite, component)
-        sync.sync_all_packages()
-    elif options.list_syncs:
-        sync = SyncPackage()
-        if len(args) != 3:
-            print("Invalid number of arguments (need source-suite, target-suite, component)")
-            sys.exit(1)
-        source_suite = args[0]
-        target_suite = args[1]
-        component = args[2]
-        sync.initialize(source_suite, target_suite, component)
-        sync.list_all_syncs()
+        if options.dry_run:
+            sync.list_all_syncs()
+        else:
+            sync.sync_all_packages()
     elif options.list_nodebian:
         sync = SyncPackage()
         if len(args) != 3:
