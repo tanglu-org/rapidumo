@@ -5,7 +5,23 @@ set -e
 export SCRIPTVARS=/srv/dak/config/tanglu/vars
 . $SCRIPTVARS
 
+DAK_LOCKDIR=/srv/dak/lock
+DAK_LOCK=$DAK_LOCKDIR/daily.lock
+
+OPTIONS="$@"
+qoption () {
+    for a in $OPTIONS; do if [ "$a" = "$1" ]; then return 0; fi; done
+    return 1
+}
+
 cd /var/archive-kit/synchrotron/sync-debian-package/
+
+if ! qoption allowdaklock; then
+	while [ -f $DAK_LOCK ]; do
+		echo `date` $DAK_LOCK exists.  Sleeping in 10 more minutes.
+		sleep 600
+	done
+fi
 
 # fetch stuff from Debian and Tanglu archives
 ./prepare-sync.sh
