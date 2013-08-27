@@ -28,7 +28,7 @@ if [ ! -d /srv/patches.tanglu.org/blacklist ]; then
   git clone git://gitorious.org/tanglu/import-blacklist.git /srv/patches.tanglu.org/blacklist
 else
   cd /srv/patches.tanglu.org/blacklist/
-  git pull
+  git pull --quiet
 fi
 rm /srv/patches.tanglu.org/sync-blacklist.txt
 cp /srv/patches.tanglu.org/blacklist/sync-blacklist.txt /srv/patches.tanglu.org/sync-blacklist.txt
