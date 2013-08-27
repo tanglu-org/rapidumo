@@ -24,7 +24,7 @@ cd $MOMDIR
 cp addcomment.py /srv/patches.tanglu.org/merges
 
 # Update the blacklist
-if [ ! -f /srv/patches.tanglu.org/blacklist ]; then
+if [ ! -d /srv/patches.tanglu.org/blacklist ]; then
   git clone git://gitorious.org/tanglu/import-blacklist.git /srv/patches.tanglu.org/blacklist
 else
   cd /srv/patches.tanglu.org/blacklist/
