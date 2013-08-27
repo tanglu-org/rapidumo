@@ -24,7 +24,16 @@ cd $MOMDIR
 cp addcomment.py /srv/patches.tanglu.org/merges
 
 # Update the blacklist
-wget -q -O/srv/patches.tanglu.org/sync-blacklist.txt http://gitorious.org/tanglu/import-blacklist/blobs/raw/master/sync-blacklist.txt
+if [ ! -f /srv/patches.tanglu.org/blacklist ]; then
+  git clone git://gitorious.org/tanglu/import-blacklist.git /srv/patches.tanglu.org/blacklist
+else
+  cd /srv/patches.tanglu.org/blacklist/
+  git pull
+fi
+rm /srv/patches.tanglu.org/sync-blacklist.txt
+cp /srv/patches.tanglu.org/blacklist/sync-blacklist.txt /srv/patches.tanglu.org/sync-blacklist.txt
+
+cd $MOMDIR
 
 # Download new packages
 ./update-pool.py $QUIET debian tanglu

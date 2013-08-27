@@ -16,15 +16,15 @@ qoption () {
 
 cd /var/archive-kit/synchrotron/sync-debian-package/
 
+# fetch stuff from Debian and Tanglu archives
+./prepare-sync.sh
+
 if ! qoption allowdaklock; then
 	while [ -f $DAK_LOCK ]; do
-		echo `date` $DAK_LOCK exists.  Sleeping in 10 more minutes.
+		echo `date` $DAK_LOCK exists.  Sleeping for 10 more minutes.
 		sleep 600
 	done
 fi
-
-# fetch stuff from Debian and Tanglu archives
-./prepare-sync.sh
 
 # sync packages
 sync-debian-package -a testing staging main
