@@ -14,7 +14,7 @@ qoption () {
     return 1
 }
 
-cd /var/archive-kit/synchrotron/sync-debian-package/
+cd /var/archive-kit/synchrotron/
 
 # fetch stuff from Debian and Tanglu archives
 ./synctool/prepare-sync.sh
