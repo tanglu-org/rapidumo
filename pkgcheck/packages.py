@@ -16,8 +16,6 @@ def KDE_FTP_URL (name, subdir = ''):
 def GSTREAMER_URL (name, series='1.0'):
     return ('http://gstreamer.freedesktop.org/src/%s/' % name, '%s-(%s\.[0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+' % (name, series))
 
-GERMINATE_OUTPUT = 'http://people.canonical.com/~ubuntu-archive/germinate-output'
-
 tanglu_base_package_info = [
  ('aalib',                 ('http://sourceforge.net/projects/aa-project/files/aa-lib/([0-9.]+)', 'aalib-([0-9][0-9a-zA-Z.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('accerciser',            GNOME_FTP_URL ('accerciser', '3.6'), GNOME_FTP_URL ('accerciser')),
@@ -845,7 +843,6 @@ tanglu_base_package_info = [
  ('remote-login-service',  ('https://launchpad.net/remote-login-service/+download', 'remote-login-service-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('rfkill',                ('http://linuxwireless.org/download/rfkill/', 'rfkill-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('rhythmbox',             GNOME_FTP_URL ('rhythmbox'), None),
- ('rhythmbox-ubuntuone',   ('https://launchpad.net/rhythmbox-ubuntuone/+download', 'rhythmbox-ubuntuone-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('rsync',                 ('http://rsync.samba.org/ftp/rsync/src/', 'rsync-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('rtkit',                 ('http://0pointer.de/public/', 'rtkit-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('rtmpdump',              ('http://rtmpdump.mplayerhq.hu/download/', 'rtmpdump-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -919,6 +916,8 @@ tanglu_base_package_info = [
  ('taglib',                ('http://developer.kde.org/~wheeler/files/src/', 'taglib-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('tali',                  GNOME_FTP_URL ('tali'), None),
  ('talloc',                ('http://www.samba.org/ftp/talloc/', 'talloc-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('tanglu-meta',           TANGLU, None),
+ ('tanglu-artwork',        TANGLU, None),
  ('tar',                   ('http://ftp.gnu.org/gnu/tar/', 'tar-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('tcl8.5',                ('http://sourceforge.net/projects/tcl/files/Tcl/(8.5.[0-9.]+)/', 'tcl([0-9][0-9.]*)-src.tar.gz'), None),
  ('tcpdump',               ('http://www.tcpdump.org/release/', 'tcpdump-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -955,28 +954,6 @@ tanglu_base_package_info = [
  ('twisted-names',         ('http://twistedmatrix.com/Releases/Names/([0-9.]*)', 'TwistedNames-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('twisted-web',           ('http://twistedmatrix.com/Releases/Web/([0-9.]*)', 'TwistedWeb-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('tzdata',                ('ftp://ftp.iana.org/tz/releases/', 'tzdata(201[0-9]+[a-z]).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ubufox',                TANGLU, None),
- ('ubuntu-docs',           TANGLU, None),
- ('ubuntu-drivers-common', TANGLU, None),
- ('ubuntu-extras-keyring', TANGLU, None),
- ('ubuntu-font-family-sources', ('http://font.ubuntu.com/download/', 'ubuntu-font-family-([0-9][0-9.]*).zip'), None),
- ('ubuntu-geoip',          ('https://launchpad.net/ubuntu-geoip/+download', 'ubuntu-geoip-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ubuntu-gnome-default-settings', TANGLU, None),
- ('ubuntu-gnome-meta',     TANGLU, None),
- ('ubuntu-meta',           TANGLU, None),
- ('ubuntu-settings',       TANGLU, None),
- ('ubuntu-themes',       TANGLU, None),
- ('ubuntuone-client-data', ('https://launchpad.net/ubuntuone-client-data/+download', 'ubuntuone-client-data-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ubuntuone-client-gnome', ('https://launchpad.net/ubuntuone-client-gnome/+download', 'ubuntuone-client-gnome-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ubuntuone-client',      ('https://launchpad.net/ubuntuone-client/+download', 'ubuntuone-client-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ubuntuone-control-panel', ('https://launchpad.net/ubuntuone-control-panel/+download', 'ubuntuone-control-panel-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ubuntuone-dev-tools',   ('https://launchpad.net/ubuntuone-dev-tools/+download', 'ubuntuone-dev-tools-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ubuntuone-storage-protocol', ('https://launchpad.net/ubuntuone-storage-protocol/+download', 'ubuntuone-storage-protocol-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ubuntu-release-upgrader', TANGLU, None),
- ('ubuntu-sounds',         TANGLU, None),
- ('ubuntu-sso-client',     ('https://launchpad.net/ubuntu-sso-client/+download', 'ubuntu-sso-client-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ubuntu-system-service', TANGLU, None),
- ('ubuntu-wallpapers',     TANGLU, None),
  ('ucf',                   DEBIAN, None),
  ('udisks2',               ('http://udisks.freedesktop.org/releases/', 'udisks-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('udisks',                ('http://hal.freedesktop.org/releases/', 'udisks-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -1341,8 +1318,8 @@ tanglu_kde_package_info = [
  ('qt-gstreamer',          ('http://gstreamer.freedesktop.org/src/qt-gstreamer/', 'qt-gstreamer-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('qtscriptgenerator',     UNTRACKED, None),
  ('qtwebkit-source',       ('http://get.qt.nokia.com/qtwebkit/', 'QtWebKit-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None), # This is an old URL - releases are on the Wiki and gitorious http://trac.webkit.org/wiki/QtWebKitRelease21
-
  ('skanlite',              KDE_FTP_URL ('skanlite'), None),
+ ('tanglu-kde-settings',   TANGLU, None),
  ('telepathy-logger-qt',   ('http://ftp.kde.org/unstable/kde-telepathy/([0-9.]+)/src/', 'telepathy-logger-qt-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None)
 ]
 

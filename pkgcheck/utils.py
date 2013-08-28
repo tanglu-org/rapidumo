@@ -22,7 +22,7 @@ def compare_versions(versionA, versionB):
         return -1
     if versionB is None or versionB == '':
         return 1
-    return apt_pkg.VersionCompare(non_epoch_version(versionA), non_epoch_version(versionB))
+    return apt_pkg.version_compare(non_epoch_version(versionA), non_epoch_version(versionB))
 
 def debug(text):
     if debug_enabled == True:
