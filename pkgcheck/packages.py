@@ -1396,3 +1396,11 @@ dummy_package_info = [
  ('glib2.0',               GNOME_FTP_URL ('glib', '2.34'), GNOME_FTP_URL ('glib')),
  ('gnome-contacts',        GNOME_FTP_URL ('gnome-contacts', '3.8'), GNOME_FTP_URL ('gnome-contacts')),
 ]
+
+package_info = {
+    'base': tanglu_base_package_info,
+    'gnome': tanglu_gnome_package_info,
+    'kde': tanglu_kde_package_info,
+    'xfce': tanglu_xfce_package_info,
+    'dummy': dummy_package_info,
+}

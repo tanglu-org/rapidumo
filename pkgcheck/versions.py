@@ -34,7 +34,7 @@ from optparse import OptionParser
 import apt_pkg
 apt_pkg.init_system()
 
-from packages import package_info, TANGLU, UBUNTU, UNTRACKED, germinate_tags
+from packages import package_info, DEBIAN, TANGLU, UNTRACKED
 from utils import compare_versions, debug, load_germinate
 
 DISTRO_SERIES = 'saucy'
@@ -43,10 +43,10 @@ DISTRO_SERIES = 'saucy'
 if 'PACKAGE_SET' in os.environ:
     PACKAGE_SET = os.environ['PACKAGE_SET']
 else:
-    PACKAGE_SET = 'tanglu_base'
+    PACKAGE_SET = 'base'
 
 # this is a limited list of packages for quicker testing
-#PACKAGE_SET = 'dummy'
+PACKAGE_SET = 'dummy'
 
 debug ('Starting')
 
@@ -99,10 +99,10 @@ def add_package (name, tag):
         packages[p].tags.append (tag)
     packages[p].on_cd = True
 
-for tag, url in germinate_tags[PACKAGE_SET].iteritems():
-    url = url % {'series': DISTRO_SERIES}
-    for p in load_germinate(url % {'series': DISTRO_SERIES}):
-        add_package(p, tag)
+#for tag, url in germinate_tags[PACKAGE_SET].iteritems():
+#    url = url % {'series': DISTRO_SERIES}
+#    for p in load_germinate(url % {'series': DISTRO_SERIES}):
+#        add_package(p, tag)
 
 # get configuration data
 parser = SafeConfigParser()
@@ -129,16 +129,10 @@ class PackageThread (threading.Thread):
         self.package = package
 
     def run (self):
-        try:
-            launchpad = open_lp_connection ()
-        except:
-            launchpad = None
-            debug (traceback.format_exc ())
-
         # Get Tanglu version
         if self.package.source in pkgs_tanglu:
             self.package.tanglu_version = pkgs_tanglu[self.package.source].version
-        else
+        else:
             debug ("Package %s not found in Tanglu!" % (self.package.source))
 
         # Get Debian version
