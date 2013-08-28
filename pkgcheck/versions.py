@@ -34,16 +34,16 @@ from optparse import OptionParser
 import apt_pkg
 apt_pkg.init_system()
 
-from packages import package_info, DEBIAN, TANGLU, UNTRACKED, germinate_tags
+from packages import package_info, package_sets, DEBIAN, TANGLU, UNTRACKED, germinate_tags
 from utils import compare_versions, debug, load_germinate
 
 if 'PACKAGE_SET' in os.environ:
     PACKAGE_SET = os.environ['PACKAGE_SET']
 else:
-    PACKAGE_SET = 'base'
+    PACKAGE_SET = 'all'
 
 # this is a limited list of packages for quicker testing
-PACKAGE_SET = 'dummy'
+# PACKAGE_SET = 'dummy'
 
 debug ('Starting')
 
@@ -73,9 +73,14 @@ class Package:
 
 debug ('Loading package list...')
 
+pkg_sets = [PACKAGE_SET]
+if PACKAGE_SET == "all":
+    pkg_sets = package_sets
+
 packages = {}
-for (name, stable_url, unstable_url) in package_info[PACKAGE_SET]:
-    packages[name] = Package(name, stable_url, unstable_url)
+for pset in pkg_sets:
+    for (name, stable_url, unstable_url) in package_info[pset]:
+        packages[name] = Package(name, stable_url, unstable_url)
 
 # components which don't have the same source name in debian and ubuntu
 debian_naming_translation = {'gdb': 'gdb-linaro', # Our gdb has a different upstream to Debian
@@ -96,10 +101,11 @@ def add_package (name, tag):
         packages[p].tags.append (tag)
     packages[p].on_cd = True
 
-for tag, url in germinate_tags[PACKAGE_SET].iteritems():
-    url = url % {'series': tanglu_series}
-    for p in load_germinate(url % {'series': tanglu_series}):
-        add_package(p, tag)
+for pset in pkg_sets:
+    for tag, url in germinate_tags[pset].iteritems():
+        url = url % {'series': tanglu_series}
+        for p in load_germinate(url % {'series': tanglu_series}):
+            add_package(p, tag)
 
 # get configuration data
 parser = SafeConfigParser()

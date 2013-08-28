@@ -1414,3 +1414,5 @@ package_info = {
     'xfce': tanglu_xfce_package_info,
     'dummy': dummy_package_info,
 }
+
+package_sets = ["base", "gnome", "kde", "xfce"]
