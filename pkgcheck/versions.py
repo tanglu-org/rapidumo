@@ -37,7 +37,7 @@ apt_pkg.init_system()
 from packages import package_info, DEBIAN, TANGLU, UNTRACKED
 from utils import compare_versions, debug, load_germinate
 
-DISTRO_SERIES = 'saucy'
+# DISTRO_SERIES = 'saucy'
 # one of ubuntu, kubuntu, xubuntu, lubuntu
 
 if 'PACKAGE_SET' in os.environ:
@@ -86,7 +86,7 @@ debian_naming_translation = {'gdb': 'gdb-linaro', # Our gdb has a different upst
                              'firefox': 'iceweasel',
                              'thunderbird': 'icedove'}
 
-ubuntu_series = "aequorea"
+tanglu_series = "aequorea"
 debian_unstable_series = "unstable"
 debian_experimental_series = "experimental"
 
@@ -111,7 +111,7 @@ _momArchivePath = parser.get('MOM', 'path')
 _dest_distro = parser.get('SyncTarget', 'distro_name')
 _extra_suite = parser.get('SyncTarget', 'devel_suite')
 
-pkginfo_tgl = PackageInfoRetriever(self._momArchivePath, self._destDistro, "staging")
+pkginfo_tgl = PackageInfoRetriever(_momArchivePath, _dest_distro, "staging")
 pkginfo_tgl.extra_suite = _extra_suite
 pkginfo_deb_unstable = PackageInfoRetriever(_momArchivePath, "debian", "unstable")
 pkginfo_deb_experimental = PackageInfoRetriever(_momArchivePath, "debian", "experimental")
@@ -137,9 +137,6 @@ class PackageThread (threading.Thread):
 
         # Get Debian version
         try:
-            debian_archive = launchpad.distributions['debian'].getArchive (name='primary')
-            debian_experimental_series = launchpad.distributions['debian'].getSeries (name_or_version='experimental')
-            debian_unstable_series = launchpad.distributions['debian'].getSeries (name_or_version='sid')
             debian_source = debian_naming_translation.get (self.package.source, self.package.source)
             if debian_source in pkgs_debian_unstable:
                 self.package.debian_version = pkgs_debian_unstable[debian_source].version
@@ -171,7 +168,7 @@ class PackageThread (threading.Thread):
             return ('UNKNOWN', None)
         elif self.package.stable_url is DEBIAN:
             return (self.package.debian_version, None)
-        elif self.package.stable_url is UBUNTU:
+        elif self.package.stable_url is TANGLU:
             return (self.package.tanglu_version, None)
         else:
             stable_version = self.get_url_version (self.package.stable_url)
@@ -370,8 +367,11 @@ for name in package_names:
         package.is_synchronised = True
     if compare_versions(package.debian_version, package.tanglu_version) > 0:
         package.is_debian_newer = True
-    if package.tanglu_version is None or compare_versions(apt_pkg.UpstreamVersion(package.upstream_version), apt_pkg.UpstreamVersion(package.tanglu_version)) > 0:
-        package.is_upstream_newer = True
+    if package.upstream_version is None:
+        debug ("Upstream version of %s was None!" % (name))
+    else:
+        if package.tanglu_version is None or compare_versions(apt_pkg.upstream_version(package.upstream_version), apt_pkg.upstream_version(package.tanglu_version)) > 0:
+            package.is_upstream_newer = True
     if package.upstream_unstable_version is not None and \
        compare_versions(package.upstream_unstable_version, package.tanglu_version) > 0:
        # HACK? don't list gnome3 ppa version as uptodate, we don't want to overlook things
@@ -554,7 +554,7 @@ td
 <table>
 <tr>
 <th><b>Package</b></th>
-<th><b>Ubuntu</b></th>
+<th><b>Tanglu</b></th>
 <th><b>Debian</b></th>
 <th><b>Upstream version</b></th>
 <th><b>Status</b></th>
@@ -646,7 +646,7 @@ td
     html += """
 <tr class='spacing'><td><br></td>
 <tr class='untracked'><td colspan='5'>Untracked packages</td>
-<tr class='uptodate'><td colspan='5'>Ubuntu package is latest upstream</td>
+<tr class='uptodate'><td colspan='5'>Tanglu package is latest upstream</td>
 <tr class='newunstable'><td colspan='5'>New unstable version available</td>
 <tr class='newdebian'><td colspan='5'>Newer version available in Debian</td>
 <tr class='syncnewupstream'><td colspan='5'>Synchronised with Debian but newer version available upstream</td>
