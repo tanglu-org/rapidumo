@@ -9,12 +9,24 @@ CURRENT_DEV_SUITE=aequorea
 
 DAK_LOCKDIR=/srv/dak/lock
 DAK_LOCK=$DAK_LOCKDIR/daily.lock
+LOCKFILE="$DAK_LOCKDIR/synchrotron.lock"
 
 OPTIONS="$@"
 qoption () {
     for a in $OPTIONS; do if [ "$a" = "$1" ]; then return 0; fi; done
     return 1
 }
+
+cleanup() {
+    rm -f "$LOCKFILE"
+}
+
+# only run one cron.daily
+if ! lockfile -r8 $LOCKFILE; then
+    echo "aborting Synchrotron cron.daily because $LOCKFILE has already been locked"
+    exit 0
+fi
+trap cleanup 0
 
 cd /var/archive-kit/synchrotron/
 
