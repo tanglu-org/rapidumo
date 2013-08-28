@@ -1377,11 +1377,10 @@ dummy_package_info = [
 GERMINATE_OUTPUT = '/srv/dak/export/germinate/'
 
 tanglu_base_germinate_tags = {
-    'boot':                        GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'boot',
-    'standard':                    GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'standard',
-    'desktop':                     GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop',
-    'desktop.build-depends':       GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop.build-depends',
-    'desktop-common':              GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop-common',
+    'boot':                         GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'boot',
+    'standard':                     GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'standard',
+    'desktop-common':               GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop-common',
+    'desktop-common.build-depends': GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop-common.build-depends',
 }
 
 tanglu_gnome_germinate_tags = {
