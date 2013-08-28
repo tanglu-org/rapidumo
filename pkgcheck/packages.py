@@ -1374,6 +1374,39 @@ dummy_package_info = [
  ('gnome-contacts',        GNOME_FTP_URL ('gnome-contacts', '3.8'), GNOME_FTP_URL ('gnome-contacts')),
 ]
 
+GERMINATE_OUTPUT = '/srv/dak/export/germinate/'
+
+tanglu_base_germinate_tags = {
+    'boot':                        GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'boot',
+    'standard':                    GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'standard',
+    'desktop':                     GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop',
+    'desktop.build-depends':       GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop.build-depends',
+    'desktop-common':              GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop-common',
+}
+
+tanglu_gnome_germinate_tags = {
+    'gnome':               GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'gnome',
+    'gnome.build-depends': GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'gnome.build-depends',
+}
+
+tanglu_kde_germinate_tags = {
+    'kde':               GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'kde',
+    'kde.build-depends': GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'kde.build-depends',
+}
+
+tanglu_xfce_germinate_tags = {
+
+}
+
+
+germinate_tags = {
+    'base': tanglu_base_germinate_tags,
+    'gnome': tanglu_gnome_germinate_tags,
+    'kde': tanglu_kde_germinate_tags,
+    'xfce': tanglu_xfce_germinate_tags,
+    'dummy': {},
+}
+
 package_info = {
     'base': tanglu_base_package_info,
     'gnome': tanglu_gnome_package_info,

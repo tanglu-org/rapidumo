@@ -34,11 +34,8 @@ from optparse import OptionParser
 import apt_pkg
 apt_pkg.init_system()
 
-from packages import package_info, DEBIAN, TANGLU, UNTRACKED
+from packages import package_info, DEBIAN, TANGLU, UNTRACKED, germinate_tags
 from utils import compare_versions, debug, load_germinate
-
-# DISTRO_SERIES = 'saucy'
-# one of ubuntu, kubuntu, xubuntu, lubuntu
 
 if 'PACKAGE_SET' in os.environ:
     PACKAGE_SET = os.environ['PACKAGE_SET']
@@ -99,10 +96,10 @@ def add_package (name, tag):
         packages[p].tags.append (tag)
     packages[p].on_cd = True
 
-#for tag, url in germinate_tags[PACKAGE_SET].iteritems():
-#    url = url % {'series': DISTRO_SERIES}
-#    for p in load_germinate(url % {'series': DISTRO_SERIES}):
-#        add_package(p, tag)
+for tag, url in germinate_tags[PACKAGE_SET].iteritems():
+    url = url % {'series': tanglu_series}
+    for p in load_germinate(url % {'series': tanglu_series}):
+        add_package(p, tag)
 
 # get configuration data
 parser = SafeConfigParser()
@@ -719,15 +716,10 @@ for p in packages:
             tags.append (t)
 
 write_page ('versions.html', [], True)
-write_page ('ubuntu-desktop.html', ['ubuntu-boot', 'ubuntu-standard', 'ubuntu-desktop-common', 'ubuntu-desktop', 'ubuntu-desktop.build-depends'])
-#write_page ('kubuntu-desktop.html', ['kubuntu-desktop'])
-#write_page ('xubuntu-desktop.html', ['xubuntu-desktop'])
-#write_page ('lubuntu-desktop.html', ['lubuntu-desktop'])
-write_page ('ubuntu-gnome-desktop.html', ['ubuntu-gnome-desktop'])
-write_page ('boot.html', ['ubuntu-boot'])
-write_page ('standard.html', ['ubuntu-standard'])
-write_page ('desktop-common.html', ['ubuntu-desktop-common'])
-write_page ('desktop.html', ['ubuntu-desktop'])
+write_page ('base.html', ['boot', 'standard'])
+write_page ('boot.html', ['boot'])
+write_page ('standard.html', ['standard'])
+write_page ('desktop-common.html', ['desktop-common', 'desktop', 'desktop.build-depends'])
 write_page ('gnome.html', ['gnome'])
-#write_page ('kde.html', ['kde'])
+write_page ('kde.html', ['kde'])
 write_page ('untagged.html', tags, True)

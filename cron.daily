@@ -5,6 +5,8 @@ set -e
 export SCRIPTVARS=/srv/dak/config/tanglu/vars
 . $SCRIPTVARS
 
+CURRENT_DEV_SUITE=aequorea
+
 DAK_LOCKDIR=/srv/dak/lock
 DAK_LOCK=$DAK_LOCKDIR/daily.lock
 
@@ -14,6 +16,15 @@ qoption () {
     return 1
 }
 
+cd /var/archive-kit/synchrotron/
+
+# update the tanglu-meta copy
+cd data/tanglu-meta
+git pull --quiet
+# germinate!
+mkdir -p /srv/dak/export/germinate/tanglu.$CURRENT_DEV_SUITE
+cd /srv/dak/export/germinate/tanglu.$CURRENT_DEV_SUITE
+germinate -S /var/archive-kit/synchrotron/data/tanglu-meta/seed  -s aequorea -d aequorea -m /srv/archive.tanglu.org/tanglu/ -c main contrib
 cd /var/archive-kit/synchrotron/
 
 # fetch stuff from Debian and Tanglu archives
