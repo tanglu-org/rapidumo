@@ -24,7 +24,7 @@ git pull --quiet
 # germinate!
 mkdir -p /srv/dak/export/germinate/tanglu.$CURRENT_DEV_SUITE
 cd /srv/dak/export/germinate/tanglu.$CURRENT_DEV_SUITE
-germinate -S /var/archive-kit/synchrotron/data/tanglu-meta/seed  -s aequorea -d aequorea -m /srv/archive.tanglu.org/tanglu/ -c main contrib
+germinate -S file:///var/archive-kit/synchrotron/data/tanglu-meta/seed  -s aequorea -d aequorea -m file:///srv/archive.tanglu.org/tanglu/ -c main contrib
 cd /var/archive-kit/synchrotron/
 
 # fetch stuff from Debian and Tanglu archives
@@ -43,8 +43,8 @@ sync-debian-package -a testing staging contrib
 sync-debian-package -a testing staging non-free
 
 # update archive
-dak generate-packages-sources2
-dak generate-releases
+dak generate-packages-sources2 -s staging
+dak generate-releases -s staging
 # sync the public ftp mirror (by syncing dists, the pool/ dir is symlinked)
 rsync -aqH --delete $ftpdir/dists $public_ftpdir/
 
