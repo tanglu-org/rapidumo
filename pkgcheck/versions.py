@@ -619,9 +619,11 @@ td
 
         html += '  <td>\n'
         html += '    <img alt="" src="https://launchpad.net/@@/package-source" />\n'
-        html += '    <a href="https://launchpad.net/ubuntu/+source/%s">%s</a>\n' % (package.source, package.source)
+        html += '    <a href="http://packages.tanglu.org/source/%s">%s</a>\n' % (package.source, package.source)
         html += '  </td>\n'
-        version = '<a class="versionlink" href="http://launchpad.net/ubuntu/+source/%s/%s">%s</a>' % (package.source, package.tanglu_version, package.tanglu_version)
+        # version = '<a class="versionlink" href="http://launchpad.net/ubuntu/+source/%s/%s">%s</a>' % (package.source, package.tanglu_version, package.tanglu_version)
+        # FIXME: Add Tanglu PTS link instead!
+        version = '<a class="versionlink" href="http://buildd.tanglu.org/job/pkg+%s_%s/">%s</a>' % (package.source, package.tanglu_version, package.tanglu_version)
         if package.in_queue:
             version = '%s Q' % version
         for (arch, url) in package.build_failures:
@@ -694,7 +696,7 @@ td
         for (n, p) in enumerate (untagged_packages):
             if n != 0:
                 html += ', '
-            html += '<a href="https://launchpad.net/ubuntu/+source/%s">%s</a>' % (p, p)
+            html += '<a href="http://packages.tanglu.org/source/%s">%s</a>' % (p, p)
         html += '</p>\n'
 
     html += '<p>\n'
