@@ -49,10 +49,10 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
 
     if debian_dsc == None:
         print("Unable to find dsc file for '%s'. This is a bug." % (pkg_name))
-        return False
+        return False, None
     if debian_src == None:
         print("Unable to find debian source for package '%s'. It might be an old package which needs a manual upload." % (pkg_name))
-        return False
+        return False, None
 
     os.chdir("/tmp")
     debian_src = ("%s/%s") % (src_pkg_dir, debian_src)
@@ -73,7 +73,7 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
         archive_compression = "bz2"
     else:
         print("Could not determine archive compression type for '%s'!" % (debian_src))
-        return False
+        return False, None
 
     changelog_fname = None
     for r,d,f in os.walk(tmp_workspace):
@@ -94,13 +94,13 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     os.chdir(os.path.abspath("%s/../.." % (changelog_fname)))
 
     # we need ubuntu as vendor to get the rebuild action
-    dch_cmd = ["dch", "--rebuild", "--vendor=ubuntu", "-Dstaging", "No-change rebuild against %s" % (rebuild_info)]
+    dch_cmd = ["dch", "--rebuild", "--vendor=Ubuntu", "-Dstaging", "No-change rebuild against %s" % (rebuild_info)]
     proc = subprocess.Popen(dch_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     output = ("%s\n%s") % (stdout, stderr)
     if (proc.returncode != 0):
         print(output)
-        return False
+        return False, None
 
     # get version number (and possible other values later)
     with open(changelog_fname) as f:
@@ -140,5 +140,5 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     output = ("%s\n%s") % (stdout, stderr)
     if (proc.returncode != 0):
         print(output)
-        return False
-    return True
+        return False, None
+    return True, debian_dsc_new

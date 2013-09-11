@@ -20,6 +20,7 @@ import os
 import sys
 import apt_pkg
 import subprocess
+import shutil
 from update_source import bump_source_version
 from optparse import OptionParser
 from synctool.pkginfo import *
@@ -72,10 +73,22 @@ def trigger_package_rebuild(suite, component, pkgname, build_note):
     if not ret:
         print("Download of package '%s' failed." % (pkgname))
         return False
-    ret = bump_source_version(workspace, pkgname, build_note)
+    ret, dsc_path = bump_source_version(workspace, pkgname, build_note)
     if not ret:
         print("Unable to bump version of source package '%s'. It might need a manual upload." % (pkgname))
         return False
+
+    # now make the package known to dak
+    cmd = ["dak", "import", "-s", "-a", "staging", component, dsc_path]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p.wait()
+    if p.returncode is not 0:
+        stdout, stderr = p.communicate()
+        print("ERR: %s\n%s %s" % (cmd, stdout, stderr))
+        raise Exception("Error while running dak!")
+        return False
+
+    shutil.rmtree(workspace)
     return True
 
 def main():
