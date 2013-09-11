@@ -22,7 +22,8 @@ import apt_pkg
 import subprocess
 from update_source import bump_source_version
 from optparse import OptionParser
-from synctool.pkginfo import *
+from pkginfo import *
+from configparser import SafeConfigParser
 
 #REPO_POOL ="http://archive.tanglu.org/tanglu/pool"
 REPO_POOL = "file:///srv/dak/ftp/pool"
