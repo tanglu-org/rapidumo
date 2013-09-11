@@ -116,6 +116,9 @@ def main():
         if build_note == "":
             print("No build-note set! Please specify a rebuild reason (e.g. 'perl-5.18')")
             sys.exit(1)
+
+        # make sure workspace is empty...
+        shutil.rmtree("/tmp/arb-workspace")
         ret = trigger_package_rebuild(suite, component, package_name, build_note)
         if not ret:
             sys.exit(2)
