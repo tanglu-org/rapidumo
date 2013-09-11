@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # Copyright (C) 2013 Matthias Klumpp <mak@debian.org>
 #
 # Licensed under the GNU General Public License Version 3
@@ -22,7 +22,7 @@ import apt_pkg
 import subprocess
 from update_source import bump_source_version
 from optparse import OptionParser
-from pkginfo import *
+from synctool.pkginfo import *
 from configparser import SafeConfigParser
 
 #REPO_POOL ="http://archive.tanglu.org/tanglu/pool"
