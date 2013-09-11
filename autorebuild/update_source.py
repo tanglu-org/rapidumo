@@ -93,7 +93,8 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     # change dir to pkg basedir
     os.chdir(os.path.abspath("%s/../.." % (changelog_fname)))
 
-    dch_cmd = ["dch", "--rebuild", "-Dstaging", "No-change rebuild against %s" % (rebuild_info)]
+    # we need ubuntu as vendor to get the rebuild action
+    dch_cmd = ["dch", "--rebuild", "--vendor=ubuntu", "-Dstaging", "No-change rebuild against %s" % (rebuild_info)]
     proc = subprocess.Popen(dch_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     output = ("%s\n%s") % (stdout, stderr)
