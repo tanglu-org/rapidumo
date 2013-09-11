@@ -28,15 +28,19 @@ from configparser import SafeConfigParser
 #REPO_POOL ="http://archive.tanglu.org/tanglu/pool"
 REPO_POOL = "file:///srv/dak/ftp/pool"
 
-def get_package_lists():
+def get_package_lists(suite):
     parser = SafeConfigParser()
     parser.read(['/srv/dak/sync-debian.conf', 'sync-debian.conf'])
     _momArchivePath = parser.get('MOM', 'path')
     _dest_distro = parser.get('SyncTarget', 'distro_name')
-    _extra_suite = parser.get('SyncTarget', 'devel_suite')
+    extra_suite = parser.get('SyncTarget', 'devel_suite')
+    if suite == extra_suite:
+        suite = "staging"
+    else
+        extra_suite = ""
 
-    pkginfo_tgl = PackageInfoRetriever(_momArchivePath, _dest_distro, "staging")
-    pkginfo_tgl.extra_suite = _extra_suite
+    pkginfo_tgl = PackageInfoRetriever(_momArchivePath, _dest_distro, suite)
+    pkginfo_tgl.extra_suite = extra_suite
     # we only care about packages in main right now
     pkgs_tanglu = pkginfo_tgl.get_packages_dict("main")
 
@@ -99,7 +103,7 @@ def main():
         if build_note == "":
             print("No build-note set! Please specify a rebuild reason (e.g. 'perl-5.18')")
             sys.exit(1)
-        ret = trigger_package_rebuild(suite, component, package_name, build_note, version)
+        ret = trigger_package_rebuild(suite, component, package_name, build_note)
         if not ret:
             sys.exit(2)
     else:
