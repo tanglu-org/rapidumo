@@ -36,7 +36,7 @@ def get_package_lists(suite):
     extra_suite = parser.get('SyncTarget', 'devel_suite')
     if suite == extra_suite:
         suite = "staging"
-    else
+    else:
         extra_suite = ""
 
     pkginfo_tgl = PackageInfoRetriever(_momArchivePath, _dest_distro, suite)
@@ -67,7 +67,7 @@ def trigger_package_rebuild(suite, component, pkgname, build_note):
     workspace = os.path.abspath("/tmp/arb-workspace/%s" % (pkgname))
     if not os.path.exists(workspace):
         os.makedirs(workspace)
-    packages = get_package_lists()
+    packages = get_package_lists(suite)
     ret = download_pkg_to_workspace(workspace, suite, component, pkgname, packages[pkgname].version)
     if not ret:
         print("Download of package '%s' failed." % (pkgname))
