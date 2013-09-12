@@ -25,10 +25,25 @@ import re
 import tempfile
 from itertools import islice
 import shutil
+import hashlib
+
+class Checksum:
+    Unknown, Sha1, Sha256, MD5 = range(4)
 
 def rreplace(s, old, new):
     li = s.rsplit(old, 1)
     return new.join(li)
+
+def get_file_hash(fname, checksum):
+    if checksum == Checksum.Unknown:
+        print("Error while assembling new dsc file: Attempt to create checksum, bot no checksum was set")
+        return False
+    if checksum == Checksum.Sha1:
+        return hashlib.sha1(open(fname, 'rb').read()).hexdigest()
+    elif checksum == Checksum.Sha256:
+        return hashlib.sha256(open(fname, 'rb').read()).hexdigest()
+    elif checksum == Checksum.MD5:
+        return hashlib.md5(open(fname, 'rb').read()).hexdigest()
 
 def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     src_pkg_dir = os.path.abspath(src_pkg_dir)
@@ -121,15 +136,36 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
 
     # now update the dsc file
     new_dsc_content = []
-    for line in open(debian_dsc):
+    checksum = Checksum.Unknown
+    debian_src_basename = os.path.basename(debian_src)
+    dsc_lines = [line.rstrip("\n") for line in open(debian_dsc)]
+    for line in dsc_lines:
         if line.startswith("Version: %s" % (pkg_version_old)):
-            new_dsc_content.append("Version: %s\n" % (pkg_version_new))
-        else:
-            new_dsc_content.append(line)
+            new_dsc_content.append("Version: %s" % (pkg_version_new))
+            continue
+
+        if line.startswith("Checksums-Sha1"):
+            checksum = Checksum.Sha1
+        if line.startswith("Checksums-Sha256"):
+            checksum = Checksum.Sha256
+        if line.startswith("Files"):
+            checksum = Checksum.MD5
+
+        # update the checksums & filenames
+        if line.endswith(debian_src_basename):
+            print("Found!")
+            hash_str = get_file_hash(debian_src_new, checksum)
+            size = os.path.getsize(debian_src_new)
+            cs_line = " %s %s %s" % (hash_str, size, os.path.basename(debian_src_new))
+            new_dsc_content.append(cs_line)
+            continue
+
+        new_dsc_content.append(line)
+
     debian_dsc_new = rreplace(debian_dsc, pkg_version_old, pkg_version_new)
-    print(debian_dsc_new)
+
     f = open(debian_dsc_new, 'w')
-    f.write("".join(new_dsc_content))
+    f.write("\n".join(new_dsc_content))
     f.close()
     os.remove(debian_dsc)
 
