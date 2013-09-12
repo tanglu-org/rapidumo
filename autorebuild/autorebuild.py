@@ -118,7 +118,8 @@ def main():
             sys.exit(1)
 
         # make sure workspace is empty...
-        shutil.rmtree("/tmp/arb-workspace")
+        if os.path.exists("/tmp/arb-workspace"):
+            shutil.rmtree("/tmp/arb-workspace")
         ret = trigger_package_rebuild(suite, component, package_name, build_note)
         if not ret:
             sys.exit(2)
