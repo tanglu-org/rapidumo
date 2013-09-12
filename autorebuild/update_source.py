@@ -153,7 +153,6 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
 
         # update the checksums & filenames
         if line.endswith(debian_src_basename):
-            print("Found!")
             hash_str = get_file_hash(debian_src_new, checksum)
             size = os.path.getsize(debian_src_new)
             cs_line = " %s %s %s" % (hash_str, size, os.path.basename(debian_src_new))
