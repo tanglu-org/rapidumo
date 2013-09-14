@@ -35,7 +35,6 @@ tanglu_base_package_info = [
  ('apg',                   ('http://www.adel.nursat.kz/apg/download.shtml', 'apg-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('apparmor',              ('https://launchpad.net/apparmor/+download', 'apparmor-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('apt',                   DEBIAN, None),
- ('apturl',                TANGLU, None),
  ('apt-xapian-index',      DEBIAN, None),
  ('argyll',                ('http://www.argyllcms.com/downloadsrc.html', 'Argyll_V([0-9][0-9.]*)_src.zip'), None),
  ('aspell-en',             ('http://ftp.gnu.org/gnu/aspell/dict/en/', 'aspell[0-9]+-en-([0-9][0-9.-]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -73,7 +72,6 @@ tanglu_base_package_info = [
  ('cdrkit',                ('http://cdrkit.org/releases/', 'cdrkit-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('celt',                  ('http://downloads.xiph.org/releases/celt/', 'celt-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('chardet',               ('http://pypi.python.org/packages/source/c/chardet/', 'chardet-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('checkbox',              TANGLU, None),
  ('chmlib',                UNTRACKED, None),
  ('cln',               ('ftp://ftpthep.physik.uni-mainz.de/pub/gnu/', 'cln-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('clucene-core',                 ('http://sourceforge.net/projects/clucene/files/clucene-core-stable/', 'clucene-core-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -170,7 +168,6 @@ tanglu_base_package_info = [
  ('freerdp',               ('https://github.com/FreeRDP/FreeRDP/downloads', 'freerdp-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('freetype',              ('http://sourceforge.net/projects/freetype/files/freetype2/([0-9.]+)', 'freetype-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('friendly-recovery',     TANGLU, None),
- ('friends',               TANGLU, None),
  ('fuse',                  ('http://sourceforge.net/projects/fuse/files/fuse-2.X/([0-9.]+)', 'fuse-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('game-music-emu',        ('http://code.google.com/p/game-music-emu/downloads/list', 'game-music-emu-([0-9][0-9.]*).tbz2'), None),
  ('gcc-4.8',               ('http://ftp.gnu.org/gnu/gcc/', 'gcc-4.8.([0-9]*)/'), None), # FIXME: uses subdirs
@@ -253,8 +250,6 @@ tanglu_base_package_info = [
  ('heimdal',               ('http://www.h5l.org/dist/src/', 'heimdal-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('hicolor-icon-theme',    ('http://icon-theme.freedesktop.org/releases/', 'hicolor-icon-theme-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('hplip',                 ('http://hplipopensource.com/hplip-web/gethplip.html', 'hplip-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
-  ('hud',                   ('https://launchpad.net/hud/+download', 'hud-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('humanity-icon-theme',   TANGLU, None),
  ('hunspell-en-us',        ('http://sourceforge.net/projects/hunspell/files/Spelling%20dictionaries/en_US/', 'hunspell-en-us-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None), # FIXME: File is here but is unversioned
  ('hunspell',              ('http://sourceforge.net/projects/hunspell/files/Hunspell/([0-9.]+)', 'hunspell-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('hwdata',                ('https://fedorahosted.org/releases/h/w/hwdata/', 'hwdata-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -701,8 +696,6 @@ tanglu_base_package_info = [
  ('network-manager',       GNOME_FTP_URL ('NetworkManager'), None),
  ('network-manager-pptp',  GNOME_FTP_URL ('NetworkManager-pptp'), None),
  ('notification-daemon',   GNOME_FTP_URL ('notification-daemon'), None),
- ('notify-osd',            ('https://launchpad.net/notify-osd/+download', 'notify-osd-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('notify-osd-icons',      TANGLU, None),
  ('notify-python',         ('http://www.galago-project.org/files/releases/source/notify-python/', 'notify-python-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('nspr',                  ('http://ftp.mozilla.org/pub/mozilla.org/nspr/releases/', 'nspr-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None), # FIXME: Has subdirs
  ('nss',                   ('http://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/', 'nss-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None), # FIXME: Has subdirs
@@ -714,7 +707,6 @@ tanglu_base_package_info = [
  ('obex-data-server',      ('http://tadas.dailyda.com/software/', 'obex-data-server-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('obexd',                 ('http://www.kernel.org/pub/linux/bluetooth/', 'obexd-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('onboard',               ('https://code.launchpad.net/onboard/+download', 'onboard-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('oneconf',               TANGLU, None),
  ('openal-soft',           ('http://kcat.strangesoft.net/openal-releases/', 'openal-soft-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('opencc',                ('http://code.google.com/p/opencc/downloads/list', 'opencc-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('openconnect',           ('ftp://ftp.infradead.org/pub/openconnect/', 'openconnect-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -861,8 +853,6 @@ tanglu_base_package_info = [
  ('sed',                   ('http://ftp.gnu.org/gnu/sed/', 'sed-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('seed',                  GNOME_FTP_URL ('seed'), None),
  ('sensible-utils',        DEBIAN, None),
- ('sessioninstaller',      ('https://launchpad.net/sessioninstaller/+download', 'sessioninstaller-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('session-migration',     TANGLU, None),
  ('sg3-utils',             ('http://sg.danny.cz/sg/p/', 'sg3_utils-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('sgml-base',             DEBIAN, None),
  ('sgml-data',             DEBIAN, None),
@@ -882,8 +872,6 @@ tanglu_base_package_info = [
  ('slang2',                ('ftp://space.mit.edu/pub/davis/slang/latest/', 'slang-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('slv2',                  ('http://download.drobilla.net/', 'slv2-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('sni-qt',                ('https://launchpad.net/sni-qt/+download', 'sni-qt-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('software-center-aptdaemon-plugins', TANGLU, None),
- ('software-center',       TANGLU, None),
  ('software-properties',   TANGLU, None),
  ('sonic',                 ('http://dev.vinux-project.org/sonic/download/', 'sonic_([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('sound-juicer',          GNOME_FTP_URL ('sound-juicer'), None),
@@ -916,8 +904,8 @@ tanglu_base_package_info = [
  ('taglib',                ('http://developer.kde.org/~wheeler/files/src/', 'taglib-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('tali',                  GNOME_FTP_URL ('tali'), None),
  ('talloc',                ('http://www.samba.org/ftp/talloc/', 'talloc-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('tanglu-meta',           TANGLU, None),
  ('tanglu-artwork',        TANGLU, None),
+ ('tanglu-meta',           TANGLU, None),
  ('tar',                   ('http://ftp.gnu.org/gnu/tar/', 'tar-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('tcl8.5',                ('http://sourceforge.net/projects/tcl/files/Tcl/(8.5.[0-9.]+)/', 'tcl([0-9][0-9.]*)-src.tar.gz'), None),
  ('tcpdump',               ('http://www.tcpdump.org/release/', 'tcpdump-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -962,10 +950,7 @@ tanglu_base_package_info = [
  ('unico',    ('https://launchpad.net/unico/+download', 'unico-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('unzip',                 ('ftp://ftp.info-zip.org/pub/infozip/src/', 'unzip-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None), # NOTE: uses mental versioning
  ('update-inetd',          DEBIAN, None),
- ('update-manager',        TANGLU, None),
- ('update-notifier',       TANGLU, None),
  ('upower',                ('http://upower.freedesktop.org/releases/', 'upower-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('usb-creator',           TANGLU, None),
  ('usb-modeswitch-data',   ('http://www.draisberghof.de/usb_modeswitch/', 'usb-modeswitch-data-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('usb-modeswitch',        ('http://www.draisberghof.de/usb_modeswitch/', 'usb-modeswitch-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('usbmuxd',               ('http://cgit.sukimashita.com/usbmuxd.git/', 'usbmuxd-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -995,7 +980,6 @@ tanglu_base_package_info = [
  ('webkit',                ('http://webkitgtk.org/releases', 'webkitgtk-([0-9]+.[0-9]*[02468].[0-9]+).(tar.(gz|bz2|xz)|tgz|zip)+'), ('http://webkitgtk.org/releases', 'webkitgtk-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+')),
  ('weston',                ('http://wayland.freedesktop.org/releases/', 'weston-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('wget',                  ('http://ftp.gnu.org/gnu/wget/', 'wget-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('whoopsie',              TANGLU, None),
  ('wildmidi',              ('http://sourceforge.net/projects/wildmidi/files/wildmidi/', 'wildmidi-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('wireless-regdb',        UNTRACKED, None),
  ('wireless-tools',        ('http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html', 'wireless_tools.([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -1231,7 +1215,8 @@ tanglu_gnome_package_info = [
  ('grail',                 ('https://launchpad.net/grail/+download', 'grail-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('grantlee',              ('http://downloads.grantlee.org/', 'grantlee-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('grilo',                 GNOME_FTP_URL ('grilo'), None),
- ('grilo-plugins',         GNOME_FTP_URL ('grilo-plugins'), None)
+ ('grilo-plugins',         GNOME_FTP_URL ('grilo-plugins'), None),
+ ('tanglu-gnome-settings', TANGLU, None)
 ]
 
 tanglu_kde_package_info = [
@@ -1285,7 +1270,6 @@ tanglu_kde_package_info = [
  ('ktp-text-ui',           ('http://ftp.kde.org/unstable/kde-telepathy/([0-9.]+)/src/', 'ktp-text-ui-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('kvkbd',                 UNTRACKED, None),
  ('kwallet',               KDE_FTP_URL ('kwallet'), None),
- ('tanglu-kde-settings', TANGLU, None),
  ('libkcddb',              KDE_FTP_URL ('libkccdb'), None),
  ('libkcompactdisc',       KDE_FTP_URL ('libkcompactdisc'), None),
  ('libkdcraw',             KDE_FTP_URL ('libkdcraw'), None),

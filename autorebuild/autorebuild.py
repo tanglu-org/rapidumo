@@ -89,6 +89,8 @@ def trigger_package_rebuild(suite, component, pkgname, build_note):
         return False
 
     shutil.rmtree(workspace)
+    print("Triggered rebuild for '%s'." % (pkgname))
+
     return True
 
 def main():
