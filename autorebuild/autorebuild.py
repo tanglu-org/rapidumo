@@ -54,7 +54,7 @@ def download_pkg_to_workspace(workspace, suite, component, pkgname, version):
         short_sec = pkgname[0:4]
     else:
         short_sec = pkgname[0:1]
-    url = "%s/%s/%s/%s/%s_%s.dsc" % (REPO_POOL, component, short_sec, pkgname, pkgname, version)
+    url = "%s/%s/%s/%s/%s_%s.dsc" % (REPO_POOL, component, short_sec, pkgname, pkgname, noEpoch(version))
     dget_cmd = ["dget", "-duq", url]
     proc = subprocess.Popen(dget_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
