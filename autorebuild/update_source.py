@@ -26,6 +26,7 @@ import tempfile
 from itertools import islice
 import shutil
 import hashlib
+from synctool.pkginfo import noEpoch
 
 class Checksum:
     Unknown, Sha1, Sha256, MD5 = range(4)
@@ -109,7 +110,7 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     os.chdir(os.path.abspath("%s/../.." % (changelog_fname)))
 
     # we need ubuntu as vendor to get the rebuild action
-    dch_cmd = ["dch", "--rebuild", "--vendor=Ubuntu", "-Dstaging", "No-change rebuild against %s" % (rebuild_info)]
+    dch_cmd = ["dch", "--rebuild", "--vendor=Tanglu", "-Dstaging", "No-change rebuild against %s" % (rebuild_info)]
     proc = subprocess.Popen(dch_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     output = ("%s\n%s") % (stdout, stderr)
@@ -126,7 +127,7 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     # recreate source file as original file
     os.chdir(tmp_workspace)
     os.remove(debian_src)
-    debian_src_new = rreplace(debian_src, pkg_version_old, pkg_version_new)
+    debian_src_new = rreplace(debian_src, noEpoch(pkg_version_old), noEpoch(pkg_version_new))
     with tarfile.open(debian_src_new, "w:%s" % (archive_compression)) as tar:
         tar.add(".", recursive=True)
 
@@ -161,7 +162,7 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
 
         new_dsc_content.append(line)
 
-    debian_dsc_new = rreplace(debian_dsc, pkg_version_old, pkg_version_new)
+    debian_dsc_new = rreplace(debian_dsc, noEpoch(pkg_version_old), noEpoch(pkg_version_new))
 
     f = open(debian_dsc_new, 'w')
     f.write("\n".join(new_dsc_content))
