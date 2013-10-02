@@ -54,7 +54,7 @@ class PackageInfoRetriever():
         self.extra_suite = ""
 
     def _get_packages_for(self, suite, component):
-        source_path = self._archivePath + "/dists/%s-%s/%s/source/Sources.gz" % (self._distroName, suite, component)
+        source_path = self._archivePath + "%s/dists/%s/%s/source/Sources.gz" % (self._distroName, suite, component)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile (f)
         packageList = []

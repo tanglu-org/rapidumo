@@ -31,7 +31,7 @@ from ConfigParser import SafeConfigParser
 REPO_POOL = "file:///srv/dak/ftp/pool"
 
 class Autorebuild():
-    def __init__(suite):
+    def __init__(self, suite):
         parser = SafeConfigParser()
         parser.read(['/srv/dak/sync-debian.conf', 'sync-debian.conf'])
         self._ArchivePath = parser.get('Archive', 'path')
