@@ -135,7 +135,7 @@ class Autorebuild():
         if len(rebuildSources) == 0:
             print("No matching packages found.")
             return
-        print(rebuildSources.join('\n'))
+        print("\n".join(rebuildSources))
 
         if dry_run:
             return # dry-run - nothing to do
