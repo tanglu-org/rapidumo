@@ -34,19 +34,19 @@ class Autorebuild():
     def __init__(self, suite):
         parser = SafeConfigParser()
         parser.read(['/srv/dak/sync-debian.conf', 'sync-debian.conf'])
-        self._ArchivePath = parser.get('Archive', 'path')
+        self._archivePath = parser.get('Archive', 'path')
         _dest_distro = parser.get('SyncTarget', 'distro_name')
         extra_suite = parser.get('SyncTarget', 'devel_suite')
+        self._suite = suite
         if suite == extra_suite:
             suite = "staging"
         else:
             extra_suite = ""
 
-        pkginfo_tgl = PackageInfoRetriever(self._ArchivePath, _dest_distro, suite)
+        pkginfo_tgl = PackageInfoRetriever(parser.get('MOM', 'path'), _dest_distro, suite)
         pkginfo_tgl.extra_suite = extra_suite
         # we only care about packages in main right now
         self._pkgs_tanglu = pkginfo_tgl.get_packages_dict("main")
-        self._suite = suite
 
         # make sure workspace is empty...
         if os.path.exists("/tmp/arb-workspace"):
@@ -99,7 +99,7 @@ class Autorebuild():
         return True
 
     def batch_rebuild_packages(self, component, bad_depends, build_note, dry_run=True):
-        source_path = self._ArchivePath + "%s/dists/%s/%s/binary-i386/Packages.gz" % ("tanglu", self._suite, component)
+        source_path = self._archivePath + "%s/dists/%s/%s/binary-i386/Packages.gz" % ("tanglu", self._suite, component)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile (f)
         rebuildSources = []
