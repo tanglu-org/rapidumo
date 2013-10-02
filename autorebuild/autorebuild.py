@@ -167,8 +167,8 @@ def main():
                   help="set note for this rebuild")
 
     parser.add_option("--dry",
-                  type="string", dest="dry_run", default="",
-                  help="don't apply changes")
+                  action="store_true", dest="dry_run",
+                  help="don't apply changes, just display what would happen")
 
     (options, args) = parser.parse_args()
 
