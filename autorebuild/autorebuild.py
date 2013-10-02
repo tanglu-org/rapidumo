@@ -103,6 +103,7 @@ class Autorebuild():
         f = gzip.open(source_path, 'rb')
         tagf = TagFile (f)
         rebuildSources = []
+        bad_depends = bad_depends.strip()
         for section in tagf:
             pkgname = section['Package']
             source_pkg = section.get('Source', '')
@@ -117,13 +118,13 @@ class Autorebuild():
             for dep in dep_chunks:
                 dep = dep.strip()
                 if dep.startswith(bad_depends):
-                    if dep == bad_depends.strip():
+                    if dep == bad_depends:
                         rebuildSources.append(source_pkg)
                         continue
                     if '(' not in dep:
                         continue
                     depid_parts = dep.split('(')
-                    if dep == depid_parts[0]:
+                    if bad_depends == depid_parts[0].strip():
                         rebuildSources.append(source_pkg)
                         continue
 
@@ -134,7 +135,7 @@ class Autorebuild():
             print(rebuildSources.join('\n'))
 
             if dry_run:
-                return
+                return # dry-run - nothing to do
 
 def main():
     # init Apt, we need it later
@@ -144,6 +145,9 @@ def main():
     parser.add_option("-r",
                   action="store_true", dest="rebuild", default=False,
                   help="rebuild package")
+    parser.add_option("-b",
+                  action="store_true", dest="rebuild_batch", default=False,
+                  help="batch-rebuild multiple packages")
     parser.add_option("-n",
                   type="string", dest="build_note", default="",
                   help="set note for this rebuild")
@@ -152,18 +156,23 @@ def main():
 
     if options.rebuild:
         if len(args) != 3:
-            print("Invalid number of arguments (need source-suite, component, package-name)")
+            print("Invalid number of arguments (need source-suite, component, (bad) package-name)")
             sys.exit(1)
         suite = args[0]
         component = args[1]
         package_name = args[2]
+
         build_note = options.build_note
         if build_note == "":
             print("No build-note set! Please specify a rebuild reason (e.g. 'perl-5.18')")
             sys.exit(1)
-
         rebuilder = Autorebuild(suite)
-        ret = rebuilder.trigger_package_rebuild(component, package_name, build_note)
+
+        ret = False
+        if options.rebuild_batch:
+            ret = rebuilder.batch_rebuild_packages(component, package_name, build_note)
+        else:
+            ret = rebuilder.trigger_package_rebuild(component, package_name, build_note)
         if not ret:
             sys.exit(2)
     else:
