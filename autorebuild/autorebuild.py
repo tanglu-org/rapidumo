@@ -114,6 +114,8 @@ class Autorebuild():
             source_pkg = section.get('Source', '')
             if source_pkg == '':
                 source_pkg = pkgname
+            if "(" in source_pkg:
+                source_pkg = source_pkg.split("(")[0].strip()
             if source_pkg in rebuildSources:
                 continue # we already handled a rebuild for that
 
