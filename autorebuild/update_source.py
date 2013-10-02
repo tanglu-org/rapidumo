@@ -99,6 +99,7 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
                  changelog_fname = path
     if changelog_fname == None:
         print("Unable to find changelog for package '%s'. It might be an old package which needs a manual upload." % (pkg_name))
+        return False, None
 
     # get version number (and possible other values later)
     with open(changelog_fname) as f:
