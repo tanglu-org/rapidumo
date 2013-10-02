@@ -99,7 +99,7 @@ class Autorebuild():
         return True
 
     def batch_rebuild_packages(self, component, bad_depends, build_note, dry_run=True):
-        source_path = self._archivePath + "%s/dists/%s/%s/binary-i386/Packages.gz" % ("tanglu", self._suite, component)
+        source_path = self._archivePath + "/%s/dists/%s/%s/binary-i386/Packages.gz" % ("tanglu", self._suite, component)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile (f)
         rebuildSources = []
@@ -109,10 +109,12 @@ class Autorebuild():
             source_pkg = section.get('Source', '')
             if source_pkg == '':
                 source_pkg = pkgname
-            if source_pkg in processedSources:
+            if source_pkg in rebuildSources:
                 continue # we already handled a rebuild for that
 
             depends = section.get('Depends', '')
+            if depends == '':
+                continue
             # we ignore pre-depends: Pre-depending stuff is much safer with a manual rebuild
             dep_chunks = depends.split(',')
             for dep in dep_chunks:
