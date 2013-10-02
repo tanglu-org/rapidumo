@@ -23,7 +23,6 @@ import apt_pkg
 import subprocess
 import shutil
 from update_source import bump_source_version
-from find_packages import find_packages_with_dependency
 from apt_pkg import TagFile, TagSection
 from optparse import OptionParser
 from synctool.pkginfo import *
@@ -102,16 +101,44 @@ class Autorebuild():
 
     def batch_rebuild_packages(self, component, bad_depends, build_note, dry_run=True):
         source_path = self._archivePath + "/%s/dists/%s/%s/binary-i386/Packages.gz" % ("tanglu", self._suite, component)
-        rebuildSources = find_packages_with_dependency(source_path)
+        f = gzip.open(source_path, 'rb')
+        tagf = TagFile (f)
+        rebuildSources = []
+        bad_depends = bad_depends.strip()
+        for section in tagf:
+            pkgname = section['Package']
+            source_pkg = section.get('Source', '')
+            if source_pkg == '':
+                source_pkg = pkgname
+            if source_pkg in rebuildSources:
+                continue # we already handled a rebuild for that
 
-            print("Packages planned for rebuild:")
-            if len(rebuildSources) == 0:
-                print("No matching packages found.")
-                return
-            print(rebuildSources.join('\n'))
+            depends = section.get('Depends', '')
+            if depends == '':
+                continue
+            # we ignore pre-depends: Pre-depending stuff is much safer with a manual rebuild
+            dep_chunks = depends.split(',')
+            for dep in dep_chunks:
+                dep = dep.strip()
+                if dep.startswith(bad_depends):
+                    if dep == bad_depends:
+                        rebuildSources.append(source_pkg)
+                        continue
+                    if '(' not in dep:
+                        continue
+                    depid_parts = dep.split('(')
+                    if bad_depends == depid_parts[0].strip():
+                        rebuildSources.append(source_pkg)
+                        continue
 
-            if dry_run:
-                return # dry-run - nothing to do
+        print("Packages planned for rebuild:")
+        if len(rebuildSources) == 0:
+            print("No matching packages found.")
+            return
+        print(rebuildSources.join('\n'))
+
+        if dry_run:
+            return # dry-run - nothing to do
 
 def main():
     # init Apt, we need it later
