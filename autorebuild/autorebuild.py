@@ -70,7 +70,7 @@ class Autorebuild():
             return False
         return True
 
-    def trigger_package_rebuild(self, component, pkgname, build_note):
+    def trigger_package_rebuild(self, component, pkgname, build_note, dry_run):
         workspace = os.path.abspath("/tmp/arb-workspace/%s" % (pkgname))
         if not os.path.exists(workspace):
             os.makedirs(workspace)
@@ -83,6 +83,10 @@ class Autorebuild():
         if not ret:
             print("Unable to bump version of source package '%s'. It might need a manual upload." % (pkgname))
             return False
+
+        if dry_run:
+            print("Able to trigger rebuild for '%s'." % (pkgname))
+            return True
 
         # now make the package known to dak
         cmd = ["dak", "import", "-s", "-a", "staging", component, dsc_path]
@@ -138,7 +142,14 @@ class Autorebuild():
         print("\n".join(rebuildSources))
 
         if dry_run:
-            return # dry-run - nothing to do
+            return True # dry-run - nothing to do
+
+        res = True
+        for pkg in rebuildSources:
+            if not self.trigger_package_rebuild(component, pkg, build_note, False):
+                res = False
+
+        return res
 
 def main():
     # init Apt, we need it later
@@ -154,6 +165,10 @@ def main():
     parser.add_option("-n",
                   type="string", dest="build_note", default="",
                   help="set note for this rebuild")
+
+    parser.add_option("--dry",
+                  type="string", dest="dry_run", default="",
+                  help="don't apply changes")
 
     (options, args) = parser.parse_args()
 
@@ -173,9 +188,9 @@ def main():
 
         ret = False
         if options.rebuild_batch:
-            ret = rebuilder.batch_rebuild_packages(component, package_name, build_note)
+            ret = rebuilder.batch_rebuild_packages(component, package_name, build_note, options.dry_run)
         else:
-            ret = rebuilder.trigger_package_rebuild(component, package_name, build_note)
+            ret = rebuilder.trigger_package_rebuild(component, package_name, build_note, options.dry_run)
         if not ret:
             sys.exit(2)
     else:
