@@ -118,6 +118,11 @@ class Autorebuild():
                 source_pkg = source_pkg.split("(")[0].strip()
             if source_pkg in rebuildSources:
                 continue # we already handled a rebuild for that
+            # old binary packages are not interesting for us
+            if source_pkg in self._pkgs_tanglu:
+                compare = version_compare(self._pkgs_tanglu[source_pkg].version, section['Version'])
+                if compare > 0:
+                    continue
 
             depends = section.get('Depends', '')
             if depends == '':
