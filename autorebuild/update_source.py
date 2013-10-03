@@ -46,7 +46,7 @@ def get_file_hash(fname, checksum):
     elif checksum == Checksum.MD5:
         return hashlib.md5(open(fname, 'rb').read()).hexdigest()
 
-def find_changelog(tmp_workspace):
+def find_changelog(tmp_workspace, pkg_name):
     changelog_fname = None
     for r,d,f in os.walk(tmp_workspace):
         for fname in f:
@@ -103,7 +103,7 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
         print("Could not determine archive compression type for '%s'!" % (debian_src))
         return False, None
 
-    changelog_fname = find_changelog(tmp_workspace)
+    changelog_fname = find_changelog(tmp_workspace, pkg_name)
     if changelog_fname == None:
         return False, None
 
@@ -126,7 +126,7 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
         return False, None
 
     # update changelog - we want the new location, since dch might have changed it
-    changelog_fname = find_changelog(tmp_workspace)
+    changelog_fname = find_changelog(tmp_workspace, pkg_name)
     if changelog_fname == None:
         return False, None
 
