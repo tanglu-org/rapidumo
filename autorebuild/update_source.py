@@ -46,6 +46,18 @@ def get_file_hash(fname, checksum):
     elif checksum == Checksum.MD5:
         return hashlib.md5(open(fname, 'rb').read()).hexdigest()
 
+def find_changelog(tmp_workspace):
+    changelog_fname = None
+    for r,d,f in os.walk(tmp_workspace):
+        for fname in f:
+            path = os.path.join(r,fname)
+            if path.endswith("debian/changelog"):
+                 changelog_fname = path
+    if changelog_fname == None:
+        print("Unable to find changelog for package '%s'. It might be an old package which needs a manual upload." % (pkg_name))
+        return None
+    return changelog_fname
+
 def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     src_pkg_dir = os.path.abspath(src_pkg_dir)
     debian_src = None
@@ -91,14 +103,8 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
         print("Could not determine archive compression type for '%s'!" % (debian_src))
         return False, None
 
-    changelog_fname = None
-    for r,d,f in os.walk(tmp_workspace):
-        for fname in f:
-            path = os.path.join(r,fname)
-            if path.endswith("debian/changelog"):
-                 changelog_fname = path
+    changelog_fname = find_changelog(tmp_workspace)
     if changelog_fname == None:
-        print("Unable to find changelog for package '%s'. It might be an old package which needs a manual upload." % (pkg_name))
         return False, None
 
     # get version number (and possible other values later)
@@ -117,6 +123,11 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     output = ("%s\n%s") % (stdout, stderr)
     if (proc.returncode != 0):
         print(output)
+        return False, None
+
+    # update changelog - we want the new location, since dch might have changed it
+    changelog_fname = find_changelog(tmp_workspace)
+    if changelog_fname == None:
         return False, None
 
     # get version number (and possible other values later)
