@@ -34,7 +34,7 @@ REPO_POOL = "file:///srv/dak/ftp/pool"
 class Autorebuild():
     def __init__(self, suite):
         parser = SafeConfigParser()
-        parser.read(['/srv/dak/sync-debian.conf', 'sync-debian.conf'])
+        parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
         self._archivePath = parser.get('Archive', 'path')
         _dest_distro = parser.get('SyncTarget', 'distro_name')
         extra_suite = parser.get('SyncTarget', 'devel_suite')

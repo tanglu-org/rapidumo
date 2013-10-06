@@ -47,7 +47,7 @@ else:
 
 debug ('Starting')
 
-from synctool.pkginfo import *
+from rapidumolib.pkginfo import *
 
 class Package:
     def __init__(self, name, stable_url, unstable_url):
@@ -107,7 +107,7 @@ for pset in pkg_sets:
 
 # get configuration data
 parser = SafeConfigParser()
-parser.read(['/srv/dak/sync-debian.conf', 'sync-debian.conf'])
+parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
 _momArchivePath = parser.get('MOM', 'path')
 _dest_distro = parser.get('SyncTarget', 'distro_name')
 _extra_suite = parser.get('SyncTarget', 'devel_suite')

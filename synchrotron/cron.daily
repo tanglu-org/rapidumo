@@ -67,5 +67,5 @@ maintain-jenkins-jobs --checkbuild
 
 # update the package-watch
 cd /srv/dak/export/package-watch
-python /var/archive-kit/synchrotron/pkgcheck/versions.py
-cd /var/archive-kit/synchrotron/
+python /var/archive-kit/rapidumo/pkgcheck/versions.py
+cd /var/archive-kit/rapidumo/

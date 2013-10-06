@@ -23,14 +23,14 @@ import subprocess
 import re
 from optparse import OptionParser
 
-from pkginfo import *
+from rapidumolib.pkginfo import *
 
 class SyncPackage:
     def __init__(self):
         self.debugMode = False
 
         parser = SafeConfigParser()
-        parser.read(['/srv/dak/sync-debian.conf', 'sync-debian.conf'])
+        parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
         self._momArchivePath = parser.get('MOM', 'path')
         self._destDistro = parser.get('SyncTarget', 'distro_name')
         self._extra_suite = parser.get('SyncTarget', 'devel_suite')
