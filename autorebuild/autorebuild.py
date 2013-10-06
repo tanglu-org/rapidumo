@@ -25,7 +25,7 @@ import shutil
 from update_source import bump_source_version
 from apt_pkg import TagFile, TagSection
 from optparse import OptionParser
-from synctool.pkginfo import *
+from rapidumolib.pkginfo import *
 from ConfigParser import SafeConfigParser
 
 #REPO_POOL ="http://archive.tanglu.org/tanglu/pool"
