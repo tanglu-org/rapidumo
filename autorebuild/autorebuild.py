@@ -74,6 +74,10 @@ class Autorebuild():
         workspace = os.path.abspath("/tmp/arb-workspace/%s" % (pkgname))
         if not os.path.exists(workspace):
             os.makedirs(workspace)
+        if not pkgname in packages:
+            print("Package named '%s' was not found!" % (pkgname))
+            return False
+
         packages = self._pkgs_tanglu
         ret = self._download_pkg_to_workspace(workspace, self._suite, component, pkgname, packages[pkgname].version)
         if not ret:
