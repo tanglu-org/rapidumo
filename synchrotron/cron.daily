@@ -29,8 +29,13 @@ if ! lockfile -r8 $LOCKFILE; then
 fi
 trap cleanup 0
 
+mkdir -p $TMP_DATA_DIR
+cd $TMP_DATA_DIR
+
 # update the tanglu-meta copy
-mkdir -p $TMP_DATA_DIR/tanglu-meta
+if [ ! -d "$TMP_DATA_DIR/tanglu-meta" ]; then
+  git clone --quiet --depth=1 git://gitorious.org/tanglu/tanglu-meta.git tanglu-meta
+fi
 cd $TMP_DATA_DIR/tanglu-meta
 git pull --quiet
 # germinate!
