@@ -11,6 +11,7 @@ DAK_LOCKDIR=/srv/dak/lock
 DAK_LOCK=$DAK_LOCKDIR/daily.lock
 LOCKFILE="$DAK_LOCKDIR/synchrotron.lock"
 TMP_DATA_DIR="/srv/dak/tmp/synchrotron-data"
+RAPIDUMO_PATH=/var/archive-kit/rapidumo
 
 OPTIONS="$@"
 qoption () {
@@ -46,7 +47,7 @@ germinate -S file://$TMP_DATA_DIR/tanglu-meta/seed  -s aequorea -d aequorea -m f
 cd $TMP_DATA_DIR
 
 # fetch stuff from Debian and Tanglu archives
-./synctool/prepare-sync.sh
+$RAPIDUMO_PATH/synchrotron/prepare-sync.sh
 
 if ! qoption allowdaklock; then
 	while [ -f $DAK_LOCK ]; do
@@ -72,5 +73,5 @@ maintain-jenkins-jobs --checkbuild
 
 # update the package-watch
 cd /srv/dak/export/package-watch
-python /var/archive-kit/rapidumo/pkgcheck/versions.py
-cd /var/archive-kit/rapidumo/
+python $RAPIDUMO_PATH/pkgcheck/versions.py
+cd $TMP_DATA_DIR
