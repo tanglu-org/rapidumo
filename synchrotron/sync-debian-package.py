@@ -93,11 +93,11 @@ class SyncPackage:
 
         return True
 
-    def _can_sync_package(self, src_pkg, dest_pkg, quiet=False, forceSync=False, mergeTodoHtml=[]):
+    def _can_sync_package(self, src_pkg, dest_pkg, quiet=False, forceSync=False):
         if src_pkg.pkgname in self._pkg_blacklist:
             if not quiet:
                 print("Package %s is on package-blacklist and cannot be synced!" % (src_pkg.pkgname))
-            return False
+            return False, None
         # check if the package is arch-only for an unsupported arch
         if " " in src_pkg.archs:
             archs = src_pkg.archs.split(" ")
@@ -112,22 +112,26 @@ class SyncPackage:
         if not supported:
                 if not quiet:
                     print("Package %s is designed for unsupported architectures and cannot be synced (only for %s).!" % (src_pkg.pkgname, archs))
-                return False
+                return False, None
         if dest_pkg == None:
-            return True
+            return True, None
 
         compare = version_compare(dest_pkg.version, src_pkg.version)
         if compare >= 0:
             if not quiet:
                 print("Package %s has a newer/equal version in the target distro. (Version in target: %s, source is %s)" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version))
-            return False
+            return False, None
 
         if (self._destDistro in dest_pkg.version) and (not forceSync):
             print("Package %s contains Tanglu-specific modifications. Please merge the package instead of syncing it. (Version in target: %s, source is %s)" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version))
-            mergeTodoHtml.append("<tr>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version))
-            return False
+            mergeTodoHtml = "<tr>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version)
+            return False, mergeTodoHtml
 
-        return True
+        return True, None
+
+    def _can_sync_package_simple(self, src_pkg, dest_pkg, quiet=False, forceSync=False):
+        ret, html = self._can_sync_package(src_pkg, dest_pkg, quiet, forceSync)
+        return ret
 
     def sync_package(self, package_name, force=False, dryRun=False):
         if not package_name in self._pkgs_src:
@@ -137,7 +141,7 @@ class SyncPackage:
 
         if not package_name in self._pkgs_dest:
             ret = False
-            if self._can_sync_package(src_pkg, None):
+            if self._can_sync_package_simple(src_pkg, None):
                 if dryRun:
                     print("Import: %s (%s) [new!]" % (src_pkg.pkgname, src_pkg.version))
                     ret = True
@@ -147,12 +151,12 @@ class SyncPackage:
 
         dest_pkg = self._pkgs_dest[package_name]
 
-        if not self._can_sync_package(src_pkg, dest_pkg, forceSync=force):
+        if not self._can_sync_package_simple(src_pkg, dest_pkg, forceSync=force):
             return False
 
         # we can now sync the package
         dest_pkg = self._pkgs_dest[src_pkg.pkgname]
-        if self._can_sync_package(src_pkg, dest_pkg, quiet=True, forceSync=force):
+        if self._can_sync_package_simple(src_pkg, dest_pkg, quiet=True, forceSync=force):
             if dryRun:
                 print("Import: %s (%s -> %s)" % (src_pkg.pkgname, dest_pkg.version, src_pkg.version))
                 ret = True
@@ -165,7 +169,7 @@ class SyncPackage:
             # check if source-package matches regex, if yes, sync package
             if re.match(package_regex, src_pkg.pkgname):
                 if not src_pkg.pkgname in self._pkgs_dest:
-                    if self._can_sync_package(src_pkg, None, True):
+                    if self._can_sync_package_simple(src_pkg, None, True):
                         if dryRun:
                             print("Import: %s (%s) [new!]" % (src_pkg.pkgname, src_pkg.version))
                             ret = True
@@ -173,7 +177,7 @@ class SyncPackage:
                             self._import_debian_package(src_pkg)
                     continue
                 dest_pkg = self._pkgs_dest[src_pkg.pkgname]
-                if self._can_sync_package(src_pkg, dest_pkg, quiet=True, forceSync=force):
+                if self._can_sync_package_simple(src_pkg, dest_pkg, quiet=True, forceSync=force):
                     if dryRun:
                         print("Import: %s (%s -> %s)" % (src_pkg.pkgname, dest_pkg.version, src_pkg.version))
                         ret = True
@@ -181,28 +185,34 @@ class SyncPackage:
                         self._import_debian_package(src_pkg)
 
     def sync_all_packages(self):
-        mergeTodoHtml = []
+        mergeTodoHtml = list()
         for src_pkg in self._pkgs_src.values():
             if not src_pkg.pkgname in self._pkgs_dest:
-                if self._can_sync_package(src_pkg, None, True, mergeTodoHtml):
+                ret, html = self._can_sync_package(src_pkg, None, True)
+                if not ret and html != None:
+                    mergeTodoHtml.append(html)
+                if ret:
                     self._import_debian_package(src_pkg)
                 continue
-            if self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True, mergeTodoHtml):
+            ret, html = self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True)
+            if not ret and html != None:
+                    mergeTodoHtml.append(html)
+            if ret:
                 self._import_debian_package(src_pkg)
 
         mergeListPage = open(get_template_dir() + "/merge-list.html.tmpl", 'r').read()
         mergeListPage = mergeListPage.replace("{{MERGE_TODO_PACKAGES_HTML}}", "\n".join(mergeTodoHtml))
-        f = open('/srv/dak/export/package-watch/merge-todo.html','w')
+        f = open('/srv/dak/export/package-watch/merge-todo_%s.html' % (self._component),'w')
         f.write(mergeListPage)
         f.close()
 
     def list_all_syncs(self):
         for src_pkg in self._pkgs_src.values():
             if not src_pkg.pkgname in self._pkgs_dest:
-                if self._can_sync_package(src_pkg, None, True):
+                if self._can_sync_package_simple(src_pkg, None, True):
                     print("Sync: %s" % (src_pkg))
                 continue
-            if self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True):
+            if self._can_sync_package_simple(src_pkg, self._pkgs_dest[src_pkg.pkgname], True):
                 print("Sync: %s" % (src_pkg))
 
     def list_not_in_debian(self):
@@ -230,7 +240,7 @@ def main():
     parser.add_option("--force",
                   action="store_true", dest="force_import", default=False,
                   help="enforce the import of a package")
-    parser.add_option("-a", "--import-all",
+    parser.add_option("--import-all",
                   action="store_true", dest="sync_everything", default=False,
                   help="sync all packages with newer versions")
     parser.add_option("-d", "--dry-run",
