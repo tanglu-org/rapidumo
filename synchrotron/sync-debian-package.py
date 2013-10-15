@@ -24,6 +24,7 @@ import re
 from optparse import OptionParser
 
 from rapidumolib.pkginfo import *
+from rapidumolib.utils import *
 
 class SyncPackage:
     def __init__(self):
@@ -189,7 +190,7 @@ class SyncPackage:
             if self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True, mergeTodoHtml):
                 self._import_debian_package(src_pkg)
 
-        mergeListPage = open(os.path.dirname(__file__) + "/../templates/merge-list.html.tmpl", 'r').read()
+        mergeListPage = open(get_template_dir() + "/merge-list.html.tmpl", 'r').read()
         mergeListPage = mergeListPage.replace("{{MERGE_TODO_PACKAGES_HTML}}", "\n".join(mergeTodoHtml))
         f = open('/srv/dak/export/package-watch/merge-todo.html','w')
         f.write(mergeListPage)
