@@ -92,7 +92,7 @@ class SyncPackage:
 
         return True
 
-    def _can_sync_package(self, src_pkg, dest_pkg, quiet=False, forceSync=False):
+    def _can_sync_package(self, src_pkg, dest_pkg, quiet=False, forceSync=False, mergeTodoHtml=[]):
         if src_pkg.pkgname in self._pkg_blacklist:
             if not quiet:
                 print("Package %s is on package-blacklist and cannot be synced!" % (src_pkg.pkgname))
@@ -123,6 +123,7 @@ class SyncPackage:
 
         if (self._destDistro in dest_pkg.version) and (not forceSync):
             print("Package %s contains Tanglu-specific modifications. Please merge the package instead of syncing it. (Version in target: %s, source is %s)" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version))
+            mergeTodoHtml.append("<tr>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version))
             return False
 
         return True
@@ -179,13 +180,20 @@ class SyncPackage:
                         self._import_debian_package(src_pkg)
 
     def sync_all_packages(self):
+        mergeTodoHtml = []
         for src_pkg in self._pkgs_src.values():
             if not src_pkg.pkgname in self._pkgs_dest:
-                if self._can_sync_package(src_pkg, None, True):
+                if self._can_sync_package(src_pkg, None, True, mergeTodoHtml):
                     self._import_debian_package(src_pkg)
                 continue
-            if self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True):
+            if self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True, mergeTodoHtml):
                 self._import_debian_package(src_pkg)
+
+        mergeListPage = open(os.path.dirname(__file__) + "/../templates/merge-list.html.tmpl", 'r').read()
+        mergeListPage = mergeListPage.replace("{{MERGE_TODO_PACKAGES_HTML}}", "\n".join(mergeTodoHtml))
+        f = open('/srv/dak/export/package-watch/merge-todo.html','w')
+        f.write(mergeListPage)
+        f.close()
 
     def list_all_syncs(self):
         for src_pkg in self._pkgs_src.values():
