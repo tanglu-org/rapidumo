@@ -202,7 +202,7 @@ class SyncPackage:
 
         mergeListPage = open(get_template_dir() + "/merge-list.html.tmpl", 'r').read()
         mergeListPage = mergeListPage.replace("{{MERGE_TODO_PACKAGES_HTML}}", "\n".join(mergeTodoHtml))
-        f = open('/srv/dak/export/package-watch/merge-todo_%s.html' % (self._component),'w')
+        f = open('/srv/dak/export/package-watch/merge-todo_%s.html' % (self._component), 'w')
         f.write(mergeListPage)
         f.close()
 
@@ -215,7 +215,7 @@ class SyncPackage:
             if self._can_sync_package_simple(src_pkg, self._pkgs_dest[src_pkg.pkgname], True):
                 print("Sync: %s" % (src_pkg))
 
-    def list_not_in_debian(self):
+    def _get_packages_not_in_debian(self):
         debian_pkg_list = self._pkgs_src.values()
         dest_pkg_list = self._pkgs_dest.keys()
         for src_pkg in debian_pkg_list:
@@ -223,8 +223,23 @@ class SyncPackage:
             if pkgname in dest_pkg_list:
                 dest_pkg_list.remove(pkgname)
                 continue
+        return dest_pkg_list
+
+    def list_not_in_debian(self, quiet=False):
+        dest_pkg_list = self._get_packages_not_in_debian()
+        pkgListHtml = list()
         for pkgname in dest_pkg_list:
-            print(pkgname)
+            linksHtml = "<a href=\"http://packages.qa.debian.org/%s\">Debian PTS</a><br/><a href=\"http://packages.tanglu.org/%s\">Tanglu Archive</a>" % (pkgname, pkgname)
+            dakRmCmd = "dak rm -m \"[auto-cruft] RID (removed in Debian and unmaintained)\" -s %s -R %s" % (self._target_suite, pkgname)
+            pkgListHtml.append("<tr>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>" % (pkgname, linksHtml, dakRmCmd))
+            if not quiet:
+                print(pkgname)
+
+        debianRemovedPage = open(get_template_dir() + "/removed-debian.html.tmpl", 'r').read()
+        debianRemovedPage = debianRemovedPage.replace("{{DEBIAN_REMOVED_HTML}}", "\n".join(pkgListHtml))
+        f = open('/srv/dak/export/package-watch/removed-debian_%s.html' % (self._component), 'w')
+        f.write(debianRemovedPage)
+        f.close()
 
 def main():
     # init Apt, we need it later
@@ -249,6 +264,9 @@ def main():
     parser.add_option("--list-not-in-debian",
                   action="store_true", dest="list_nodebian", default=False,
                   help="show a list of packages which are not in Debian")
+    parser.add_option("--quiet",
+                  action="store_true", dest="quiet", default=False,
+                  help="don't show output (except for errors)")
 
     (options, args) = parser.parse_args()
 
@@ -291,7 +309,7 @@ def main():
         target_suite = args[1]
         component = args[2]
         sync.initialize(source_suite, target_suite, component)
-        sync.list_not_in_debian()
+        sync.list_not_in_debian(options.quiet)
     else:
         print("Run with -h for a list of available command-line options!")
 
