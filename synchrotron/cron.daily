@@ -5,6 +5,18 @@ set -e
 export SCRIPTVARS=/srv/dak/config/tanglu/vars
 . $SCRIPTVARS
 
+########################################################################
+# Functions                                                            #
+########################################################################
+# common functions are "outsourced"
+. "${configdir}/common"
+
+# source the dinstall functions
+. "${configdir}/dinstall.functions"
+
+########################################################################
+########################################################################
+
 CURRENT_DEV_SUITE=aequorea
 
 DAK_LOCKDIR=/srv/dak/lock
@@ -64,8 +76,8 @@ sync-debian-package --import-all testing staging non-free
 # update archive
 dak generate-packages-sources2 -s staging
 dak generate-releases -s staging
-# sync the public ftp mirror (by syncing dists, the pool/ dir is symlinked)
-rsync -aqH --delete $ftpdir/dists $public_ftpdir/
+# sync the public local ftp mirror
+mirror
 
 # update jenkins
 maintain-jenkins-jobs --update
