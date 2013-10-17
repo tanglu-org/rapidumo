@@ -223,6 +223,12 @@ class SyncPackage:
             if pkgname in dest_pkg_list:
                 dest_pkg_list.remove(pkgname)
                 continue
+        # we don't want Tanglu-only packages to be listed here
+        for pkgname in dest_pkg_list:
+            if ("-0tanglu" in self._pkgs_dest[pkgname].version) or (pkgname == "tanglu-archive-keyring"):
+                dest_pkg_list.remove(pkgname)
+                continue
+
         return dest_pkg_list
 
     def list_not_in_debian(self, quiet=False):
