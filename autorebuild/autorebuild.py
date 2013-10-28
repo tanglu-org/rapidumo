@@ -46,8 +46,11 @@ class Autorebuild():
 
         pkginfo_tgl = PackageInfoRetriever(parser.get('MOM', 'path'), _dest_distro, suite)
         pkginfo_tgl.extra_suite = extra_suite
-        # we only care about packages in main right now
-        self._pkgs_tanglu = pkginfo_tgl.get_packages_dict("main")
+
+        # get a list of the highest versions of all packages in all components in the archive
+        self._pkgs_tanglu = pkginfo_tgl.get_packages_dict("non-free")
+        self._pkgs_tanglu.update(pkginfo_tgl.get_packages_dict("contrib"))
+        self._pkgs_tanglu.update(pkginfo_tgl.get_packages_dict("main"))
 
         # make sure workspace is empty...
         if os.path.exists("/tmp/arb-workspace"):
