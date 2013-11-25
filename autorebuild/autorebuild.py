@@ -44,7 +44,7 @@ class Autorebuild():
         else:
             extra_suite = ""
 
-        pkginfo_tgl = PackageInfoRetriever(parser.get('MOM', 'path'), _dest_distro, suite)
+        pkginfo_tgl = PackageInfoRetriever(parser.get('Archive', 'path'), _dest_distro, suite)
         pkginfo_tgl.extra_suite = extra_suite
 
         # get a list of the highest versions of all packages in all components in the archive

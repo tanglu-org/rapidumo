@@ -47,14 +47,18 @@ class PackageInfo():
         return "Package: name: %s | version: %s | suite: %s | comp.: %s" % (self.pkgname, self.version, self.suite, self.component)
 
 class PackageInfoRetriever():
-    def __init__(self, path, distro, suite):
+    def __init__(self, path, distro, suite, momCache=False):
         self._archivePath = path
         self._distroName = distro
         self._suiteName = suite
         self.extra_suite = ""
+        self.useMOMCache = momCache
 
     def _get_packages_for(self, suite, component):
-        source_path = self._archivePath + "/dists/%s-%s/%s/source/Sources.gz" % (self._distroName, suite, component)
+        if self.useMOMCache:
+            source_path = self._archivePath + "/dists/%s-%s/%s/source/Sources.gz" % (self._distroName, suite, component)
+        else:
+            source_path = self._archivePath + "/%s/dists/%s/%s/source/Sources.gz" % (self._distroName, suite, component)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile (f)
         packageList = []
