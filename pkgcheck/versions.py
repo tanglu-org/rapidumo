@@ -109,8 +109,8 @@ for pset in pkg_sets:
 parser = SafeConfigParser()
 parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
 _momArchivePath = parser.get('MOM', 'path')
-_dest_distro = parser.get('SyncTarget', 'distro_name')
-_extra_suite = parser.get('SyncTarget', 'devel_suite')
+_dest_distro = parser.get('General', 'distro_name')
+_extra_suite = parser.get('Archive', 'devel_suite')
 
 pkginfo_tgl = PackageInfoRetriever(_momArchivePath, _dest_distro, "staging")
 pkginfo_tgl.extra_suite = _extra_suite

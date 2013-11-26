@@ -33,7 +33,7 @@ class SyncPackage:
         parser = SafeConfigParser()
         parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
         self._momArchivePath = parser.get('MOM', 'path')
-        self._destDistro = parser.get('SyncTarget', 'distro_name')
+        self._destDistro = parser.get('General', 'distro_name')
         self._extra_suite = parser.get('Archive', 'devel_suite')
 
         self._supportedArchs = parser.get('Archive', 'archs').split (" ")

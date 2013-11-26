@@ -34,6 +34,7 @@ class Janitor:
         self._devel_suite = suite
         if self._devel_suite == "":
             self._devel_suite = parser.get('Archive', 'devel_suite')
+        self._distro_name = parser.get('General', 'distro_name')
         self._staging_suite = parser.get('Archive', 'staging_suite')
         self._archive_path = parser.get('Archive', 'path')
 
@@ -41,7 +42,7 @@ class Janitor:
         self._unsupportedArchs = parser.get('SyncSource', 'archs').split (" ")
         for arch in self._supportedArchs:
             self._unsupportedArchs.remove(arch)
-        pkginfo = PackageInfoRetriever(self._archive_path, "tanglu", self._devel_suite)
+        pkginfo = PackageInfoRetriever(self._archive_path, self._distro_name, self._devel_suite)
         pkginfo.extra_suite = self._staging_suite
         self._source_pkgs_full = pkginfo.get_packages_dict("non-free")
         self._source_pkgs_full.update(pkginfo.get_packages_dict("contrib"))
@@ -60,7 +61,7 @@ class Janitor:
                     pkg_item = self._source_pkgs_full[pkg]
                     # the package is in Tanglu, check if it contains Tanglu changes.
                     # if it does, we skip it here, else it apparently is cruft
-                    if not "tanglu" in pkg_item.version:
+                    if not self._distro_name in pkg_item.version:
                         tglpkgrm = PackageRemovalItem(self._devel_suite, [pkg], rmitem.reason)
                         cruftList.append(tglpkgrm)
         return cruftList

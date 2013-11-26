@@ -36,8 +36,8 @@ class Autorebuild():
         parser = SafeConfigParser()
         parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
         self._archivePath = parser.get('Archive', 'path')
-        _dest_distro = parser.get('SyncTarget', 'distro_name')
-        extra_suite = parser.get('SyncTarget', 'devel_suite')
+        _dest_distro = parser.get('General', 'distro_name')
+        extra_suite = parser.get('Archive', 'devel_suite')
         self._suite = suite
         if suite == extra_suite:
             suite = "staging"
