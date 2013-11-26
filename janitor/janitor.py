@@ -56,14 +56,13 @@ class Janitor:
             # we don't care about experimental
             if rmitem.suite == "experimental":
                 continue
-            for pkg in rmitem.pkgnames:
-                if pkg in self._source_pkgs_full:
-                    pkg_item = self._source_pkgs_full[pkg]
-                    # the package is in Tanglu, check if it contains Tanglu changes.
-                    # if it does, we skip it here, else it apparently is cruft
-                    if not self._distro_name in pkg_item.version:
-                        tglpkgrm = PackageRemovalItem(self._devel_suite, [pkg], rmitem.reason)
-                        cruftList.append(tglpkgrm)
+            if rmitem.pkgname in self._source_pkgs_full:
+                pkg_item = self._source_pkgs_full[rmitem.pkgname]
+                # the package is in Tanglu, check if it contains Tanglu changes.
+                # if it does, we skip it here, else it apparently is cruft
+                if not self._distro_name in pkg_item.version:
+                    tglpkgrm = PackageRemovalItem(self._devel_suite, pkg_item.pkgname, pkg_item.version, rmitem.reason)
+                    cruftList.append(tglpkgrm)
         return cruftList
 
     def remove_cruft(self):

@@ -21,9 +21,9 @@ from apt_pkg import TagFile, TagSection
 import urllib2
 
 class PackageRemovalItem():
-    def __init__(self, suite, pkgnames, reason):
-        self.pkgnames = list()
-        self.pkgnames.extend(pkgnames)
+    def __init__(self, suite, pkgname, version, reason):
+        self.pkgname = pkgnames
+        self.version = version
         self.suite = suite
         self.reason = reason
 
@@ -32,6 +32,18 @@ class DebianRemovals:
         # fetch a list of removed packages from Debian
         response = urllib2.urlopen('http://ftp-master.debian.org/removals.822')
         self._removalsRFC822 = response
+
+    def _get_version_from_pkid(self, pkid):
+        s = pkid[::-1]
+        s = s[:s.index("_")]
+
+        return s[::-1]
+
+    def _get_pkgname_from_pkid(self, pkid):
+        s = pkid[pkid.index("+")+1:]
+        s = s[:s.index("_")]
+
+        return s
 
     def get_removed_sources(self):
         tagf = TagFile (self._removalsRFC822)
@@ -42,8 +54,13 @@ class DebianRemovals:
             # check if we have a source removal - the only thing of interest for us, at time
             if sources_raw == '' or suite == '':
                 continue
-            sources = [x.strip() for x in sources_raw.split('\n')]
+            source_ids = [x.strip() for x in sources_raw.split('\n')]
             reason = section['Reason']
-            pkgrm = PackageRemovalItem(suite, sources, reason)
-            resultsList.append(pkgrm)
+            for source_id in source_ids:
+                if not "_" in source_id:
+                    continue
+                version = self._get_version_from_pkid(source_id)
+                source = self._get_pkgname_from_pkid(source_id)
+                pkgrm = PackageRemovalItem(suite, source, version, reason)
+                resultsList.append(pkgrm)
         return resultsList
