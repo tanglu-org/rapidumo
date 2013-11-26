@@ -55,6 +55,9 @@ class DebianRemovals:
                 continue
             source_ids = [x.strip() for x in sources_raw.split('\n')]
             reason = section['Reason']
+            # NVITs at Debian are no reason to delete anything from Tanglu ;-)
+            if "NVIT" in reason:
+                continue
             for source_id in source_ids:
                 if not "_" in source_id:
                     continue
