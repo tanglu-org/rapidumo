@@ -59,6 +59,16 @@ class Janitor:
                 # the package is in Tanglu, check if it contains Tanglu changes.
                 # if it does, we skip it here, else it apparently is cruft
                 if not self._distro_name in pkg_item.version:
+                    # check for Tanglu autorebuilds (and don't count them when comparing versions)
+                    p = re.compile(r"(.*)b\d$")
+                    m = p.match(pkg_item.version)
+                    if m == None:
+                        version_norebuild = pkg_item.version
+                    else:
+                        version_norebuild = m.group(1)
+                    if apt_pkg.version_compare(version_norebuild, rmitem.version) >= 0:
+                        # the version in Tanglu is newer, we don't want to delete the package
+                        continue
                     tglpkgrm = PackageRemovalItem(self._current_suite, pkg_item.pkgname, pkg_item.version, rmitem.reason)
                     cruftList.append(tglpkgrm)
         return cruftList
