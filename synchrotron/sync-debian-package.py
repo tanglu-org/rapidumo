@@ -264,7 +264,7 @@ def main():
     parser.add_option("--import-all",
                   action="store_true", dest="sync_everything", default=False,
                   help="sync all packages with newer versions")
-    parser.add_option("-d", "--dry-run",
+    parser.add_option("-d", "--dry",
                   action="store_true", dest="dry_run", default=False,
                   help="list all packages which would be synced")
     parser.add_option("--list-not-in-debian",
