@@ -38,15 +38,14 @@ class Janitor:
         self._staging_suite = parser.get('Archive', 'staging_suite')
         self._archive_path = parser.get('Archive', 'path')
 
-        self._supportedArchs = parser.get('Archive', 'archs').split (" ")
-        self._unsupportedArchs = parser.get('SyncSource', 'archs').split (" ")
-        for arch in self._supportedArchs:
-            self._unsupportedArchs.remove(arch)
+        self._hints_file = parser.get('Janitor', 'hints_file')
+
         pkginfo = PackageInfoRetriever(self._archive_path, self._distro_name, self._devel_suite)
         pkginfo.extra_suite = self._staging_suite
         self._source_pkgs_full = pkginfo.get_packages_dict("non-free")
         self._source_pkgs_full.update(pkginfo.get_packages_dict("contrib"))
         self._source_pkgs_full.update(pkginfo.get_packages_dict("main"))
+        self.dryrun = False
 
     def _get_debcruft(self):
         debrm = DebianRemovals()
@@ -65,13 +64,36 @@ class Janitor:
                     cruftList.append(tglpkgrm)
         return cruftList
 
-    def remove_cruft(self):
-        removals_list = self._get_debcruft()
+    def _print_removals_list(self, removals_list):
         for rmitem in removals_list:
             print("----")
             print(rmitem.suite)
-            print(rmitem.pkgnames)
+            print(rmitem.pkgname + " - " + rmitem.version)
             print(rmitem.reason)
+
+    def remove_cruft(self, dak_mode=False):
+        removals_list = self._get_debcruft()
+        if self.dryrun:
+            self._print_removals_list(removals_list)
+            print("#")
+            print("End of dry-run. Packages flagged for removal are shown above.")
+            return True
+        if not dak_mode:
+            f = open(self._hints_file, 'w')
+            f.write('##\n# Hints file for the Tanglu Archive Janitor\n##\n')
+            last_reason = ""
+            for rmitem in removals_list:
+                if rmitem.reason != last_reason:
+                    last_reason = rmitem.reason
+                    f.write("\n# %s\n" % (rmitem.reason))
+                # create a Britney remove-hint
+                f.write("remove %s/%s" % (rmitem.pkgname, rmitem.version))
+                if rmitem.suite == self._staging_suite:
+                    print("Attention! Wrote a britney-hint on the staging suite (package: %s/%s). That might not be what you wanted." % (rmitem.pkgname, rmitem.version))
+            f.close()
+        else:
+            print("To be implemented.")
+
         return True
 
 def main():
@@ -85,6 +107,9 @@ def main():
     parser.add_option("-s",
                   type="string", dest="suite", default="",
                   help="suite to operate on")
+    parser.add_option("--use-dak",
+                  action="store_true", dest="use_dak", default=False,
+                  help="call dak to remove packages, instead of writing a britney hints file")
     parser.add_option("--dry",
                   action="store_true", dest="dry_run", default=False,
                   help="list all packages which would be synced")
@@ -96,8 +121,9 @@ def main():
 
     if options.cruft_remove:
         janitor = Janitor(options.suite)
+        janitor.dryrun = options.dry_run
         ret = False
-        ret = janitor.remove_cruft()
+        ret = janitor.remove_cruft(options.use_dak)
         if not ret:
             sys.exit(2)
     else:

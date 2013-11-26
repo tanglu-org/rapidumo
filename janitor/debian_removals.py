@@ -22,7 +22,7 @@ import urllib2
 
 class PackageRemovalItem():
     def __init__(self, suite, pkgname, version, reason):
-        self.pkgname = pkgnames
+        self.pkgname = pkgname
         self.version = version
         self.suite = suite
         self.reason = reason
@@ -40,8 +40,7 @@ class DebianRemovals:
         return s[::-1]
 
     def _get_pkgname_from_pkid(self, pkid):
-        s = pkid[pkid.index("+")+1:]
-        s = s[:s.index("_")]
+        s = pkid[:pkid.index("_")]
 
         return s
 
