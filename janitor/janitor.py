@@ -44,7 +44,9 @@ class Janitor:
         self._source_pkgs_full = pkginfo.get_packages_dict("non-free")
         self._source_pkgs_full.update(pkginfo.get_packages_dict("contrib"))
         self._source_pkgs_full.update(pkginfo.get_packages_dict("main"))
+
         self.dryrun = False
+        self.quiet = False
 
     def _get_debcruft(self):
         debrm = DebianRemovals()
@@ -109,6 +111,8 @@ class Janitor:
                     stdout, stderr = p.communicate()
                     raise Exception("Error while running dak!\n----\n%s\n%s %s" % (cmd, stdout, stderr))
                     return False
+                if not self.quiet:
+                    print("Removed: %s/%s" % (rmitem.pkgname, rmitem.version))
         return True
 
 def main():
@@ -137,6 +141,7 @@ def main():
     if options.cruft_remove:
         janitor = Janitor(options.suite)
         janitor.dryrun = options.dry_run
+        janitor.quiet = options.quiet
         ret = False
         ret = janitor.remove_cruft(options.use_dak)
         if not ret:
