@@ -31,17 +31,16 @@ class Janitor:
     def __init__(self, suite = ""):
         parser = SafeConfigParser()
         parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
-        self._devel_suite = suite
-        if self._devel_suite == "":
-            self._devel_suite = parser.get('Archive', 'devel_suite')
+        self._current_suite = suite
+        if self._current_suite == "":
+            self._current_suite = parser.get('Archive', 'devel_suite')
         self._distro_name = parser.get('General', 'distro_name')
         self._staging_suite = parser.get('Archive', 'staging_suite')
         self._archive_path = parser.get('Archive', 'path')
 
         self._hints_file = parser.get('Janitor', 'hints_file')
 
-        pkginfo = PackageInfoRetriever(self._archive_path, self._distro_name, self._devel_suite)
-        pkginfo.extra_suite = self._staging_suite
+        pkginfo = PackageInfoRetriever(self._archive_path, self._distro_name, self._current_suite)
         self._source_pkgs_full = pkginfo.get_packages_dict("non-free")
         self._source_pkgs_full.update(pkginfo.get_packages_dict("contrib"))
         self._source_pkgs_full.update(pkginfo.get_packages_dict("main"))
@@ -60,7 +59,7 @@ class Janitor:
                 # the package is in Tanglu, check if it contains Tanglu changes.
                 # if it does, we skip it here, else it apparently is cruft
                 if not self._distro_name in pkg_item.version:
-                    tglpkgrm = PackageRemovalItem(self._devel_suite, pkg_item.pkgname, pkg_item.version, rmitem.reason)
+                    tglpkgrm = PackageRemovalItem(self._current_suite, pkg_item.pkgname, pkg_item.version, rmitem.reason)
                     cruftList.append(tglpkgrm)
         return cruftList
 
@@ -87,13 +86,19 @@ class Janitor:
                     last_reason = rmitem.reason
                     f.write("\n# %s\n" % (rmitem.reason))
                 # create a Britney remove-hint
-                f.write("remove %s/%s" % (rmitem.pkgname, rmitem.version))
+                f.write("remove %s/%s\n" % (rmitem.pkgname, rmitem.version))
                 if rmitem.suite == self._staging_suite:
                     print("Attention! Wrote a britney-hint on the staging suite (package: %s/%s). That might not be what you wanted." % (rmitem.pkgname, rmitem.version))
             f.close()
         else:
-            print("To be implemented.")
-
+            for rmitem in removals_list:
+                cmd = ["dak", "rm", "-s", rmitem.suite, "-m", rmitem.reason, "-C", "ftpmaster@ftp-master.tanglu.org", rmitem.pkgname]
+                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p.wait()
+                if p.returncode is not 0:
+                    stdout, stderr = p.communicate()
+                    raise Exception("Error while running dak!\n----\n%s\n%s %s" % (cmd, stdout, stderr))
+                    return False
         return True
 
 def main():
