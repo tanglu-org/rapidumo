@@ -105,7 +105,8 @@ class Janitor:
         else:
             for rmitem in removals_list:
                 cmd = ["dak", "rm", "-s", rmitem.suite, "-m", rmitem.reason, "-C", "ftpmaster@ftp-master.tanglu.org", rmitem.pkgname]
-                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p.communicate(input='y\n')
                 p.wait()
                 if p.returncode is not 0:
                     stdout, stderr = p.communicate()
