@@ -18,22 +18,17 @@ fi
 MOMDIR="/var/archive-kit/merge-o-matic"
 WORKDIR="/srv/patches.tanglu.org"
 
-cd $MOMDIR
-#bzr update
-
-cp addcomment.py /srv/patches.tanglu.org/merges
+# FIXME: Don't hardcode paths anywhere...
+BASE=/var/archive-kit/rapidumo
 
 # Update the blacklist
-if [ ! -d /srv/patches.tanglu.org/blacklist ]; then
-  git clone git://gitorious.org/tanglu/import-blacklist.git /srv/patches.tanglu.org/blacklist
-else
-  cd /srv/patches.tanglu.org/blacklist/
-  git pull --quiet
-fi
+sh $BASE/cron/sync-hints.sh
 rm /srv/patches.tanglu.org/sync-blacklist.txt
-cp /srv/patches.tanglu.org/blacklist/sync-blacklist.txt /srv/patches.tanglu.org/sync-blacklist.txt
+cp /srv/dak/archive-hints/sync-blacklist/sync-blacklist.txt /srv/patches.tanglu.org/sync-blacklist.txt
 
 cd $MOMDIR
+
+cp addcomment.py /srv/patches.tanglu.org/merges
 
 # Download new packages
 ./update-pool.py $QUIET debian tanglu
