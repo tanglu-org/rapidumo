@@ -66,7 +66,7 @@ class Janitor:
                         version_norebuild = pkg_item.version
                     else:
                         version_norebuild = m.group(1)
-                    if apt_pkg.version_compare(version_norebuild, rmitem.version) >= 0:
+                    if apt_pkg.version_compare(version_norebuild, rmitem.version) > 0:
                         # the version in Tanglu is newer, we don't want to delete the package
                         continue
                     tglpkgrm = PackageRemovalItem(self._current_suite, pkg_item.pkgname, pkg_item.version, rmitem.reason)
