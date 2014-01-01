@@ -1,0 +1,10 @@
+#!/bin/bash
+# Execute Rapidumo tasks (every 3 days)
+
+# import the global variable set.
+. /var/archive-kit/rapidumo/cron/vars
+
+# sync Debian packages, if we are not in import freeze
+if test "x$DEBIAN_SYNC_ENABLED" = xyes; then
+  $RAPIDUMO_PATH/cron/sync-packages.sh
+fi

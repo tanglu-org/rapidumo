@@ -1,0 +1,20 @@
+#!/bin/bash
+# Execute daily Rapidumo tasks
+
+# import the global variable set.
+. /var/archive-kit/rapidumo/cron/vars
+
+# sync the archive manipulation hints
+$RAPIDUMO_PATH/cron/sync-hints.sh
+
+# fetch stuff from Debian and Tanglu archives
+$RAPIDUMO_PATH/synchrotron/prepare-sync.sh
+
+# update the package-watch pages
+$RAPIDUMO_PATH/cron/package-watch.sh
+
+# create new germinator output
+$RAPIDUMO_PATH/cron/germinate-update.sh
+
+# run Ben (the transition tracker)
+$RAPIDUMO_PATH/cron/run-ben.sh

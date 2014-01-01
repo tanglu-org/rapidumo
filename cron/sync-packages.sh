@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
 
-# import the general variable set.
-export SCRIPTVARS=/srv/dak/config/tanglu/vars
-. $SCRIPTVARS
+# import the global variable set.
+. /var/archive-kit/rapidumo/cron/vars
 
 ########################################################################
 # Functions                                                            #
@@ -17,13 +16,9 @@ export SCRIPTVARS=/srv/dak/config/tanglu/vars
 ########################################################################
 ########################################################################
 
-CURRENT_DEV_SUITE=aequorea
-
 DAK_LOCKDIR=/srv/dak/lock
 DAK_LOCK=$DAK_LOCKDIR/daily.lock
 LOCKFILE="$DAK_LOCKDIR/synchrotron.lock"
-TMP_DATA_DIR="/srv/dak/tmp/synchrotron-data"
-RAPIDUMO_PATH=/var/archive-kit/rapidumo
 
 OPTIONS="$@"
 qoption () {
@@ -41,25 +36,6 @@ if ! lockfile -r8 $LOCKFILE; then
     exit 0
 fi
 trap cleanup 0
-
-mkdir -p $TMP_DATA_DIR
-cd $TMP_DATA_DIR
-
-# update the tanglu-meta copy
-if [ ! -d "$TMP_DATA_DIR/tanglu-meta" ]; then
-  git clone --quiet --depth=1 git://gitorious.org/tanglu/tanglu-meta.git tanglu-meta
-fi
-cd $TMP_DATA_DIR/tanglu-meta
-git pull --quiet
-# germinate!
-mkdir -p /srv/dak/export/germinate/tanglu.$CURRENT_DEV_SUITE
-cd /srv/dak/export/germinate/tanglu.$CURRENT_DEV_SUITE
-germinate -S file://$TMP_DATA_DIR/tanglu-meta/seed  -s aequorea -d aequorea -m file:///srv/archive.tanglu.org/tanglu/ -c main contrib
-
-cd $TMP_DATA_DIR
-
-# fetch stuff from Debian and Tanglu archives
-$RAPIDUMO_PATH/synchrotron/prepare-sync.sh
 
 if ! qoption allowdaklock; then
 	while [ -f $DAK_LOCK ]; do
@@ -82,8 +58,3 @@ mirror
 # update jenkins
 maintain-jenkins-jobs --update
 maintain-jenkins-jobs --checkbuild
-
-# update the package-watch
-cd /srv/dak/export/package-watch
-python $RAPIDUMO_PATH/pkgcheck/versions.py
-cd $TMP_DATA_DIR
