@@ -87,7 +87,13 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     debian_dsc = ("%s/%s") % (src_pkg_dir, debian_dsc)
 
     tmp_workspace = tempfile.mkdtemp()
-    tar = tarfile.open(debian_src)
+    tar = None
+    try:
+        tar = tarfile.open(debian_src)
+    except:
+        print("Failed to open Tar file %s" % (debian_src))
+        print("Package %s needs a manual upload." % (pkg_name))
+        return False, None
     tar.extractall(path=tmp_workspace)
     tar.close()
 
