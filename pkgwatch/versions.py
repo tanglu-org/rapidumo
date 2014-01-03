@@ -472,11 +472,6 @@ n_seconds = int (duration - 60 * n_minutes)
 
 def generate_page (tags = [], invert = False):
     html = '''<style type="text/css">
-body
-{
-   font-family: sans-serif;
-}
-
 :link, :visited
 {
    color: #0033aa;
