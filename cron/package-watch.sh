@@ -6,5 +6,5 @@ set -e
 
 # update the package-watch pages
 cd /srv/dak/export/package-watch
-python $RAPIDUMO_PATH/pkgcheck/versions.py
+python $RAPIDUMO_PATH/pkgwatch/versions.py
 cd $TMP_DATA_DIR
