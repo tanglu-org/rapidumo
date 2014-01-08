@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright (C) 2013 Matthias Klumpp <mak@debian.org>
+# Copyright (C) 2013-2014 Matthias Klumpp <mak@debian.org>
 #
 # Licensed under the GNU General Public License Version 3
 #
@@ -29,8 +29,7 @@ from debian_removals import DebianRemovals, PackageRemovalItem
 
 class Janitor:
     def __init__(self, suite = ""):
-        parser = SafeConfigParser()
-        parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
+        parser = get_archive_config_parser()
         self._current_suite = suite
         if self._current_suite == "":
             self._current_suite = parser.get('Archive', 'devel_suite')

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright (C) 2013 Matthias Klumpp <mak@debian.org>
+# Copyright (C) 2013-2014 Matthias Klumpp <mak@debian.org>
 #
 # Licensed under the GNU General Public License Version 3
 #
@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+from ConfigParser import SafeConfigParser
 
 def get_template_dir():
     dir_str = os.path.dirname(os.path.realpath(__file__)) + "/../templates"
@@ -24,3 +25,8 @@ def get_template_dir():
 
 def replace_template_var(tpl, varname, varvalue):
     return tpl.replace("{{%s}}" % (varname), varvalue)
+
+def get_archive_config_parser():
+    parser = SafeConfigParser()
+    parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
+    return parser
