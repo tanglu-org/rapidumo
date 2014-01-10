@@ -81,11 +81,11 @@ class JanitorDebcheck:
         doc = yaml.load(info)
         if doc['report'] is not None:
             for p in doc['report']:
-                pkg = p['package']
+                pkg = p['source']
                 if pkg.startswith('src%3a'):
                     pkg = pkg.replace('src%3a',"",1)
-                if ":" in pkg:
-                    parts = pkg.split (':')
-                    pkg = parts[1]
+                if "(" in pkg:
+                    parts = pkg.split ('(')
+                    pkg = parts[1].strip()
                 res[pkg] = p['reasons']
         return res

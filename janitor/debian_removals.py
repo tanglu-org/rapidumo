@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright (C) 2013 Matthias Klumpp <mak@debian.org>
+# Copyright (C) 2013-2014 Matthias Klumpp <mak@debian.org>
 #
 # Licensed under the GNU General Public License Version 3
 #
@@ -19,13 +19,7 @@
 import os
 from apt_pkg import TagFile, TagSection
 import urllib2
-
-class PackageRemovalItem():
-    def __init__(self, suite, pkgname, version, reason):
-        self.pkgname = pkgname
-        self.version = version
-        self.suite = suite
-        self.reason = reason
+from janitor_utils import PackageRemovalItem
 
 class DebianRemovals:
     def __init__(self):

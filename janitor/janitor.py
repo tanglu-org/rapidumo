@@ -25,7 +25,9 @@ from optparse import OptionParser
 
 from rapidumolib.pkginfo import *
 from rapidumolib.utils import *
-from debian_removals import DebianRemovals, PackageRemovalItem
+from janitor_utils import *
+from debian_removals import DebianRemovals
+from installability_test import JanitorDebcheck
 
 class Janitor:
     def __init__(self, suite = ""):
@@ -36,6 +38,7 @@ class Janitor:
         self._distro_name = parser.get('General', 'distro_name')
         self._staging_suite = parser.get('Archive', 'staging_suite')
         self._archive_path = parser.get('Archive', 'path')
+        self._supportedArchs = parser.get('Archive', 'archs').split (" ")
 
         self._hints_file = parser.get('Janitor', 'hints_file')
 
@@ -46,6 +49,7 @@ class Janitor:
 
         self.dryrun = False
         self.quiet = False
+        self.rmuninstallable = False
 
     def _get_debcruft(self):
         debrm = DebianRemovals()
@@ -74,6 +78,22 @@ class Janitor:
                     cruftList.append(tglpkgrm)
         return cruftList
 
+    def _get_uninstallable_cruft(self):
+        dcheck = JanitorDebcheck()
+        cruft_dict = {}
+        for component in ["main", "contrib", "non-free"]:
+            for arch in self._supportedArchs:
+                uninst_pkgs = dcheck.get_uninstallable_packages(self._current_suite, component, arch)
+                for pkg in uninst_pkgs.keys():
+                    if pkg in cruft_dict:
+                        rmitem = cruft_dict[pkg]
+                        rmitem.reason = "%s, %s" % (rmitem.reason, arch)
+                        cruft_dict[pkg] = rmitem
+                    else:
+                        pkg_item = self._source_pkgs_full[pkg]
+                        cruft_dict[pkg] = PackageRemovalItem(self._current_suite, pkg, pkg_item.version, "Binaries with broken dependencies on: %s" % (arch))
+        return cruft_dict.values()
+
     def _print_removals_list(self, removals_list):
         for rmitem in removals_list:
             print("----")
@@ -83,6 +103,8 @@ class Janitor:
 
     def remove_cruft(self, dak_mode=False):
         removals_list = self._get_debcruft()
+        if self.rmuninstallable:
+            removals_list.extend(self._get_uninstallable_cruft())
         if self.dryrun:
             self._print_removals_list(removals_list)
             print("#")
@@ -129,6 +151,9 @@ def main():
     parser.add_option("--use-dak",
                   action="store_true", dest="use_dak", default=False,
                   help="call dak to remove packages, instead of writing a britney hints file")
+    parser.add_option("--rm-uninstallable",
+                  action="store_true", dest="rm_uninst", default=False,
+                  help="remove source-packages which have binary packages with broken dependencies (use with care!)")
     parser.add_option("--dry",
                   action="store_true", dest="dry_run", default=False,
                   help="list all packages which would be synced")
@@ -142,6 +167,7 @@ def main():
         janitor = Janitor(options.suite)
         janitor.dryrun = options.dry_run
         janitor.quiet = options.quiet
+        janitor.rmuninstallable = options.rm_uninst
         ret = False
         ret = janitor.remove_cruft(options.use_dak)
         if not ret:
