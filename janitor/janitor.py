@@ -87,6 +87,7 @@ class Janitor:
             print("----")
             print(rmitem.suite)
             print(rmitem.pkgname + " - " + rmitem.version)
+            print("-")
             print(rmitem.reason)
 
     def remove_cruft(self, dak_mode=False):

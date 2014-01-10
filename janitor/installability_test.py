@@ -115,5 +115,6 @@ class JanitorDebcheck:
                     elif 'conflict' in reason_yml:
                         reason = "%s\nConflicting packages. '%s' is involved." % (reason, reason_yml['conflict']['pkg1']['unsat-conflict'])
                     reason = "%s\nBroken on arch: %s" % (reason, arch)
+                    reason = reason.replace("%3a", ":")
                     cruft_dict[pkg] = PackageRemovalItem(suite, pkg, version, reason)
         return cruft_dict.values()
