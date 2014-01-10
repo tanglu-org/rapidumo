@@ -19,12 +19,14 @@
 from rapidumolib.utils import *
 import subprocess
 import yaml
+from janitor_utils import PackageRemovalItem
 
 class JanitorDebcheck:
     def __init__(self):
         parser = get_archive_config_parser()
         path = parser.get('Archive', 'path')
         self._archive_path = path
+        self._devel_suite = parser.get('Archive', 'devel_suite')
         self._distro = parser.get('General', 'distro_name').lower()
 
     def _get_binary_indices_list(self, suite, comp, arch):
@@ -42,21 +44,19 @@ class JanitorDebcheck:
 
         if suite == "staging":
             # staging needs the aequorea data (it is no complete suite)
-            archive_indices.extend(self._get_binary_indices_list("aequorea", comp, arch))
+            archive_indices.extend(self._get_binary_indices_list(self._devel_suite, comp, arch))
 
         return archive_indices
 
-    def _run_dose_debcheck(self, suite, comp, arch):
-        # we always need main components
+    def _run_dose_debcheck(self, suite, arch):
+        # we always need the main component
         archive_indices = self._get_binary_indices_list(suite, "main", arch)
-        if comp != "main":
-            # if the component is not main, add it to the list
-            comp_indices = self._get_binary_indices_list(suite, comp, arch)
-            archive_indices.extend(comp_indices)
-            if comp == "non-free":
-                # non-free might need contrib
-                comp_indices = self._get_binary_indices_list(suite, "contrib", arch)
-                archive_indices.extend(comp_indices)
+        # add contrib
+        comp_indices = self._get_binary_indices_list(suite, "contrib", arch)
+        archive_indices.extend(comp_indices)
+        # analyze non-free too
+        comp_indices = self._get_binary_indices_list(suite, "non-free", arch)
+        archive_indices.extend(comp_indices)
 
         dose_cmd = ["dose-debcheck", "--quiet", "-e", "-f", "--summary", "--deb-native-arch=%s" % (arch)]
         # add the archive index files
@@ -70,22 +70,49 @@ class JanitorDebcheck:
         #    return False, stderr
         return True, output
 
-    def get_debcheck_yaml(self, suite, component, architecture):
-        ret, output = self._run_dose_debcheck(suite, component, architecture)
+    def get_debcheck_yaml(self, suite, architecture):
+        ret, output = self._run_dose_debcheck(suite, architecture)
         return output
 
-    def get_uninstallable_packages(self, suite, component, architecture):
+    def get_uninstallable_packages(self, suite, architecture):
         # we return a package=>reason dictionary
         res = {}
-        info = self.get_debcheck_yaml(suite, component, architecture)
-        doc = yaml.load(info)
+        info = self.get_debcheck_yaml(suite, architecture)
+        doc = yaml.safe_load(info)
         if doc['report'] is not None:
             for p in doc['report']:
                 pkg = p['source']
                 if pkg.startswith('src%3a'):
-                    pkg = pkg.replace('src%3a',"",1)
-                if "(" in pkg:
-                    parts = pkg.split ('(')
-                    pkg = parts[1].strip()
-                res[pkg] = p['reasons']
+                    pkg = pkg.replace('src%3a', "", 1)
+                if not "(" in pkg:
+                    continue
+                parts = pkg.split ('(')
+                pkg = parts[0].strip()
+                version = parts[1].replace("=", "", 1).strip()
+                res["%s/%s" % (pkg, version)] = p['reasons']
         return res
+
+    def get_uninstallable_removals(self, suite, archs):
+        cruft_dict = {}
+        for arch in archs:
+            uninst_pkgs = self.get_uninstallable_packages(suite, arch)
+            for pkg_id in uninst_pkgs.keys():
+                parts = pkg_id.split("/")
+                pkg = parts[0]
+                version = parts[1]
+                if pkg in cruft_dict:
+                    # package is uninstallable on another arch
+                    rmitem = cruft_dict[pkg]
+                    rmitem.reason = "%s, %s" % (rmitem.reason, arch)
+                    cruft_dict[pkg] = rmitem
+                else:
+                    reason_yml = uninst_pkgs[pkg_id]
+                    reason = "Binary packages with broken dependencies."
+                    # extract some very basic hints on why this package is broken
+                    if reason_yml['missing'] is not None:
+                        reason = "\n%sMissing dependency: %s" % (reason, reason_yml['missing']['pkg']['unsat-dependency'])
+                    elif reason_yml['conflict'] is not None:
+                        reason = "\n%sConflicting packages. '%s' is involved." % (reason, reason_yml['conflict']['pkg1']['unsat-conflict'])
+                    reason = "\n%sBroken on arch: %s" % (reason, arch)
+                    cruft_dict[pkg] = PackageRemovalItem(self._current_suite, pkg, version, reason)
+        return cruft_dict.values()

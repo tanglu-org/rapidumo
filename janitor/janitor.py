@@ -80,19 +80,7 @@ class Janitor:
 
     def _get_uninstallable_cruft(self):
         dcheck = JanitorDebcheck()
-        cruft_dict = {}
-        for component in ["main", "contrib", "non-free"]:
-            for arch in self._supportedArchs:
-                uninst_pkgs = dcheck.get_uninstallable_packages(self._current_suite, component, arch)
-                for pkg in uninst_pkgs.keys():
-                    if pkg in cruft_dict:
-                        rmitem = cruft_dict[pkg]
-                        rmitem.reason = "%s, %s" % (rmitem.reason, arch)
-                        cruft_dict[pkg] = rmitem
-                    else:
-                        pkg_item = self._source_pkgs_full[pkg]
-                        cruft_dict[pkg] = PackageRemovalItem(self._current_suite, pkg, pkg_item.version, "Binaries with broken dependencies on: %s" % (arch))
-        return cruft_dict.values()
+        return dcheck.get_uninstallable_removals(self._current_suite, self._supportedArchs)
 
     def _print_removals_list(self, removals_list):
         for rmitem in removals_list:
@@ -117,7 +105,7 @@ class Janitor:
             for rmitem in removals_list:
                 if rmitem.reason != last_reason:
                     last_reason = rmitem.reason
-                    f.write("\n# %s\n" % (rmitem.reason))
+                    f.write("\n# %s\n" % (rmitem.reason.replace('\n', "\n#")))
                 # create a Britney remove-hint
                 f.write("remove %s/%s\n" % (rmitem.pkgname, rmitem.version))
                 if rmitem.suite == self._staging_suite:
