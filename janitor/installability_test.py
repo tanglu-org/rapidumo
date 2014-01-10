@@ -101,7 +101,7 @@ class JanitorDebcheck:
                 pkg = parts[0]
                 version = parts[1]
                 if pkg in cruft_dict:
-                    # package is uninstallable on another arch
+                    # package is uninstallable on another arch (or different version - we don't handle this case at time)
                     rmitem = cruft_dict[pkg]
                     rmitem.reason = "%s, %s" % (rmitem.reason, arch)
                     cruft_dict[pkg] = rmitem
@@ -109,10 +109,11 @@ class JanitorDebcheck:
                     reason_yml = uninst_pkgs[pkg_id]
                     reason = "Binary packages with broken dependencies."
                     # extract some very basic hints on why this package is broken
-                    if reason_yml['missing'] is not None:
-                        reason = "\n%sMissing dependency: %s" % (reason, reason_yml['missing']['pkg']['unsat-dependency'])
-                    elif reason_yml['conflict'] is not None:
-                        reason = "\n%sConflicting packages. '%s' is involved." % (reason, reason_yml['conflict']['pkg1']['unsat-conflict'])
-                    reason = "\n%sBroken on arch: %s" % (reason, arch)
-                    cruft_dict[pkg] = PackageRemovalItem(self._current_suite, pkg, version, reason)
+                    reason_yml = reason_yml[0] # we only want the first reason
+                    if 'missing' in reason_yml:
+                        reason = "%s\nMissing dependency: %s" % (reason, reason_yml['missing']['pkg']['unsat-dependency'])
+                    elif 'conflict' in reason_yml:
+                        reason = "%s\nConflicting packages. '%s' is involved." % (reason, reason_yml['conflict']['pkg1']['unsat-conflict'])
+                    reason = "%s\nBroken on arch: %s" % (reason, arch)
+                    cruft_dict[pkg] = PackageRemovalItem(suite, pkg, version, reason)
         return cruft_dict.values()
