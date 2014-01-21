@@ -18,14 +18,20 @@
 
 import os
 from apt_pkg import TagFile, TagSection
-import urllib2
+import httplib
 from janitor_utils import PackageRemovalItem
 
 class DebianRemovals:
     def __init__(self):
-        # fetch a list of removed packages from Debian
-        response = urllib2.urlopen('http://ftp-master.debian.org/removals.822')
-        self._removalsRFC822 = response
+        c = httplib.HTTPSConnection("ftp-master.debian.org")
+        c.request("GET", "/removals.822")
+        response = c.getresponse()
+        data = response.read()
+        if response.status != 200:
+            print("Error while loading removals from Debian!")
+            print("Response: %s, %s" % (response.status, response.reason))
+
+        self._removalsRFC822 = data
 
     def _get_version_from_pkid(self, pkid):
         s = pkid[::-1]
