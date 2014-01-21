@@ -19,6 +19,7 @@
 import os
 from apt_pkg import TagFile, TagSection
 import httplib
+import tempfile
 from janitor_utils import PackageRemovalItem
 
 class DebianRemovals:
@@ -45,7 +46,9 @@ class DebianRemovals:
         return s
 
     def get_removed_sources(self):
-        tagf = TagFile (self._removalsRFC822)
+        f = tempfile.SpooledTemporaryFile()
+        f.write(self._removalsRFC822)
+        tagf = TagFile (f)
         resultsList = []
         for section in tagf:
             suite = section.get('Suite', '').strip()
