@@ -19,6 +19,7 @@
 from rapidumolib.utils import *
 import subprocess
 import yaml
+import re
 from janitor_utils import PackageRemovalItem
 
 class JanitorDebcheck:
@@ -89,6 +90,7 @@ class JanitorDebcheck:
                 parts = pkg.split ('(')
                 pkg = parts[0].strip()
                 version = parts[1].replace("=", "", 1).strip()
+                version = re.sub('\)$', '', version)
                 res["%s/%s" % (pkg, version)] = p['reasons']
         return res
 
