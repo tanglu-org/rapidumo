@@ -46,8 +46,9 @@ class DebianRemovals:
         return s
 
     def get_removed_sources(self):
-        f = tempfile.SpooledTemporaryFile()
+        f = tempfile.TemporaryFile()
         f.write(self._removalsRFC822)
+        f.seek(0)
         tagf = TagFile (f)
         resultsList = []
         for section in tagf:
