@@ -29,6 +29,7 @@ from rapidumolib.utils import *
 class SyncPackage:
     def __init__(self):
         self.debugMode = False
+        self.dryRun = False
 
         parser = SafeConfigParser()
         parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
@@ -74,6 +75,9 @@ class SyncPackage:
 
     def _import_debian_package(self, pkg):
         print("Attempt to import package: %s" % (pkg))
+        # make 100% sure that we never import any package by accident in dry-run mode
+        if self.dryRun:
+            return
         # adjust the pkg-dir (we need to remove pool/main, pool/non-free etc. from the string)
         pkg_dir = pkg.directory
         if pkg_dir.startswith("pool"):
@@ -133,7 +137,7 @@ class SyncPackage:
         ret, html = self._can_sync_package(src_pkg, dest_pkg, quiet, forceSync)
         return ret
 
-    def sync_package(self, package_name, force=False, dryRun=False):
+    def sync_package(self, package_name, force=False):
         if not package_name in self._pkgs_src:
             print("Cannot sync %s, package doesn't exist in Debian (%s/%s)!" % (package_name, self._sourceSuite, self._component))
             return False
@@ -142,7 +146,7 @@ class SyncPackage:
         if not package_name in self._pkgs_dest:
             ret = False
             if self._can_sync_package_simple(src_pkg, None):
-                if dryRun:
+                if self.dryRun:
                     print("Import: %s (%s) [new!]" % (src_pkg.pkgname, src_pkg.version))
                     ret = True
                 else:
@@ -157,20 +161,20 @@ class SyncPackage:
         # we can now sync the package
         dest_pkg = self._pkgs_dest[src_pkg.pkgname]
         if self._can_sync_package_simple(src_pkg, dest_pkg, quiet=True, forceSync=force):
-            if dryRun:
+            if self.dryRun:
                 print("Import: %s (%s -> %s)" % (src_pkg.pkgname, dest_pkg.version, src_pkg.version))
                 ret = True
             else:
                 ret = self._import_debian_package(src_pkg)
         return ret
 
-    def sync_package_regex(self, package_regex, force=False, dryRun=False):
+    def sync_package_regex(self, package_regex, force=False):
         for src_pkg in self._pkgs_src.values():
             # check if source-package matches regex, if yes, sync package
             if re.match(package_regex, src_pkg.pkgname):
                 if not src_pkg.pkgname in self._pkgs_dest:
                     if self._can_sync_package_simple(src_pkg, None, True):
-                        if dryRun:
+                        if self.dryRun:
                             print("Import: %s (%s) [new!]" % (src_pkg.pkgname, src_pkg.version))
                             ret = True
                         else:
@@ -178,7 +182,7 @@ class SyncPackage:
                     continue
                 dest_pkg = self._pkgs_dest[src_pkg.pkgname]
                 if self._can_sync_package_simple(src_pkg, dest_pkg, quiet=True, forceSync=force):
-                    if dryRun:
+                    if self.dryRun:
                         print("Import: %s (%s -> %s)" % (src_pkg.pkgname, dest_pkg.version, src_pkg.version))
                         ret = True
                     else:
@@ -264,9 +268,9 @@ def main():
     parser.add_option("--import-all",
                   action="store_true", dest="sync_everything", default=False,
                   help="sync all packages with newer versions")
-    parser.add_option("-d", "--dry",
+    parser.add_option("--dry",
                   action="store_true", dest="dry_run", default=False,
-                  help="list all packages which would be synced")
+                  help="don't do anything, just simulate what would happen (some meta-information will still be written to disk)")
     parser.add_option("--list-not-in-debian",
                   action="store_true", dest="list_nodebian", default=False,
                   help="show a list of packages which are not in Debian")
@@ -286,11 +290,12 @@ def main():
         component = args[2]
         package_name = args[3]
         sync.initialize(source_suite, target_suite, component)
+        sync.dryRun = options.dry_run
         ret = False
         if options.import_pkg_regex:
-            ret = sync.sync_package_regex(package_name, force=options.force_import, dryRun=options.dry_run)
+            ret = sync.sync_package_regex(package_name, force=options.force_import)
         else:
-            ret = sync.sync_package(package_name, force=options.force_import, dryRun=options.dry_run)
+            ret = sync.sync_package(package_name, force=options.force_import)
         if not ret:
             sys.exit(2)
     elif options.sync_everything:
@@ -302,6 +307,7 @@ def main():
         target_suite = args[1]
         component = args[2]
         sync.initialize(source_suite, target_suite, component)
+        sync.dryRun = options.dry_run
         if options.dry_run:
             sync.list_all_syncs()
         else:
@@ -315,6 +321,7 @@ def main():
         target_suite = args[1]
         component = args[2]
         sync.initialize(source_suite, target_suite, component)
+        sync.dryRun = options.dry_run
         sync.list_not_in_debian(options.quiet)
     else:
         print("Run with -h for a list of available command-line options!")
