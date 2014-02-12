@@ -196,28 +196,25 @@ class SyncPackage:
                 if not ret and html != None:
                     mergeTodoHtml.append(html)
                 if ret:
-                    self._import_debian_package(src_pkg)
+                    if self.dryRun:
+                        print("Sync: %s" % (src_pkg))
+                    else:
+                        self._import_debian_package(src_pkg)
                 continue
             ret, html = self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True)
             if not ret and html != None:
                     mergeTodoHtml.append(html)
             if ret:
-                self._import_debian_package(src_pkg)
+                if self.dryRun:
+                    print("Sync: %s" % (src_pkg))
+                else:
+                    self._import_debian_package(src_pkg)
 
         mergeListPage = open(get_template_dir() + "/merge-list.html.tmpl", 'r').read()
         mergeListPage = mergeListPage.replace("{{MERGE_TODO_PACKAGES_HTML}}", "\n".join(mergeTodoHtml))
         f = open('/srv/dak/export/package-watch/merge-todo_%s.html' % (self._component), 'w')
         f.write(mergeListPage)
         f.close()
-
-    def list_all_syncs(self):
-        for src_pkg in self._pkgs_src.values():
-            if not src_pkg.pkgname in self._pkgs_dest:
-                if self._can_sync_package_simple(src_pkg, None, True):
-                    print("Sync: %s" % (src_pkg))
-                continue
-            if self._can_sync_package_simple(src_pkg, self._pkgs_dest[src_pkg.pkgname], True):
-                print("Sync: %s" % (src_pkg))
 
     def _get_packages_not_in_debian(self):
         debian_pkg_list = self._pkgs_src.values()
@@ -308,10 +305,7 @@ def main():
         component = args[2]
         sync.initialize(source_suite, target_suite, component)
         sync.dryRun = options.dry_run
-        if options.dry_run:
-            sync.list_all_syncs()
-        else:
-            sync.sync_all_packages()
+        sync.sync_all_packages()
     elif options.list_nodebian:
         sync = SyncPackage()
         if len(args) != 3:
