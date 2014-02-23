@@ -42,7 +42,7 @@ class Janitor:
 
         self._hints_file = parser.get('Janitor', 'hints_file')
 
-        pkginfo = PackageInfoRetriever(self._archive_path, self._distro_name, self._current_suite)
+        pkginfo = SourcePackageInfoRetriever(self._archive_path, self._distro_name, self._current_suite)
         self._source_pkgs_full = pkginfo.get_packages_dict("non-free")
         self._source_pkgs_full.update(pkginfo.get_packages_dict("contrib"))
         self._source_pkgs_full.update(pkginfo.get_packages_dict("main"))

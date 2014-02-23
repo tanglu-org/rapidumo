@@ -46,8 +46,8 @@ class SyncPackage:
         self._sourceSuite = source_suite
         self._component = component
         self._target_suite = target_suite
-        pkginfo_src = PackageInfoRetriever(self._momArchivePath, "debian", source_suite, momCache=True)
-        pkginfo_dest = PackageInfoRetriever(self._momArchivePath, self._destDistro, target_suite, momCache=True)
+        pkginfo_src = SourcePackageInfoRetriever(self._momArchivePath, "debian", source_suite, momCache=True)
+        pkginfo_dest = SourcePackageInfoRetriever(self._momArchivePath, self._destDistro, target_suite, momCache=True)
         pkginfo_dest.extra_suite = self._extra_suite
         self._pkgs_src = pkginfo_src.get_packages_dict(component)
         self._pkgs_dest = pkginfo_dest.get_packages_dict(component)

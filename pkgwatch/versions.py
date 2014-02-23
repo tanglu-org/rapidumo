@@ -113,7 +113,7 @@ _momArchivePath = parser.get('MOM', 'path')
 _dest_distro = parser.get('General', 'distro_name')
 _extra_suite = parser.get('Archive', 'devel_suite')
 
-pkginfo_tgl = PackageInfoRetriever(_momArchivePath, _dest_distro, "staging", momCache=True)
+pkginfo_tgl = SourcePackageInfoRetriever(_momArchivePath, _dest_distro, "staging", momCache=True)
 pkginfo_tgl.extra_suite = _extra_suite
 pkginfo_deb_unstable = PackageInfoRetriever(_momArchivePath, "debian", "unstable", momCache=True)
 pkginfo_deb_experimental = PackageInfoRetriever(_momArchivePath, "debian", "experimental", momCache=True)
