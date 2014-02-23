@@ -38,12 +38,14 @@ class PackageInfo():
         self.suite = suite
         self.component = component
         self.archs = archs
-        self.info = ""
         self.installed_archs = []
         self.directory = directory
 
         self.build_depends = ""
         self.build_conflicts = ""
+
+        self.maintainer = ""
+        self.comaintainers = ""
 
         self.extra_source_only = False
 
@@ -132,7 +134,7 @@ class PackageBuildInfoRetriever():
 
     def _set_pkg_installed_for_arch(self, dirname, pkg, binaryName):
         for arch in self._supportedArchs:
-            if arch in pkg.installedArchs:
+            if arch in pkg.installed_archs:
                 continue
 
             # check caches for installed package
@@ -140,7 +142,7 @@ class PackageBuildInfoRetriever():
             if pkg_id in self._installedPkgs:
                 existing_pkgversion = self._installedPkgs[pkg_id]
                 if pkg.version == existing_pkgversion:
-                    pkg.installedArchs.append(arch)
+                    pkg.installed_archs.append(arch)
                     continue
 
             # we also check if the package file is still installed in pool.
@@ -158,7 +160,7 @@ class PackageBuildInfoRetriever():
                     break
 
             if binaryExists:
-                pkg.installedArchs.append(arch)
+                pkg.installed_archs.append(arch)
                 continue
 
     def get_packages_for(self, suite, component):
@@ -194,6 +196,9 @@ class PackageBuildInfoRetriever():
             # values needed for build-dependency solving
             pkg.build_depends = section.get('Build-Depends', '')
             pkg.build_conflicts = section.get('Build-Conflicts', '')
+
+            pkg.maintainer = section['Maintainer']
+            pkg.comaintainers = section.get('Uploaders', '')
 
             # we check if one of the arch-binaries exists. if it does, we consider the package built for this architecture
             # FIXME: This does not work well for binNMUed packages! Implement a possible solution later.
