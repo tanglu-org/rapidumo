@@ -46,7 +46,7 @@ class JanitorDebcheck:
             archive_indices.append(archive_binary_index_path_all)
 
         if suite == "staging":
-            # staging needs the aequorea data (it is no complete suite)
+            # staging needs the devel suite data (it is no complete suite)
             archive_indices.extend(self._get_binary_indices_list(self._devel_suite, comp, arch))
 
         return archive_indices

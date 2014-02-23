@@ -4,6 +4,6 @@ export SCRIPTVARS=/srv/dak/config/tanglu/vars
 
 RAPIDUMO_PATH=/var/archive-kit/rapidumo
 
-CURRENT_DEV_SUITE=aequorea
+CURRENT_DEV_SUITE=bartholomea
 DEBIAN_SYNC_ENABLED=no
 TMP_DATA_DIR="/srv/dak/tmp/synchrotron-data"

@@ -87,7 +87,7 @@ for pset in pkg_sets:
 debian_naming_translation = {'firefox': 'iceweasel',
                              'thunderbird': 'icedove'}
 
-tanglu_series = "aequorea"
+tanglu_series = "bartholomea"
 debian_unstable_series = "unstable"
 debian_experimental_series = "experimental"
 
