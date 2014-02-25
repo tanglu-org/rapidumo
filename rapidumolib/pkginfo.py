@@ -89,8 +89,9 @@ class SourcePackageInfoRetriever():
 
             packageList.append(pkg)
 
-        if self.extra_suite != "":
-            packageList.extend(self._get_packages_for(self.extra_suite, component))
+        if suite == "staging":
+            if self.extra_suite != "":
+                packageList.extend(self._get_packages_for(self.extra_suite, component))
 
         return packageList
 

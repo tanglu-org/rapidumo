@@ -21,6 +21,7 @@ import sys
 import apt_pkg
 import subprocess
 import re
+from optparse import OptionParser
 
 from rapidumolib.pkginfo import *
 from rapidumolib.utils import *
