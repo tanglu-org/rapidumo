@@ -120,7 +120,7 @@ class PackageBuildInfoRetriever():
         path = aconf['path']
         path = "%s/%s" % (path, self._conf.distro_name)
         self._archivePath = path
-        export_path = aconf.['export_dir']
+        export_path = aconf['export_dir']
         self._installedPkgs = {}
 
         # to speed up source-fetching and to kill packages without maintainer immediately, we include the pkg-maintainer

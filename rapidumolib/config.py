@@ -51,7 +51,13 @@ class RapidumoConfig():
         return self._conf["Suites"]
 
     def get_supported_archs(self, suite):
-        for s in suites_config:
+        for s in self.suites_config:
             if s['name'] == suite:
                 return s['archs']
+        return None
+
+    def get_supported_components(self, suite):
+        for s in self.suites_config:
+            if s['name'] == suite:
+                return s['components']
         return None
