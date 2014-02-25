@@ -26,25 +26,25 @@ from update_source import bump_source_version
 from apt_pkg import TagFile, TagSection
 from optparse import OptionParser
 from rapidumolib.pkginfo import *
-from ConfigParser import SafeConfigParser
+from rapidumolib.config import *
 
 #REPO_POOL ="http://archive.tanglu.org/tanglu/pool"
 REPO_POOL = "file:///srv/dak/ftp/pool"
 
 class Autorebuild():
     def __init__(self, suite):
-        parser = SafeConfigParser()
-        parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
-        self._archivePath = parser.get('Archive', 'path')
-        _dest_distro = parser.get('General', 'distro_name')
-        extra_suite = parser.get('Archive', 'devel_suite')
+        conf = RapidumoConfig()
+        archive_conf = conf.archive_config
+        self._archivePath = archive_conf['path']
+        _dest_distro = conf.distro_name
+        extra_suite = archive_conf['devel_suite']
         self._suite = suite
         if suite == extra_suite:
             suite = "staging"
         else:
             extra_suite = ""
 
-        pkginfo_tgl = SourcePackageInfoRetriever(parser.get('Archive', 'path'), _dest_distro, suite)
+        pkginfo_tgl = SourcePackageInfoRetriever(self._archivePath, _dest_distro, suite)
         pkginfo_tgl.extra_suite = extra_suite
 
         # get a list of the highest versions of all packages in all components in the archive

@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from rapidumolib.utils import *
+from rapidumolib.config import *
 import subprocess
 import yaml
 import re
@@ -24,11 +25,12 @@ from janitor_utils import PackageRemovalItem
 
 class JanitorDebcheck:
     def __init__(self):
-        parser = get_archive_config_parser()
-        path = parser.get('Archive', 'path')
+        conf = RapidumoConfig()
+        aconf = conf.archive_config
+        path = aconf['path']
         self._archive_path = path
-        self._devel_suite = parser.get('Archive', 'devel_suite')
-        self._distro = parser.get('General', 'distro_name').lower()
+        self._devel_suite = aconf['devel_suite']
+        self._distro = conf.distro_name.lower()
 
     def _get_binary_indices_list(self, suite, comp, arch):
         archive_indices = []

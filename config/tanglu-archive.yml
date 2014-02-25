@@ -1,0 +1,31 @@
+---
+General:
+    distro_name: tanglu
+
+MOM:
+    path: /srv/patches.tanglu.org
+
+Archive:
+    path: /srv/archive.tanglu.org
+    devel_suite: bartholomea
+    staging_suite: staging
+    export_dir: /srv/dak/export
+
+SyncSource:
+    archs: amd64 armel armhf i386 ia64 mips mipsel powerpc s390 s390x sparc kfreebsd-amd64 kfreebsd-i386 m68k
+
+Janitor:
+    hints_file: /srv/dak/archive-hints/britney/janitor
+
+Templates:
+    package_watch:
+
+Suites:
+    - name: aequorea
+      components: main contrib non-free
+      archs: amd64 i386
+
+    - name: bartholomea
+      components: main contrib non-free
+      archs: amd64 i386
+

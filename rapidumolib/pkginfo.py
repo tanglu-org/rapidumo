@@ -23,6 +23,7 @@ from ConfigParser import SafeConfigParser
 from apt_pkg import TagFile, TagSection
 from apt_pkg import version_compare
 from rapidumolib.utils import *
+from rapidumolib.config import *
 
 def noEpoch(version):
     v = version
@@ -114,14 +115,12 @@ class SourcePackageInfoRetriever():
 """
 class PackageBuildInfoRetriever():
     def __init__(self):
-        parser = get_archive_config_parser()
-        path = parser.get('Archive', 'path')
-        path = "%s/%s" % (path, parser.get('General', 'distro_name'))
+        self._conf = RapidumoConfig()
+        aconf = self._conf.archive_config
+        path = aconf['path']
+        path = "%s/%s" % (path, self._conf.distro_name)
         self._archivePath = path
-        export_path = parser.get('Archive', 'export_dir')
-        self._archiveComponents = parser.get('Archive', 'components').split (" ")
-        self._supportedArchs = parser.get('Archive', 'archs').split (" ")
-        self._supportedArchs.append("all")
+        export_path = aconf.['export_dir']
         self._installedPkgs = {}
 
         # to speed up source-fetching and to kill packages without maintainer immediately, we include the pkg-maintainer
@@ -164,6 +163,9 @@ class PackageBuildInfoRetriever():
                 continue
 
     def get_packages_for(self, suite, component):
+        self._supportedArchs = self._conf.get_supported_archs(suite).split(" ")
+        self._supportedArchs.append("all")
+
         # create a cache of all installed packages on the different architectures
         self._build_installed_pkgs_cache(suite, component)
         source_path = self._archivePath + "/dists/%s/%s/source/Sources.gz" % (suite, component)

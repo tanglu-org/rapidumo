@@ -29,7 +29,6 @@ import urllib2
 import os, math, traceback, tempfile, re, sys
 import threading, Queue
 import subprocess
-from optparse import OptionParser
 
 import apt_pkg
 apt_pkg.init_system()
@@ -49,6 +48,7 @@ debug ('Starting')
 
 from rapidumolib.pkginfo import *
 from rapidumolib.utils import *
+from rapidumolib.config import *
 
 class Package:
     def __init__(self, name, stable_url, unstable_url):
@@ -107,11 +107,10 @@ for pset in pkg_sets:
             add_package(p, tag)
 
 # get configuration data
-parser = SafeConfigParser()
-parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
-_momArchivePath = parser.get('MOM', 'path')
-_dest_distro = parser.get('General', 'distro_name')
-_extra_suite = parser.get('Archive', 'devel_suite')
+conf = RapidumoConfig()
+_momArchivePath = conf.mom_config["path"]
+_dest_distro = conf.distro_name
+_extra_suite = conf.archive_config["devel_suite"]
 
 pkginfo_tgl = SourcePackageInfoRetriever(_momArchivePath, _dest_distro, "staging", momCache=True)
 pkginfo_tgl.extra_suite = _extra_suite
@@ -122,7 +121,7 @@ pkgs_debian_unstable = pkginfo_deb_unstable.get_packages_dict("main")
 pkgs_debian_experimental = pkginfo_deb_experimental.get_packages_dict("main")
 pkgs_tanglu = pkginfo_tgl.get_packages_dict("main")
 
-tpath = parser.get('Templates', 'package_watch')
+tpath = conf.templates_config["package_watch"]
 if tpath != "":
     html_template = open(tpath, 'r').read()
 else:

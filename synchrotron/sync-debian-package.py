@@ -21,24 +21,23 @@ import sys
 import apt_pkg
 import subprocess
 import re
-from optparse import OptionParser
 
 from rapidumolib.pkginfo import *
 from rapidumolib.utils import *
+from rapidumolib.config import *
 
 class SyncPackage:
     def __init__(self):
         self.debugMode = False
         self.dryRun = False
 
-        parser = SafeConfigParser()
-        parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
-        self._momArchivePath = parser.get('MOM', 'path')
-        self._destDistro = parser.get('General', 'distro_name')
-        self._extra_suite = parser.get('Archive', 'devel_suite')
+        conf = RapidumoConfig()
+        self._momArchivePath = conf.mom_config['path']
+        self._destDistro = conf.distro_name
+        self._extra_suite = conf.archive_config['devel_suite']
 
-        self._supportedArchs = parser.get('Archive', 'archs').split (" ")
-        self._unsupportedArchs = parser.get('SyncSource', 'archs').split (" ")
+        self._supportedArchs = conf.get_supported_archs(self._extra_suite).split (" ")
+        self._unsupportedArchs = conf.syncsource_config['archs'].split (" ")
         for arch in self._supportedArchs:
             self._unsupportedArchs.remove(arch)
 

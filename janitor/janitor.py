@@ -25,22 +25,23 @@ from optparse import OptionParser
 
 from rapidumolib.pkginfo import *
 from rapidumolib.utils import *
+from rapidumolib.config import *
 from janitor_utils import *
 from debian_removals import DebianRemovals
 from installability_test import JanitorDebcheck
 
 class Janitor:
     def __init__(self, suite = ""):
-        parser = get_archive_config_parser()
+        conf = RapidumoConfig()
         self._current_suite = suite
         if self._current_suite == "":
-            self._current_suite = parser.get('Archive', 'devel_suite')
-        self._distro_name = parser.get('General', 'distro_name')
-        self._staging_suite = parser.get('Archive', 'staging_suite')
-        self._archive_path = parser.get('Archive', 'path')
-        self._supportedArchs = parser.get('Archive', 'archs').split (" ")
+            self._current_suite = conf.archive_config['devel_suite']
+        self._distro_name = conf.distro_name
+        self._staging_suite = conf.archive_config['staging_suite']
+        self._archive_path = conf.archive_config['path']
+        self._supportedArchs = conf.get_supported_archs(self._current_suite).split (" ")
 
-        self._hints_file = parser.get('Janitor', 'hints_file')
+        self._hints_file = conf.janitor_config['hints_file']
 
         pkginfo = SourcePackageInfoRetriever(self._archive_path, self._distro_name, self._current_suite)
         self._source_pkgs_full = pkginfo.get_packages_dict("non-free")
