@@ -163,9 +163,17 @@ class PackageBuildInfoRetriever():
                 pkg.installed_archs.append(arch)
                 continue
 
-    def get_packages_for(self, suite, component):
-        self._supportedArchs = self._conf.get_supported_archs(suite).split(" ")
+    def _set_supported_archs(self, suite):
+        devel_suite = self._conf.archive_config['devel_suite']
+        staging_suite = self._conf.archive_config['staging_suite']
+        a_suite = suite
+        if suite == staging_suite:
+            a_suite = devel_suite
+        self._supportedArchs = self._conf.get_supported_archs(a_suite).split(" ")
         self._supportedArchs.append("all")
+
+    def get_packages_for(self, suite, component):
+        self._set_supported_archs(suite)
 
         # create a cache of all installed packages on the different architectures
         self._build_installed_pkgs_cache(suite, component)
@@ -212,7 +220,6 @@ class PackageBuildInfoRetriever():
                 binaryPkgs = [binaries]
             for binaryName in binaryPkgs:
                 self._set_pkg_installed_for_arch(directory, pkg, binaryName)
-                #if (pkg.installedArchs != ["all"]) or (len(binaryPkgs) <= 0:
 
             packageList += [pkg]
 
