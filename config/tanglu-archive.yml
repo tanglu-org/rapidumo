@@ -10,6 +10,7 @@ Archive:
     devel_suite: bartholomea
     staging_suite: staging
     export_dir: /srv/dak/export
+    incoming: /pub/ftp/incoming
 
 SyncSource:
     archs: amd64 armel armhf i386 ia64 mips mipsel powerpc s390 s390x sparc kfreebsd-amd64 kfreebsd-i386 m68k

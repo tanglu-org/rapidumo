@@ -39,7 +39,10 @@ class Janitor:
         self._distro_name = conf.distro_name
         self._staging_suite = conf.archive_config['staging_suite']
         self._archive_path = conf.archive_config['path']
-        self._supportedArchs = conf.get_supported_archs(self._current_suite).split (" ")
+        arch_suite = self._current_suite
+        if arch_suite == self._staging_suite:
+            arch_suite = conf.archive_config['devel_suite']
+        self._supportedArchs = conf.get_supported_archs(arch_suite).split (" ")
 
         self._hints_file = conf.janitor_config['hints_file']
 
