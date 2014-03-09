@@ -30,3 +30,13 @@ Suites:
       components: main contrib non-free
       archs: amd64 i386
 
+Fedmsg:
+    prefix: "org.tanglu"
+    sign: false
+    environment: "dev"
+    endpoints:
+        "rapidumolib.curie":
+            - "tcp://localhost:3000"
+            - "tcp://localhost:3001"
+            - "tcp://localhost:3002"
+            - "tcp://localhost:3003"

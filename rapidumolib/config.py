@@ -50,6 +50,10 @@ class RapidumoConfig():
     def suites_config(self):
         return self._conf["Suites"]
 
+    @property
+    def fedmsg_config(self):
+        return self._conf["Fedmsg"]
+
     def get_supported_archs(self, suite):
         for s in self.suites_config:
             if s['name'] == suite:
