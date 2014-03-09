@@ -32,7 +32,7 @@ if fedmsg:
         endpoints=fmcfg.get("endpoints", {}),
     )
 
-def emit_raw(component, topic, modname, message):
+def emit_raw(component, modname, topic, message):
     modname = "%s.%s" % (component, modname)
     if fedmsg:
         return fedmsg.publish(topic=topic, modname=modname, msg=message)

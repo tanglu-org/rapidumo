@@ -26,6 +26,7 @@ from optparse import OptionParser
 from rapidumolib.pkginfo import *
 from rapidumolib.utils import *
 from rapidumolib.config import *
+from rapidumolib.messaging import *
 
 class SyncPackage:
     def __init__(self):
@@ -52,6 +53,10 @@ class SyncPackage:
         self._pkgs_src = pkginfo_src.get_packages_dict(component)
         self._pkgs_dest = pkginfo_dest.get_packages_dict(component)
         self._pkg_blacklist = self._read_blacklist()
+
+    @staticmethod
+    def emit(modname, topic, message):
+        emit_raw("synchrotron", modname, topic, message)
 
     def _read_blacklist(self):
         filename = "%s/sync-blacklist.txt" % self._momArchivePath
@@ -92,8 +97,10 @@ class SyncPackage:
         if p.returncode is not 0:
             stdout, stderr = p.communicate()
             print("ERR: %s\n%s %s" % (cmd, stdout, stderr))
+            emit("import", "error", "Import of package %s-%s failed!" % (pkg.pkgname, pkg.version))
             raise Exception("Error while running dak!")
             return False
+        emit("import", "done", "Synced package %s-%s from Debian." % (pkg.pkgname, pkg.version))
 
         return True
 
