@@ -32,8 +32,14 @@ def noEpoch(version):
     else:
         return v
 
+def find_dsc(value):
+    for text in value.split(None):
+        if text.endswith(".dsc"):
+            return text
+    return None
+
 class PackageInfo():
-    def __init__(self, pkgname, pkgversion, suite, component, archs, directory):
+    def __init__(self, pkgname, pkgversion, suite, component, archs, directory, dsc):
         self.pkgname = pkgname
         self.version = pkgversion
         self.suite = suite
@@ -41,6 +47,7 @@ class PackageInfo():
         self.archs = archs
         self.installed_archs = []
         self.directory = directory
+        self.dsc = dsc
 
         self.build_depends = ""
         self.build_conflicts = ""
@@ -82,7 +89,8 @@ class SourcePackageInfoRetriever():
             pkgversion = section['Version']
             pkgname = section['Package']
             directory = section['Directory']
-            pkg = PackageInfo(pkgname, pkgversion, suite, component, archs, directory)
+            dsc = find_dsc(section['Files'])
+            pkg = PackageInfo(pkgname, pkgversion, suite, component, archs, directory, dsc)
 
             if section.get('Extra-Source-Only', 'no') == 'yes':
                 pkg.extra_source_only = True
@@ -193,6 +201,7 @@ class PackageBuildInfoRetriever():
             binaries = section['Binary']
             pkgversion = section['Version']
             directory = section['Directory']
+            dsc = find_dsc(section['Files'])
 
             if ' ' in archs_str:
                 archs = archs_str.split(' ')
@@ -202,7 +211,7 @@ class PackageBuildInfoRetriever():
             # this is very important, because we otherwise will add duplicate build requests in Jenkins
             archs = list(set(archs))
 
-            pkg = PackageInfo(pkgname, pkgversion, suite, component, archs, directory)
+            pkg = PackageInfo(pkgname, pkgversion, suite, component, archs, directory, dsc)
 
             # values needed for build-dependency solving
             pkg.build_depends = section.get('Build-Depends', '')
