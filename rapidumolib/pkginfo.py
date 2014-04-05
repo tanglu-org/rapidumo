@@ -46,6 +46,7 @@ class PackageInfo():
         self.suite = suite
         self.component = component
         self.archs = archs
+        self.binaries = []
         self.installed_archs = []
         self.directory = directory
         self.dsc = dsc
@@ -144,51 +145,17 @@ class PackageBuildInfoRetriever():
             if len(pkg_m) > 1:
                 self._activePackages.append(pkg_m[0].strip())
 
-    def _set_pkg_installed_for_arch(self, dirname, pkg, binaryName):
-        for arch in self._supportedArchs:
-            if arch in pkg.installed_archs:
-                continue
-
-            # check caches for installed package
-            pkg_id = "%s_%s" % (binaryName, arch)
-            if pkg_id in self._installedPkgs:
-                existing_pkgversion = self._installedPkgs[pkg_id]
-                if pkg.version == existing_pkgversion:
-                    pkg.installed_archs.append(arch)
-                    continue
-
-            # we also check if the package file is still installed in pool.
-            # this reduces the amount of useless rebuild requests, because if there is still
-            # a binary package in pool, the newly built package with the same version will be rejected
-            # anyway.
-            # This doesn't catch all corner-cases (e.g. different binary-versions), but it's better than nothing.
-            binaryExists = False
-            for fileExt in ["deb", "udeb"]:
-                binaryPkgName = "%s_%s_%s.%s" % (binaryName, pkg.getVersionNoEpoch(), arch, fileExt)
-                expectedPackagePath = self._archivePath + "/%s/%s" % (dirname, binaryPkgName)
-
-                if os.path.isfile(expectedPackagePath):
-                    binaryExists = True
-                    break
-
-            if binaryExists:
-                pkg.installed_archs.append(arch)
-                continue
-
-    def _set_supported_archs(self, suite):
+    def _set_suite_info(self, suite):
         devel_suite = self._conf.archive_config['devel_suite']
         staging_suite = self._conf.archive_config['staging_suite']
         a_suite = suite
         if suite == staging_suite:
             a_suite = devel_suite
+        self._supportedComponents = self._conf.get_supported_components(a_suite).split(" ")
         self._supportedArchs = self._conf.get_supported_archs(a_suite).split(" ")
         self._supportedArchs.append("all")
 
-    def get_packages_for(self, suite, component):
-        self._set_supported_archs(suite)
-
-        # create a cache of all installed packages on the different architectures
-        self._build_installed_pkgs_cache(suite, component)
+    def _get_package_list(self, suite, component):
         source_path = self._archivePath + "/dists/%s/%s/source/Sources.gz" % (suite, component)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile(f)
@@ -202,7 +169,6 @@ class PackageBuildInfoRetriever():
             if not pkgname in self._activePackages:
                 continue
             archs_str = section['Architecture']
-            binaries = section['Binary']
             pkgversion = section['Version']
             directory = section['Directory']
             dsc = find_dsc(section['Files'])
@@ -224,49 +190,39 @@ class PackageBuildInfoRetriever():
             pkg.maintainer = section['Maintainer']
             pkg.comaintainers = section.get('Uploaders', '')
 
-            # we check if one of the arch-binaries exists. if it does, we consider the package built for this architecture
-            # FIXME: This does not work well for binNMUed packages! Implement a possible solution later.
-            # (at time, a version-check prevents packages from being built twice)
-            if "," in binaries:
-                binaryPkgs = binaries.split(', ')
-            else:
-                binaryPkgs = [binaries]
-            for binaryName in binaryPkgs:
-                self._set_pkg_installed_for_arch(directory, pkg, binaryName)
-
             packageList += [pkg]
 
         return packageList
 
-    def _build_installed_pkgs_cache(self, suite, component):
-        for arch in self._supportedArchs:
-            source_path = self._archivePath + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, component, arch)
-            f = gzip.open(source_path, 'rb')
-            tagf = TagFile(f)
-            for section in tagf:
-                # make sure we have the right arch (closes bug in installed-detection)
-                if section['Architecture'] != arch:
-                    continue
+    def _add_binaries_to_dict(self, pkg_dict, suite, component, arch):
+        source_path = self._archivePath + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, component, arch)
+        f = gzip.open(source_path, 'rb')
+        tagf = TagFile(f)
+        for section in tagf:
+            # make sure we have the right arch (closes bug in installed-detection)
+            if section['Architecture'] != arch:
+                continue
 
-                pkgversion = section['Version']
-                pkgname = section['Package']
-                pkgsource = section.get('Source', '')
-                # if source has different version, we cheat and set the binary pkg version
-                # to the source package version
-                if "(" in pkgsource:
-                    m = re.search(r"\((.*)\)", pkgsource)
-                    s = m.group(1).strip()
-                    if s != "":
-                        pkgversion = s
-                pkid = "%s_%s" % (pkgname, arch)
-                if pkid in self._installedPkgs:
-                    regVersion = self._installedPkgs[pkid]
-                    compare = version_compare(regVersion, pkgversion)
-                    if compare >= 0:
-                        continue
-                self._installedPkgs[pkid] = pkgversion
+            pkgversion = section['Version']
+            pkgname = section['Package']
+            pkgsource = section.get('Source', pkgname)
+            # if source has different version, we cheat and set the binary pkg version
+            # to the source package version
+            if "(" in pkgsource:
+                m = re.search(r"^(.*)\((.*)\)$", pkgsource)
+                pkgsource = m.group(1).strip()
+                pkgversion = m.group(2).strip()
 
-    def package_list_to_dict(self, pkg_list):
+            pkg = pkg_dict.get(pkgsource, None)
+            if pkg is not None and pkg.version == pkgversion:
+                if arch not in pkg.installed_archs and os.path.isfile(self._archivePath + section['Filename']):
+                    pkg.installed_archs += [arch]
+                pkg.binaries += [(pkgname, arch, section['Filename'])]
+                pkg_dict[pkgsource] = pkg
+
+        return pkg_dict
+
+    def _package_list_to_dict(self, pkg_list):
         pkg_dict = {}
         for pkg in pkg_list:
             # replace it only if the version of the new item is higher (required to handle epoch bumps and new uploads)
@@ -276,4 +232,18 @@ class PackageBuildInfoRetriever():
                 if compare >= 0:
                     continue
             pkg_dict[pkg.pkgname] = pkg
+        return pkg_dict
+
+    def get_packages(self, suite):
+        self._set_suite_info(suite)
+
+        pkg_list = []
+        for component in self._supportedComponents:
+            pkg_list += self._get_package_list(suite, component)
+        pkg_dict = self._package_list_to_dict()
+
+        for component in self._supportedComponents:
+            for arch in self._supportedArchs:
+                pkg_dict = self._add_binaries_to_dict(pkg_dict, suite, component, arch)
+
         return pkg_dict
