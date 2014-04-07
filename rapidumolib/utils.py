@@ -19,12 +19,15 @@
 import os
 from ConfigParser import SafeConfigParser
 
+
 def get_template_dir():
     dir_str = os.path.dirname(os.path.realpath(__file__)) + "/../templates"
     return dir_str
 
+
 def replace_template_var(tpl, varname, varvalue):
     return tpl.replace("{{%s}}" % (varname), varvalue)
+
 
 def get_archive_config_parser():
     parser = SafeConfigParser()

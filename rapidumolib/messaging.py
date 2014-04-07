@@ -19,7 +19,9 @@ try:
     import fedmsg
 except ImportError:
     fedmsg = None
-from rapidumolib.config import *
+
+from rapidumolib.config import RapidumoConfig
+
 
 if fedmsg:
     config = RapidumoConfig()
@@ -31,6 +33,7 @@ if fedmsg:
         sign_messages=fmcfg.get("sign", False),
         endpoints=fmcfg.get("endpoints", {}),
     )
+
 
 def emit_raw(component, modname, topic, message):
     modname = "%s.%s" % (component, modname)

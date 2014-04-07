@@ -19,11 +19,10 @@
 import gzip
 import os.path
 import re
-from ConfigParser import SafeConfigParser
-from apt_pkg import TagFile, TagSection
+from apt_pkg import TagFile
 from apt_pkg import version_compare
-from rapidumolib.utils import *
-from rapidumolib.config import *
+from rapidumolib.config import RapidumoConfig
+
 
 def noEpoch(version):
     v = version
@@ -32,11 +31,13 @@ def noEpoch(version):
     else:
         return v
 
+
 def find_dsc(value):
     for text in value.split(None):
         if text.endswith(".dsc"):
             return text
     return None
+
 
 class PackageInfo():
     def __init__(self, pkgname, pkgversion, suite, component, archs, directory, dsc):
@@ -63,11 +64,13 @@ class PackageInfo():
     def __str__(self):
         return "Package: name: %s | version: %s | suite: %s | comp.: %s" % (self.pkgname, self.version, self.suite, self.component)
 
-"""
- Retrieve information about source packages available
- in the distribution.
-"""
+
 class SourcePackageInfoRetriever():
+    """
+     Retrieve information about source packages available
+     in the distribution.
+    """
+
     def __init__(self, path, distro, suite, momCache=False):
         self._archivePath = path
         self._distroName = distro
@@ -81,11 +84,10 @@ class SourcePackageInfoRetriever():
         else:
             source_path = self._archivePath + "/%s/dists/%s/%s/source/Sources.gz" % (self._distroName, suite, component)
         f = gzip.open(source_path, 'rb')
-        tagf = TagFile (f)
+        tagf = TagFile(f)
         packageList = []
         for section in tagf:
             archs = section['Architecture']
-            binaries = section['Binary']
             pkgversion = section['Version']
             pkgname = section['Package']
             directory = section['Directory']
@@ -118,11 +120,13 @@ class SourcePackageInfoRetriever():
 
         return packages_dict
 
-"""
- Retrieve information about source packages and their build status.
- Useful for our build infrastructure.
-"""
+
 class PackageBuildInfoRetriever():
+    """
+     Retrieve information about source packages and their build status.
+     Useful for our build infrastructure.
+    """
+
     def __init__(self):
         self._conf = RapidumoConfig()
         aconf = self._conf.archive_config
@@ -136,9 +140,9 @@ class PackageBuildInfoRetriever():
         # mapping, to find out active source/binary packages (currently, only source packages are filtered)
         self._activePackages = []
         for line in open(export_path + "/SourceMaintainers"):
-           pkg_m = line.strip ().split (" ", 1)
-           if len (pkg_m) > 1:
-               self._activePackages.append(pkg_m[0].strip())
+            pkg_m = line.strip().split(" ", 1)
+            if len(pkg_m) > 1:
+                self._activePackages.append(pkg_m[0].strip())
 
     def _set_pkg_installed_for_arch(self, dirname, pkg, binaryName):
         for arch in self._supportedArchs:
@@ -187,7 +191,7 @@ class PackageBuildInfoRetriever():
         self._build_installed_pkgs_cache(suite, component)
         source_path = self._archivePath + "/dists/%s/%s/source/Sources.gz" % (suite, component)
         f = gzip.open(source_path, 'rb')
-        tagf = TagFile (f)
+        tagf = TagFile(f)
         packageList = []
         for section in tagf:
             # don't even try to build source-only packages
@@ -238,7 +242,7 @@ class PackageBuildInfoRetriever():
         for arch in self._supportedArchs:
             source_path = self._archivePath + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, component, arch)
             f = gzip.open(source_path, 'rb')
-            tagf = TagFile (f)
+            tagf = TagFile(f)
             for section in tagf:
                 # make sure we have the right arch (closes bug in installed-detection)
                 if section['Architecture'] != arch:
@@ -256,10 +260,10 @@ class PackageBuildInfoRetriever():
                         pkgversion = s
                 pkid = "%s_%s" % (pkgname, arch)
                 if pkid in self._installedPkgs:
-                   regVersion = self._installedPkgs[pkid]
-                   compare = version_compare(regVersion, pkgversion)
-                   if compare >= 0:
-                       continue
+                    regVersion = self._installedPkgs[pkid]
+                    compare = version_compare(regVersion, pkgversion)
+                    if compare >= 0:
+                        continue
                 self._installedPkgs[pkid] = pkgversion
 
     def package_list_to_dict(self, pkg_list):
