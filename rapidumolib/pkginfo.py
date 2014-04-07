@@ -240,7 +240,7 @@ class PackageBuildInfoRetriever():
         pkg_list = []
         for component in self._supportedComponents:
             pkg_list += self._get_package_list(suite, component)
-        pkg_dict = self._package_list_to_dict()
+        pkg_dict = self._package_list_to_dict(pkg_list)
 
         for component in self._supportedComponents:
             for arch in self._supportedArchs:
