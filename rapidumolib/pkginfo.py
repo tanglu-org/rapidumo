@@ -214,6 +214,12 @@ class PackageBuildInfoRetriever():
                 pkgversion = m.group(2).strip()
 
             pkg = pkg_dict.get(pkgsource, None)
+
+            # we also check if the package file is still installed in pool.
+            # this reduces the amount of useless rebuild requests, because if there is still
+            # a binary package in pool, the newly built package with the same version will be rejected
+            # anyway.
+            # This doesn't catch all corner-cases (e.g. different binary-versions), but it's better than nothing.
             if pkg is not None and pkg.version == pkgversion:
                 if arch not in pkg.installed_archs and os.path.isfile(self._archivePath + section['Filename']):
                     pkg.installed_archs += [arch]
