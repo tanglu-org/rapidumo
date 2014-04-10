@@ -24,6 +24,19 @@ from apt_pkg import version_compare
 from rapidumolib.config import RapidumoConfig
 
 
+def package_list_to_dict(pkg_list):
+    pkg_dict = {}
+    for pkg in pkg_list:
+        # replace it only if the version of the new item is higher (required to handle epoch bumps and new uploads)
+        if pkg.pkgname in pkg_dict:
+            regVersion = pkg_dict[pkg.pkgname].version
+            compare = version_compare(regVersion, pkg.version)
+            if compare >= 0:
+                continue
+        pkg_dict[pkg.pkgname] = pkg
+    return pkg_dict
+
+
 def noEpoch(version):
     v = version
     if ":" in v:
@@ -108,16 +121,8 @@ class SourcePackageInfoRetriever():
 
     def get_packages_dict(self, component):
         packageList = self._get_packages_for(self._suiteName, component)
-        packages_dict = {}
-        for pkg in packageList:
-            pkgname = pkg.pkgname
-            # replace it only if the version of the new item is higher (required to handle epoch bumps and new uploads)
-            if pkgname in packages_dict:
-                regVersion = packages_dict[pkgname].version
-                compare = version_compare(regVersion, pkg.version)
-                if compare >= 0:
-                    continue
-            packages_dict[pkgname] = pkg
+
+        packages_dict = package_list_to_dict(packageList)
 
         return packages_dict
 
@@ -224,25 +229,13 @@ class PackageBuildInfoRetriever():
 
         return pkg_dict
 
-    def _package_list_to_dict(self, pkg_list):
-        pkg_dict = {}
-        for pkg in pkg_list:
-            # replace it only if the version of the new item is higher (required to handle epoch bumps and new uploads)
-            if pkg.pkgname in pkg_dict:
-                regVersion = pkg_dict[pkg.pkgname].version
-                compare = version_compare(regVersion, pkg.version)
-                if compare >= 0:
-                    continue
-            pkg_dict[pkg.pkgname] = pkg
-        return pkg_dict
-
     def get_packages(self, suite):
         self._set_suite_info(suite)
 
         pkg_list = []
         for component in self._supportedComponents:
             pkg_list += self._get_package_list(suite, component)
-        pkg_dict = self._package_list_to_dict(pkg_list)
+        pkg_dict = package_list_to_dict(pkg_list)
 
         for component in self._supportedComponents:
             for arch in self._supportedArchs:
