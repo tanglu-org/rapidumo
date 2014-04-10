@@ -146,13 +146,9 @@ class PackageBuildInfoRetriever():
                 self._activePackages.append(pkg_m[0].strip())
 
     def _set_suite_info(self, suite):
-        devel_suite = self._conf.archive_config['devel_suite']
-        staging_suite = self._conf.archive_config['staging_suite']
-        a_suite = suite
-        if suite == staging_suite:
-            a_suite = devel_suite
-        self._supportedComponents = self._conf.get_supported_components(a_suite).split(" ")
-        self._supportedArchs = self._conf.get_supported_archs(a_suite).split(" ")
+        base_suite = self._conf.get_base_suite(suite)
+        self._supportedComponents = self._conf.get_supported_components(base_suite).split(" ")
+        self._supportedArchs = self._conf.get_supported_archs(base_suite).split(" ")
         self._supportedArchs.append("all")
 
     def _get_package_list(self, suite, component):
