@@ -21,7 +21,6 @@ import os.path
 import re
 from apt_pkg import TagFile
 from apt_pkg import version_compare
-from rapidumolib.config import RapidumoConfig
 
 
 def package_list_to_dict(pkg_list):
@@ -133,14 +132,10 @@ class PackageBuildInfoRetriever():
      Useful for our build infrastructure.
     """
 
-    def __init__(self):
-        self._conf = RapidumoConfig()
-        aconf = self._conf.archive_config
-        path = aconf['path']
-        path = "%s/%s" % (path, self._conf.distro_name)
-        self._archivePath = path
-        export_path = aconf['export_dir']
-        self._installedPkgs = {}
+    def __init__(self, conf):
+        self._conf = conf
+        self._archivePath = "%s/%s" % (self._conf.archive_config['path'], self._conf.distro_name)
+        export_path = self._conf.archive_config['export_dir']
 
         # to speed up source-fetching and to kill packages without maintainer immediately, we include the pkg-maintainer
         # mapping, to find out active source/binary packages (currently, only source packages are filtered)
@@ -149,12 +144,6 @@ class PackageBuildInfoRetriever():
             pkg_m = line.strip().split(" ", 1)
             if len(pkg_m) > 1:
                 self._activePackages.append(pkg_m[0].strip())
-
-    def _set_suite_info(self, suite):
-        base_suite = self._conf.get_base_suite(suite)
-        self._supportedComponents = self._conf.get_supported_components(base_suite).split(" ")
-        self._supportedArchs = self._conf.get_supported_archs(base_suite).split(" ")
-        self._supportedArchs.append("all")
 
     def _get_package_list(self, suite, component):
         source_path = self._archivePath + "/dists/%s/%s/source/Sources.gz" % (suite, component)
@@ -169,20 +158,15 @@ class PackageBuildInfoRetriever():
             pkgname = section['Package']
             if not pkgname in self._activePackages:
                 continue
-            archs_str = section['Architecture']
             pkgversion = section['Version']
+            archs = list(set(section['Architecture'].split(None)))
             directory = section['Directory']
             dsc = find_dsc(section['Files'])
 
-            if ' ' in archs_str:
-                archs = archs_str.split(' ')
-            else:
-                archs = [archs_str]
-            # remove duplicate archs from list
-            # this is very important, because we otherwise will add duplicate build requests in Jenkins
-            archs = list(set(archs))
-
             pkg = PackageInfo(pkgname, pkgversion, suite, component, archs, directory, dsc)
+
+            if section.get('Extra-Source-Only', 'no') == 'yes':
+                pkg.extra_source_only = True
 
             # values needed for build-dependency solving
             pkg.build_depends = section.get('Build-Depends', '')
@@ -229,16 +213,19 @@ class PackageBuildInfoRetriever():
 
         return pkg_dict
 
-    def get_packages(self, suite):
-        self._set_suite_info(suite)
+    def get_packages_dict(self, suite):
+        base_suite = self._conf.get_base_suite(suite)
+        components = self._conf.get_supported_components(base_suite).split(" ")
+        archs = self._conf.get_supported_archs(base_suite).split(" ")
+        archs.append("all")
 
         pkg_list = []
-        for component in self._supportedComponents:
+        for component in components:
             pkg_list += self._get_package_list(suite, component)
         pkg_dict = package_list_to_dict(pkg_list)
 
-        for component in self._supportedComponents:
-            for arch in self._supportedArchs:
+        for component in components:
+            for arch in archs:
                 pkg_dict = self._add_binaries_to_dict(pkg_dict, suite, component, arch)
 
         return pkg_dict
