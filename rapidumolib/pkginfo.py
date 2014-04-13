@@ -216,13 +216,13 @@ class PackageBuildInfoRetriever():
             for arch in archs:
                 if (arch not in pkg.installed_archs and
                         glob.glob(self._archivePath + "/%s/*_%s_%s.deb" %
-                                  (pkg.directory, noEpoch(pkg.pkgversion), arch))):
+                                  (pkg.directory, noEpoch(pkg.version), arch))):
                     # There are *.deb files in the pool, but no entries in Packages.gz
                     # We don't want spurious build jobs if this is a temporary error,
                     # but without info on the binary packages we can't use them either,
                     # so skip this package for now.
                     print("Skipping %s (%s) in %s due to repository inconsistencies" %
-                          (pkg.pkgname, pkg.pkgversion, pkg.suite))
+                          (pkg.pkgname, pkg.version, pkg.suite))
                     del pkg_dict[name]
                     break
 
