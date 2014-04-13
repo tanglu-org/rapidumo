@@ -16,11 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import glob
 import gzip
-import os.path
 import re
-from apt_pkg import TagFile
-from apt_pkg import version_compare
+from apt_pkg import TagFile, version_compare
 
 
 def package_list_to_dict(pkg_list):
@@ -135,15 +134,6 @@ class PackageBuildInfoRetriever():
     def __init__(self, conf):
         self._conf = conf
         self._archivePath = "%s/%s" % (self._conf.archive_config['path'], self._conf.distro_name)
-        export_path = self._conf.archive_config['export_dir']
-
-        # to speed up source-fetching and to kill packages without maintainer immediately, we include the pkg-maintainer
-        # mapping, to find out active source/binary packages (currently, only source packages are filtered)
-        self._activePackages = []
-        for line in open(export_path + "/SourceMaintainers"):
-            pkg_m = line.strip().split(" ", 1)
-            if len(pkg_m) > 1:
-                self._activePackages.append(pkg_m[0].strip())
 
     def _get_package_list(self, suite, component):
         source_path = self._archivePath + "/dists/%s/%s/source/Sources.gz" % (suite, component)
@@ -156,8 +146,6 @@ class PackageBuildInfoRetriever():
                 continue
 
             pkgname = section['Package']
-            if not pkgname in self._activePackages:
-                continue
             pkgversion = section['Version']
             archs = list(set(section['Architecture'].split(None)))
             directory = section['Directory']
@@ -200,13 +188,8 @@ class PackageBuildInfoRetriever():
 
             pkg = pkg_dict.get(pkgsource, None)
 
-            # we also check if the package file is still installed in pool.
-            # this reduces the amount of useless rebuild requests, because if there is still
-            # a binary package in pool, the newly built package with the same version will be rejected
-            # anyway.
-            # This doesn't catch all corner-cases (e.g. different binary-versions), but it's better than nothing.
             if pkg is not None and pkg.version == pkgversion:
-                if arch not in pkg.installed_archs and os.path.isfile(self._archivePath + section['Filename']):
+                if arch not in pkg.installed_archs:
                     pkg.installed_archs += [arch]
                 pkg.binaries += [(pkgname, arch, section['Filename'])]
                 pkg_dict[pkgsource] = pkg
@@ -215,17 +198,32 @@ class PackageBuildInfoRetriever():
 
     def get_packages_dict(self, suite):
         base_suite = self._conf.get_base_suite(suite)
+        suites = [suite, base_suite] if suite != base_suite else [suite]
         components = self._conf.get_supported_components(base_suite).split(" ")
-        archs = self._conf.get_supported_archs(base_suite).split(" ")
-        archs.append("all")
+        archs = self._conf.get_supported_archs(base_suite).split(" ") + ["all"]
 
         pkg_list = []
         for component in components:
             pkg_list += self._get_package_list(suite, component)
         pkg_dict = package_list_to_dict(pkg_list)
 
-        for component in components:
+        for suite in suites:
+            for component in components:
+                for arch in archs:
+                    pkg_dict = self._add_binaries_to_dict(pkg_dict, suite, component, arch)
+
+        for name, pkg in pkg_dict.items():
             for arch in archs:
-                pkg_dict = self._add_binaries_to_dict(pkg_dict, suite, component, arch)
+                if (arch not in pkg.installed_archs and
+                        glob.glob(self._archivePath + "/%s/*_%s_%s.deb" %
+                                  (pkg.directory, noEpoch(pkg.pkgversion), arch))):
+                    # There are *.deb files in the pool, but no entries in Packages.gz
+                    # We don't want spurious build jobs if this is a temporary error,
+                    # but without info on the binary packages we can't use them either,
+                    # so skip this package for now.
+                    print("Skipping %s (%s) in %s due to repository inconsistencies" %
+                          (pkg.pkgname, pkg.pkgversion, pkg.suite))
+                    del pkg_dict[name]
+                    break
 
         return pkg_dict
