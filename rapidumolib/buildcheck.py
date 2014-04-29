@@ -38,17 +38,13 @@ class BuildCheck:
         elif comp != "main":
             comps += [comp]
 
-        archs = [arch]
         if arch == "all":
-            archs += ["amd64"]
-        else:
-            archs += ["all"]
+            arch = "amd64"
 
         binary_indices = []
         for suite in suites:
             for comp in comps:
-                for arch in archs:
-                    binary_indices += [self._archive_path + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, comp, arch)]
+                binary_indices += [self._archive_path + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, comp, arch)]
 
         return binary_indices
 
