@@ -55,6 +55,5 @@ dak generate-releases -s staging
 # sync the public local ftp mirror
 mirror
 
-# update jenkins
-maintain-jenkins-jobs --update
-maintain-jenkins-jobs --checkbuild
+# tell Debile that we have new stuff
+debile_unblock_trigger
