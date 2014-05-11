@@ -21,6 +21,7 @@ import sys
 import apt_pkg
 import subprocess
 import re
+import time
 from optparse import OptionParser
 
 from rapidumolib.pkginfo import *
@@ -218,6 +219,7 @@ class SyncPackage:
 
         mergeListPage = open(get_template_dir() + "/merge-list.html.tmpl", 'r').read()
         mergeListPage = mergeListPage.replace("{{MERGE_TODO_PACKAGES_HTML}}", "\n".join(mergeTodoHtml))
+        mergeListPage = mergeListPage.replace("{{TIME}}", time.strftime("%c"))
         f = open('/srv/dak/export/package-watch/merge-todo_%s.html' % (self._component), 'w')
         f.write(mergeListPage)
         f.close()
