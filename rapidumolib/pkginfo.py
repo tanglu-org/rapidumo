@@ -167,8 +167,11 @@ class PackageBuildInfoRetriever():
 
         return packageList
 
-    def _add_binaries_to_dict(self, pkg_dict, suite, component, arch):
-        source_path = self._archivePath + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, component, arch)
+    def _add_binaries_to_dict(self, pkg_dict, suite, component, arch, udeb=False):
+        if udeb:
+            source_path = self._archivePath + "/dists/%s/%s/debian-installer/binary-%s/Packages.gz" % (suite, component, arch)
+        else:
+            source_path = self._archivePath + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, component, arch)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile(f)
         for section in tagf:
@@ -211,6 +214,7 @@ class PackageBuildInfoRetriever():
             for component in components:
                 for arch in archs:
                     pkg_dict = self._add_binaries_to_dict(pkg_dict, suite, component, arch)
+                    pkg_dict = self._add_binaries_to_dict(pkg_dict, suite, component, arch, udeb=True)
 
         for name, pkg in pkg_dict.items():
             for arch in archs:
