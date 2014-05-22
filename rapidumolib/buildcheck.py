@@ -18,9 +18,6 @@
 
 
 import subprocess
-import gzip
-import apt_pkg
-from apt_pkg import TagFile, version_compare
 
 
 class BuildCheck:
@@ -51,31 +48,13 @@ class BuildCheck:
 
         return binary_indices
 
-    def _merge_indices(self, indices):
-        pkg_dict = {}
-
-        for index in indices:
-            tagf = TagFile(gzip.open(index, 'rb'))
-            for section in tagf:
-                pkg = pkg_dict.get(section['Package'], None)
-                if pkg and version_compare(pkg['Version'], section['Version']) >= 0:
-                    continue
-                pkg_dict[section['Package']] = section
-
-        ret = ""
-        for section in pkg_dict.itervalues():
-            ret += apt_pkg.rewrite_section(section, apt_pkg.REWRITE_PACKAGE_ORDER, [])
-            ret += "\n"
-
-        return ret
-
     def get_package_states_yaml(self, suite, comp, arch):
-        dose_cmd = ["dose-builddebcheck", "--quiet", "-e", "-f", "--summary", "--deb-native-arch=%s" % (arch),
-                    "-", self._archive_path + "/dists/%s/%s/source/Sources.gz" % (suite, comp)]
-        binary_index = self._merge_indices(self._get_binary_indices_list(suite, comp, arch))
+        dose_cmd = ["dose-builddebcheck", "--quiet", "-e", "-f", "--summary", "--deb-native-arch=%s" % (arch)]
+        dose_cmd += self._get_binary_indices_list(suite, comp, arch)
+        dose_cmd += [self._archive_path + "/dists/%s/%s/source/Sources.gz" % (suite, comp)]
 
         proc = subprocess.Popen(dose_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = proc.communicate(input=binary_index)
+        stdout, stderr = proc.communicate()
         if (proc.returncode != 0):
             raise Exception(stderr)
         return stdout
