@@ -8,3 +8,8 @@ set -e
 JANITOR=$RAPIDUMO_PATH/janitor/janitor.py
 
 python $JANITOR -r -s staging --use-dak
+
+# automatically delete packages which are removed in Debian (and don't carry Tanglu changes)
+if test "x$CLEANUP_DEVEL" = xyes; then
+  python $JANITOR -r -s $CURRENT_DEV_SUITE
+fi
