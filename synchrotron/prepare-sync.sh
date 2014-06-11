@@ -35,3 +35,6 @@ cp addcomment.py /srv/patches.tanglu.org/merges
 
 # Update the Sources files against new packages that have been downloaded.
 ./update-sources.py $QUIET
+
+# Expire any old packages from the pool
+./expire-pool.py $QUIET
