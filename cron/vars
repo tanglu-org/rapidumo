@@ -6,6 +6,7 @@ RAPIDUMO_PATH=/var/archive-kit/rapidumo
 
 CURRENT_DEV_SUITE=bartholomea
 DEBIAN_SYNC_ENABLED=yes
+DEBIAN_SOURCE_SUITE=testing
 TMP_DATA_DIR="/srv/dak/tmp/synchrotron-data"
 
 CLEANUP_DEVEL=yes

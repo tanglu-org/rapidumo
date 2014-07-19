@@ -45,9 +45,9 @@ if ! qoption allowdaklock; then
 fi
 
 # sync packages
-sync-debian-package --import-all testing staging main
-sync-debian-package --import-all testing staging contrib
-sync-debian-package --import-all testing staging non-free
+sync-debian-package --import-all $DEBIAN_SOURCE_SUITE staging main
+sync-debian-package --import-all $DEBIAN_SOURCE_SUITE staging contrib
+sync-debian-package --import-all $DEBIAN_SOURCE_SUITE staging non-free
 
 # update archive
 dak generate-packages-sources2 -s staging
