@@ -113,6 +113,8 @@ class ArchiveTracBridge:
         pkglist.remove("general")
 
         for spkgname in pkglist:
+            if spkgname == "":
+                continue
             print ("trac-admin %s component remove '%s'" % (TRAC_DIR, spkgname))
 
 if __name__ == '__main__':
