@@ -19,7 +19,9 @@
 import os
 import sys
 import subprocess
-from rapidumolib import pkginfo
+import apt_pkg
+from rapidumolib.pkginfo import *
+from optparse import OptionParser
 
 # settings
 TRAC_DIR = "/srv/bugs.tanglu.org"
@@ -29,10 +31,10 @@ class ArchiveTracBridge:
         self.tracComponents = self._getTracComponents ()
 
     def getArchiveSourcePackageInfo (self):
-        spkgs = SourcePackageInfoRetriever("/srv/de.archive.tanglu.org/tanglu", "bartholomea")
-        pkgs = pkginfo_tgl.get_packages_dict("non-free")
-        pkgs.update(pkginfo_tgl.get_packages_dict("contrib"))
-        pkgs.update(pkginfo_tgl.get_packages_dict("main"))
+        spkgret = SourcePackageInfoRetriever("/srv/de.archive.tanglu.org/", "tanglu", "bartholomea")
+        pkgs = spkgret.get_packages_dict("non-free")
+        pkgs.update(spkgret.get_packages_dict("contrib"))
+        pkgs.update(spkgret.get_packages_dict("main"))
 
         return pkgs
 
@@ -50,12 +52,18 @@ class ArchiveTracBridge:
 
         rawTracCmp = resLines.splitlines ()
         tracCmps = {}
-        # NOTE: we keep the beginning comment and garbage in the components dict, as they are not harmful
-        # for later processing
+        start = False
         for cmpln in rawTracCmp:
+           if cmpln.startswith("-----"):
+               start = True
+               continue
+           if not start:
+               continue
            tcomp = cmpln.strip ().split (" ", 1)
            if len (tcomp) > 1:
                tracCmps[tcomp[0].strip ()] = tcomp[1].strip ()
+           elif len(tcomp) == 1:
+               tracCmps[tcomp[0].strip ()] = ""
 
         return tracCmps
 
@@ -84,7 +92,7 @@ class ArchiveTracBridge:
     def refreshTracComponentList (self):
         # get some fresh data
         debSourceInfo = self.getArchiveSourcePackageInfo ()
-        for spkg in debSourceInfo:
+        for spkg in debSourceInfo.values():
             pkg_name = spkg.pkgname
             pkg_maint = spkg.maintainer
             if not pkg_name in self.tracComponents:
@@ -94,9 +102,36 @@ class ArchiveTracBridge:
         # TODO: Maybe remove components as soon as they leave the maintained distribution?
         # (or better keep them for historic reasons?))
 
+    def show_obsolete_components(self):
+        sdebinfo = self.getArchiveSourcePackageInfo ()
+        pkglist = self.tracComponents.keys()
+        for spkgname in sdebinfo.keys():
+            if spkgname in self.tracComponents.keys():
+                pkglist.remove(spkgname)
+
+        # keep special components
+        pkglist.remove("general")
+
+        for spkgname in pkglist:
+            print ("trac-admin %s component remove '%s'" % (TRAC_DIR, spkgname))
+
 if __name__ == '__main__':
-    daktrac = ArchiveTracBridge ()
-    daktrac.refreshTracComponentList ()
+    apt_pkg.init()
+    parser = OptionParser()
+    parser.add_option("-r", "--refresh",
+                  action="store_true", dest="refresh", default=False,
+                  help="refresh component information of the bugtracker")
+    parser.add_option("--cruft-report",
+                  action="store_true", dest="cruft_report", default=False,
+                  help="report old components in the bugtracker")
 
-    print("Done.")
+    (options, args) = parser.parse_args()
+    daktrac = ArchiveTracBridge()
 
+    if options.refresh:
+        daktrac.refreshTracComponentList()
+        print("Done.")
+    elif options.cruft_report:
+        daktrac.show_obsolete_components()
+    else:
+        print("I don't know what to do.")

@@ -105,6 +105,8 @@ class SourcePackageInfoRetriever():
             directory = section['Directory']
             dsc = find_dsc(section['Files'])
             pkg = PackageInfo(pkgname, pkgversion, suite, component, archs, directory, dsc)
+            pkg.maintainer = section['Maintainer']
+            pkg.comaintainers = section.get('Uploaders', '')
 
             if section.get('Extra-Source-Only', 'no') == 'yes':
                 pkg.extra_source_only = True
