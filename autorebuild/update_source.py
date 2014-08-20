@@ -18,6 +18,8 @@
 
 import os
 import tarfile
+import contextlib
+import lzma
 import apt_pkg
 import glob
 import subprocess
@@ -87,15 +89,6 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     debian_dsc = ("%s/%s") % (src_pkg_dir, debian_dsc)
 
     tmp_workspace = tempfile.mkdtemp()
-    tar = None
-    try:
-        tar = tarfile.open(debian_src)
-    except:
-        print("Failed to open Tar file %s" % (debian_src))
-        print("Package %s needs a manual upload." % (pkg_name))
-        return False, None
-    tar.extractall(path=tmp_workspace)
-    tar.close()
 
     # determine archive type
     archive_compression = None
@@ -107,6 +100,20 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
         archive_compression = "bz2"
     else:
         print("Could not determine archive compression type for '%s'!" % (debian_src))
+        return False, None
+
+    try:
+        if archive_compression == "xz":
+            with contextlib.closing(lzma.LZMAFile(debian_src)) as xz:
+                with tarfile.open(fileobj=xz) as tar:
+                    tar.extractall(path=tmp_workspace)
+        else:
+            tar = tarfile.open(debian_src)
+            tar.extractall(path=tmp_workspace)
+            tar.close()
+    except Exception as e:
+        print("Failed to open Tar file %s (%s)" % (debian_src, str(e)))
+        print("Package %s needs a manual upload." % (pkg_name))
         return False, None
 
     changelog_fname = find_changelog(tmp_workspace, pkg_name)
@@ -123,7 +130,7 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     os.chdir(os.path.abspath("%s/../.." % (changelog_fname)))
 
     # we need ubuntu as vendor to get the rebuild action
-    dch_cmd = ["dch", "--rebuild", "--vendor=Tanglu", "-Dstaging", "No-change rebuild against %s" % (rebuild_info)]
+    dch_cmd = ["dch", "--rebuild", "--vendor=Tanglu", "-Dstaging", "%s" % (rebuild_info)]
     proc = subprocess.Popen(dch_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     output = ("%s\n%s") % (stdout, stderr)
@@ -146,8 +153,14 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     os.chdir(tmp_workspace)
     os.remove(debian_src)
     debian_src_new = rreplace(debian_src, noEpoch(pkg_version_old), noEpoch(pkg_version_new))
-    with tarfile.open(debian_src_new, "w:%s" % (archive_compression)) as tar:
-        tar.add(".", recursive=True)
+    if archive_compression == "xz":
+        with tarfile.open("%s.tmp" % (debian_src_new), 'w') as tar:
+            tar.add(".", recursive=True)
+        with open("%s.tmp" % (debian_src_new), 'rb') as f, open(debian_src_new, 'wb') as out:
+            out.write(lzma.compress(bytes(f.read())))
+    else:
+        with tarfile.open(debian_src_new, "w:%s" % (archive_compression)) as tar:
+            tar.add(".", recursive=True)
 
     os.chdir("/tmp")
     # cleanup workspace

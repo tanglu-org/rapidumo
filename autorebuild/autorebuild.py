@@ -100,14 +100,20 @@ class Autorebuild():
         cmd = ["dak", "import", "-s", "-a", "staging", component, dsc_path]
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.wait()
+        skip = False
         if p.returncode is not 0:
             stdout, stderr = p.communicate()
-            print("ERR: %s\n%s %s" % (cmd, stdout, stderr))
-            raise Exception("Error while running dak!")
-            return False
+            if "Does not match file already existing in the pool." in stderr:
+                print("Don't import package %s: Does not match file already existing in the pool." % (pkgname))
+                skip = True
+            else:
+                print("DAK-ERROR: %s\n%s %s" % (cmd, stdout, stderr))
+                raise Exception("Error while running dak!")
+                return False
 
         shutil.rmtree(workspace)
-        print("Triggered rebuild for '%s'." % (pkgname))
+        if not skip:
+            print("Triggered rebuild for '%s'." % (pkgname))
 
         return True
 
@@ -179,7 +185,7 @@ def main():
                   help="batch-rebuild multiple packages")
     parser.add_option("-n",
                   type="string", dest="build_note", default="",
-                  help="set note for this rebuild")
+                  help="set note for this rebuild, usually something like 'No-change rebuild against X'")
 
     parser.add_option("--dry",
                   action="store_true", dest="dry_run",
@@ -197,7 +203,7 @@ def main():
 
         build_note = options.build_note
         if build_note == "":
-            print("No build-note set! Please specify a rebuild reason (e.g. 'perl-5.18')")
+            print("No build-note set! Please specify a rebuild reason (e.g. 'No-change rebuild against Perl 5.18')")
             sys.exit(1)
         rebuilder = Autorebuild(suite)
 
