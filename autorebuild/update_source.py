@@ -77,6 +77,10 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
             debian_src = fname
             break
 
+    if ".diff." in debian_src:
+        print("Package %s is a v1.0 package which needs a manual upload." % (pkg_name))
+        return False, None
+
     if debian_dsc == None:
         print("Unable to find dsc file for '%s'. This is a bug." % (pkg_name))
         return False, None
