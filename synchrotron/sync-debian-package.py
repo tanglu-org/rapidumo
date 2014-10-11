@@ -45,6 +45,8 @@ class SyncPackage:
         self._supportedArchs = conf.get_supported_archs(self._extra_suite).split (" ")
         self._unsupportedArchs = conf.syncsource_config['archs'].split (" ")
         self._sync_enabled = conf.synchrotron_config['sync_enabled']
+        self._freeze_exceptions_fname = conf.synchrotron_config.get('freeze_exceptions')
+
         for arch in self._supportedArchs:
             self._unsupportedArchs.remove(arch)
 
@@ -57,14 +59,16 @@ class SyncPackage:
         pkginfo_dest.extra_suite = self._extra_suite
         self._pkgs_src = pkginfo_src.get_packages_dict(component)
         self._pkgs_dest = pkginfo_dest.get_packages_dict(component)
-        self._pkg_blacklist = self._read_blacklist()
+        self._pkg_blacklist = self._read_synclist("%s/sync-blacklist.txt" % self._momArchivePath)
+        self._pkg_freeze_exceptions = list()
+        if self._freeze_exceptions_fname:
+            self._pkg_freeze_exceptions = self._read_synclist(self._freeze_exceptions_fname)
 
-    def _read_blacklist(self):
-        filename = "%s/sync-blacklist.txt" % self._momArchivePath
+    def _read_synclist(self, filename):
         if not os.path.isfile(filename):
             return []
 
-        bl = []
+        sl = []
         with open(filename) as blacklist:
             for line in blacklist:
                 try:
@@ -76,8 +80,8 @@ class SyncPackage:
                 if not line:
                     continue
 
-                bl.append(line)
-        return bl
+                sl.append(line)
+        return sl
 
     def _import_debian_package(self, pkg):
         print("Attempt to import package: %s" % (pkg))
@@ -196,6 +200,15 @@ class SyncPackage:
                     else:
                         self._import_debian_package(src_pkg)
 
+    def _sync_allowed(self, src_pkg):
+        """
+        Return true if the package is freeze-exempt
+        """
+        if src_pkg.pkgname in self._pkg_freeze_exceptions:
+            return True
+        return self._sync_enabled
+
+
     def sync_all_packages(self):
         mergeTodoHtml = list()
 
@@ -210,7 +223,7 @@ class SyncPackage:
                 if ret:
                     if self.dryRun:
                         print("Sync: %s" % (src_pkg))
-                    else:
+                    elif self._sync_allowed(src_pkg):
                         self._import_debian_package(src_pkg)
                 continue
             ret, html = self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True)
@@ -219,7 +232,7 @@ class SyncPackage:
             if ret:
                 if self.dryRun:
                     print("Sync: %s" % (src_pkg))
-                elif self._sync_enabled:
+                elif self._sync_allowed(src_pkg):
                     self._import_debian_package(src_pkg)
 
         mergeListPage = open(get_template_dir() + "/merge-list.html.tmpl", 'r').read()

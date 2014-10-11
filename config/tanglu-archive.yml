@@ -16,6 +16,7 @@ Synchrotron:
     sync_source:
         archs: amd64 armel armhf i386 ia64 mips mipsel powerpc s390 s390x sparc kfreebsd-amd64 kfreebsd-i386 m68k
     sync_enabled: false
+    freeze_exceptions: /srv/dak/archive-hints/synchrotron/freeze-exceptions.txt
 
 Janitor:
     hints_file: /srv/dak/archive-hints/britney/janitor
