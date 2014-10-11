@@ -34,9 +34,14 @@ class RapidumoConfig():
     def archive_config(self):
         return self._conf["Archive"]
 
+
+    @property
+    def synchrotron_config(self):
+        return self._conf["Synchrotron"]
+
     @property
     def syncsource_config(self):
-        return self._conf["SyncSource"]
+        return self.synchrotron_config["sync_source"]
 
     @property
     def janitor_config(self):

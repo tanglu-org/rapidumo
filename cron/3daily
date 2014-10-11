@@ -7,7 +7,5 @@
 # perform autoJanitor
 $RAPIDUMO_PATH/cron/auto-janitor.sh
 
-# sync Debian packages, if we are not in import freeze
-if test "x$DEBIAN_SYNC_ENABLED" = xyes; then
-  $RAPIDUMO_PATH/cron/sync-packages.sh
-fi
+# sync Debian packages
+$RAPIDUMO_PATH/cron/sync-packages.sh

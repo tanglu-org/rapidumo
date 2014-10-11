@@ -44,6 +44,7 @@ class SyncPackage:
 
         self._supportedArchs = conf.get_supported_archs(self._extra_suite).split (" ")
         self._unsupportedArchs = conf.syncsource_config['archs'].split (" ")
+        self._sync_enabled = conf.synchrotron_config['sync_enabled']
         for arch in self._supportedArchs:
             self._unsupportedArchs.remove(arch)
 
@@ -197,6 +198,10 @@ class SyncPackage:
 
     def sync_all_packages(self):
         mergeTodoHtml = list()
+
+        if not self._sync_enabled:
+            print("INFO: Package syncs are currently disabled. Will only sync packages with permanent freeze exceptions.")
+
         for src_pkg in self._pkgs_src.values():
             if not src_pkg.pkgname in self._pkgs_dest:
                 ret, html = self._can_sync_package(src_pkg, None, True)
@@ -214,7 +219,7 @@ class SyncPackage:
             if ret:
                 if self.dryRun:
                     print("Sync: %s" % (src_pkg))
-                else:
+                elif self._sync_enabled:
                     self._import_debian_package(src_pkg)
 
         mergeListPage = open(get_template_dir() + "/merge-list.html.tmpl", 'r').read()
