@@ -24,7 +24,7 @@ BASE=/var/archive-kit/rapidumo
 # Update the blacklist
 sh $BASE/cron/sync-hints.sh
 rm /srv/patches.tanglu.org/sync-blacklist.txt
-cp /srv/dak/archive-hints/sync-blacklist/sync-blacklist.txt /srv/patches.tanglu.org/sync-blacklist.txt
+cp /srv/dak/archive-hints/synchrotron/sync-blacklist.txt /srv/patches.tanglu.org/sync-blacklist.txt
 
 cd $MOMDIR
 
