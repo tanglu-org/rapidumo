@@ -389,7 +389,7 @@ tanglu_base_package_info = [
  ('libfs',                 ('http://xorg.freedesktop.org/releases/individual/lib/', 'libFS-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libgadu',               ('http://toxygen.net/libgadu/files/', 'libgadu-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libgcrypt11',           ('ftp://ftp.gnupg.org/gcrypt/libgcrypt/', 'libgcrypt-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('libgd2',                ('https://bitbucket.org/libgd/gd-libgd/downloads', 'libgd-([0-9][0-9.]*)(-alpha[0-9]).(tar.(gz|bz2|xz)|tgz|zip)+'), None), 
+ ('libgd2',                ('https://bitbucket.org/libgd/gd-libgd/downloads', 'libgd-([0-9][0-9.]*)(-alpha[0-9]).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libgda5',               GNOME_FTP_URL ('libgda', '5.0'), None),
  ('libgdata',              GNOME_FTP_URL ('libgdata'), None),
  ('libgee-0.8',            GNOME_FTP_URL ('libgee', '0.8'), None),
@@ -584,7 +584,7 @@ tanglu_base_package_info = [
  ('libxfont',              ('http://xorg.freedesktop.org/releases/individual/lib/', 'libXfont-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libxi',                 ('http://xorg.freedesktop.org/releases/individual/lib/', 'libXi-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libxinerama',           ('http://xorg.freedesktop.org/releases/individual/lib/', 'libXinerama-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('libxkbcommon',           ('http://xkbcommon.org/download/', 'libxkbcommon-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None), 
+ ('libxkbcommon',           ('http://xkbcommon.org/download/', 'libxkbcommon-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libxkbfile',            ('http://xorg.freedesktop.org/releases/individual/lib/', 'libxkbfile-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libxklavier',           ('http://sourceforge.net/projects/gswitchit/files/libxklavier/([0-9.]+)', 'libxklavier-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libxml2',               ('ftp://xmlsoft.org/libxml2/', 'libxml2-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -1223,7 +1223,7 @@ tanglu_kde_package_info = [
  ('akonadi-facebook',      UNTRACKED, None),
  ('akonadi',               ('http://ftp.kde.org/stable/akonadi/src/', 'akonadi-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('amarok',                ('http://ftp.kde.org/stable/amarok/([0-9.]+)/src/', 'amarok-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('ark',                   KDE_FTP_URL ('ark'), None), 
+ ('ark',                   KDE_FTP_URL ('ark'), None),
  ('audiocd-kio',           KDE_FTP_URL ('audiocd-kio'), None),
  ('bluedevil',             ('http://ftp.kde.org/stable/bluedevil/([0-9.]+)/src/', 'bluedevil-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('calligra',              ('http://ftp.kde.org/stable/calligra-latest/', 'calligra-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -1361,7 +1361,7 @@ dummy_package_info = [
 GERMINATE_OUTPUT = '/srv/dak/export/germinate/'
 
 tanglu_base_germinate_tags = {
-    'boot':                         GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'boot',
+    'minimal':                         GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'minimal',
     'standard':                     GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'standard',
     'desktop-common':               GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop-common',
     'desktop-common.build-depends': GERMINATE_OUTPUT + 'tanglu.%(series)s/' + 'desktop-common.build-depends',

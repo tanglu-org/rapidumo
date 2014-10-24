@@ -725,8 +725,8 @@ for p in packages:
             tags.append (t)
 
 write_page ('versions.html', [], True)
-write_page ('base.html', ['boot', 'standard'])
-write_page ('boot.html', ['boot'])
+write_page ('base.html', ['minimal', 'standard'])
+write_page ('minimal.html', ['minimal'])
 write_page ('standard.html', ['standard'])
 write_page ('desktop-common.html', ['desktop-common', 'desktop-common.build-depends'])
 write_page ('gnome.html', ['gnome'])
