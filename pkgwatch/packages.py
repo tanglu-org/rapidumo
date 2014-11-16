@@ -971,7 +971,8 @@ tanglu_base_package_info = [
  ('vo-aacenc',             ('http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/', 'vo-aacenc-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('vo-amrwbenc',           ('http://sourceforge.net/projects/opencore-amr/files/vo-amrwbenc/', 'vo-amrwbenc-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('vorbis-tools',          ('http://downloads.xiph.org/releases/vorbis/', 'vorbis-tools-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('vte3',                  GNOME_FTP_URL ('vte', '0.34'), GNOME_FTP_URL ('vte')),
+ ('vte2.91',               GNOME_FTP_URL ('vte'), None),
+ ('vte3',                  GNOME_FTP_URL ('vte'), None),
  ('vte',                   DEBIAN, None), # Ignore, will be removed once everything uses vte3
  ('wacomtablet',           UNTRACKED, None),
  ('wavpack',               ('http://www.wavpack.com/downloads.html', 'wavpack-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
