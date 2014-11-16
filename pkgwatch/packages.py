@@ -93,7 +93,7 @@ tanglu_base_package_info = [
  ('dasher',                GNOME_FTP_URL ('dasher'), None),
  ('db',                    ('http://www.oracle.com/technetwork/products/berkeleydb/downloads/index.html', 'db-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('dbus-glib',             ('http://dbus.freedesktop.org/releases/dbus-glib/', 'dbus-glib-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('dbus',                  ('http://dbus.freedesktop.org/releases/dbus/', 'dbus-(1.6[0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('dbus',                  ('http://dbus.freedesktop.org/releases/dbus/', 'dbus-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('dbus-python',           ('http://dbus.freedesktop.org/releases/dbus-python/', 'dbus-python-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('dbus-test-runner',      ('https://launchpad.net/dbus-test-runner/+download', 'dbus-test-runner-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('d-conf',                GNOME_FTP_URL ('dconf'), GNOME_FTP_URL ('dconf')),
