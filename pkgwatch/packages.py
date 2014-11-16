@@ -187,7 +187,7 @@ tanglu_base_package_info = [
  ('geoip-database',        DEBIAN, None),
  ('geoip',                 ('http://www.maxmind.com/download/geoip/api/c/', 'GeoIP-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('gettext',               ('ftp://ftp.gnu.org/pub/gnu/gettext/', 'gettext-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('gexiv2',                ('http://yorba.org/download/gexiv2/latest', 'libgexiv2-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('gexiv2',                GNOME_FTP_URL ('gexiv2'), None),
  ('ghex',                  GNOME_FTP_URL ('ghex'), None),
  ('ghostscript',           ('http://sourceforge.net/projects/ghostscript/files/GPL%20Ghostscript/([0-9.]+)', 'ghostscript-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('giblib',                ('http://linuxbrit.co.uk/downloads/', 'giblib-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
