@@ -934,7 +934,7 @@ tanglu_base_package_info = [
  ('toshset',               UNTRACKED, None), # FIXME: http://schwieters.org/toshset/ but not versioned
  ('totem',                 GNOME_FTP_URL ('totem'), GNOME_FTP_URL ('totem')),
  ('totem-pl-parser',       GNOME_FTP_URL ('totem-pl-parser'), None),
- ('tracker',               GNOME_FTP_URL ('tracker', '0.14'), GNOME_FTP_URL ('tracker')),
+ ('tracker',               GNOME_FTP_URL ('tracker'), None),
  ('transmission',          ('http://www.transmissionbt.com/download.php', 'transmission-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('tslib',                 ('https://github.com/kergoth/tslib/tags', '([0-9][0-9.]*).zip'), None),
  ('ttf-dejavu',            ('http://sourceforge.net/projects/dejavu/files/dejavu/([0-9.]+)', 'dejavu-fonts-ttf-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
