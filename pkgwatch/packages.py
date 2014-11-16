@@ -1174,6 +1174,7 @@ tanglu_gnome_package_info = [
  ('gnome-settings-daemon', GNOME_FTP_URL ('gnome-settings-daemon'), GNOME_FTP_URL ('gnome-settings-daemon')),
  ('gnome-sharp2',          GNOME_FTP_URL ('gnome-sharp'), None),
  ('gnome-shell',           GNOME_FTP_URL ('gnome-shell'), GNOME_FTP_URL ('gnome-shell')),
+ ('gnome-shell-extensions', GNOME_FTP_URL ('gnome-shell'), GNOME_FTP_URL ('gnome-shell')),
  ('gnome-speech',          GNOME_FTP_URL ('gnome-speech'), None),
  ('gnome-sudoku',          GNOME_FTP_URL ('gnome-sudoku'), None),
  ('gnome-sushi',           GNOME_FTP_URL ('sushi'), GNOME_FTP_URL ('sushi')),
