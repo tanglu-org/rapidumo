@@ -196,7 +196,7 @@ tanglu_base_package_info = [
  ('giflib',                ('http://sourceforge.net/projects/giflib/files/giflib-4.x/giflib-([0-9.]+)/', 'giflib-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('gigolo',                ('http://www.uvena.de/gigolo/download.html', 'gigolo-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('gimp',                  ('http://ftp.gtk.org/pub/gimp/v2.8', 'gimp-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('gjs',                   GNOME_FTP_URL ('gjs', '1.34'), GNOME_FTP_URL ('gjs')),
+ ('gjs',                   GNOME_FTP_URL ('gjs'), None),
  ('gksu',                  ('http://people.debian.org/~kov/gksu/', '"gksu-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('glade',                 GNOME_FTP_URL ('glade'), None),
  ('glew',                  ('http://sourceforge.net/projects/glew/files/glew/([0-9.]+)', 'glew-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
