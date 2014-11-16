@@ -56,7 +56,7 @@ tanglu_base_package_info = [
  ('binutils',              ('http://ftp.gnu.org/gnu/binutils/', 'binutils-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('bison',                 ('http://ftp.gnu.org/gnu/bison/', 'bison-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('bluez',                 ('http://www.kernel.org/pub/linux/bluetooth/', 'bluez-(4.[0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), ('http://www.kernel.org/pub/linux/bluetooth/', 'bluez-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+')),
- ('boost1.49',             ('http://sourceforge.net/projects/boost/files/boost/(1.49.[0-9.]+)', 'boost_(1_49_[0-9]+).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('boost1.55',             ('http://sourceforge.net/projects/boost/files/boost/(1.55.[0-9.]+)', 'boost_(1_55_[0-9]+).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('boost-defaults',        DEBIAN, None),
  ('brltty',                ('http://mielke.cc/brltty/download.html', 'brltty-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('bsdmainutils',          DEBIAN, None),
