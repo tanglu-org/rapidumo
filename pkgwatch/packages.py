@@ -198,7 +198,7 @@ tanglu_base_package_info = [
  ('gimp',                  ('http://ftp.gtk.org/pub/gimp/v2.8', 'gimp-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('gjs',                   GNOME_FTP_URL ('gjs', '1.34'), GNOME_FTP_URL ('gjs')),
  ('gksu',                  ('http://people.debian.org/~kov/gksu/', '"gksu-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('glade',                 GNOME_FTP_URL ('glade), None),
+ ('glade',                 GNOME_FTP_URL ('glade'), None),
  ('glew',                  ('http://sourceforge.net/projects/glew/files/glew/([0-9.]+)', 'glew-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('glib2.0',               GNOME_FTP_URL ('glib'), GNOME_FTP_URL ('glib')),
  ('groff',                 ('http://ftp.gnu.org/gnu/groff/', 'groff-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
