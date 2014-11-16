@@ -860,7 +860,7 @@ tanglu_base_package_info = [
  ('shadow',                UNTRACKED, None),
  ('shared-mime-info',      ('http://people.freedesktop.org/~hadess/', 'shared-mime-info-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('shimmer-themes',        UNTRACKED, None),
- ('shotwell',              ('http://yorba.org/download/shotwell/([0-9.]+)', 'shotwell-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('shotwell',              GNOME_FTP_URL ('shotwell'), None),
  ('sidplay-libs',          UNTRACKED, None),
  ('signon',                ('https://launchpad.net/online-accounts-signond/+download', 'signon-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('signon-keyring-extension', ('https://launchpad.net/online-accounts-keyring-extension/+download', 'keyring-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
