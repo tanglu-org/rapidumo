@@ -375,7 +375,7 @@ tanglu_base_package_info = [
  ('libept',                DEBIAN, None),
  ('libevent',              ('https://github.com/libevent/libevent/downloads', 'libevent-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libexif',               ('http://sourceforge.net/projects/libexif/files/libexif/([0-9.]+)', 'libexif-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('libexttextcat',         ('http://cgit.freedesktop.org/libreoffice/libexttextcat/', 'libexttextcat-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('libexttextcat',         ('http://dev-www.libreoffice.org/src/libexttextcat/', 'libexttextcat-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libextutils-depends-perl', ('http://search.cpan.org/dist/ExtUtils-Depends/', 'ExtUtils-Depends-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libextutils-pkgconfig-perl', ('http://search.cpan.org/dist/ExtUtils-PkgConfig/', 'ExtUtils-PkgConfig-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libffi',                ('ftp://sourceware.org/pub/libffi/', 'libffi-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
