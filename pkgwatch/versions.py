@@ -122,7 +122,7 @@ pkgs_debian_experimental = pkginfo_deb_experimental.get_packages_dict("main")
 pkgs_tanglu = pkginfo_tgl.get_packages_dict("main")
 
 tpath = conf.templates_config["package_watch"]
-if tpath != "":
+if tpath:
     html_template = open(tpath, 'r').read()
 else:
     html_template = "<html><body>{{extra_css}}\n{{content}}\n{{extra_footer}}\n</body></html>"
