@@ -171,7 +171,7 @@ tanglu_base_package_info = [
  ('friendly-recovery',     TANGLU, None),
  ('fuse',                  ('http://sourceforge.net/projects/fuse/files/fuse-2.X/([0-9.]+)', 'fuse-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('game-music-emu',        ('http://code.google.com/p/game-music-emu/downloads/list', 'game-music-emu-([0-9][0-9.]*).tbz2'), None),
- ('gcc-4.8',               ('http://ftp.gnu.org/gnu/gcc/', 'gcc-4.8.([0-9]*)/'), None), # FIXME: uses subdirs
+ ('gcc-4.9',               ('http://ftp.gnu.org/gnu/gcc/', 'gcc-4.8.([0-9]*)/'), None), # FIXME: uses subdirs
  ('gcc-defaults',          DEBIAN, None),
  ('gccxml',                UNTRACKED, None),
  ('gdb',                   ('https://launchpad.net/gdb-linaro/+download', 'gdb-linaro-([0-9][0-9.-]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
