@@ -754,7 +754,7 @@ tanglu_base_package_info = [
  ('pm-utils',              ('http://pm-utils.freedesktop.org/releases/', 'pm-utils-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('pnm2ppa',               ('http://sourceforge.net/projects/pnm2ppa/files/pnm2ppa/([0-9.]+)', 'pnm2ppa-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('policykit-1-gnome',     GNOME_FTP_URL ('polkit-gnome'), None),
- ('policykit-1',           ('http://hal.freedesktop.org/releases/', 'polkit-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('policykit-1',           ('http://www.freedesktop.org/software/polkit/releases/', 'polkit-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('policykit-desktop-privileges', TANGLU, None),
  ('poppler-data',          ('http://poppler.freedesktop.org', 'poppler-data-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('poppler',               ('http://poppler.freedesktop.org/releases.html', 'poppler-(0.20.[0-9.]+).(tar.(gz|bz2|xz)|tgz|zip)+'), ('http://poppler.freedesktop.org', 'poppler-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+')),
