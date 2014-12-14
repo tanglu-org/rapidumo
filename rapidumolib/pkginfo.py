@@ -68,6 +68,7 @@ class PackageInfo():
         self.maintainer = ""
         self.comaintainers = ""
 
+        self.homepage = None
         self.extra_source_only = False
 
     def getVersionNoEpoch(self):
@@ -107,6 +108,7 @@ class SourcePackageInfoRetriever():
             pkg = PackageInfo(pkgname, pkgversion, suite, component, archs, directory, dsc)
             pkg.maintainer = section['Maintainer']
             pkg.comaintainers = section.get('Uploaders', '')
+            pkg.homepage = section.get('Homepage', None)
 
             if section.get('Extra-Source-Only', 'no') == 'yes':
                 pkg.extra_source_only = True
