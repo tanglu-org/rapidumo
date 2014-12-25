@@ -20,9 +20,15 @@ import os
 from rapidumo.config import RapidumoConfig
 from jinja2 import Environment, FileSystemLoader
 
+# set up templates
 template_dir = os.path.dirname(os.path.realpath(__file__))
 template_dir = os.path.realpath(os.path.join(template_dir, "..", "templates"))
 j2_env = Environment(loader=FileSystemLoader(template_dir))
+
+# check if we are in debug mode
+debug_enabled = False
+if 'DEBUG' in os.environ:
+    debug_enabled = True
 
 def render_template(name, out_name = None, *args, **kwargs):
     config = RapidumoConfig()
@@ -43,3 +49,7 @@ def render_template(name, out_name = None, *args, **kwargs):
     f = open(out_path, 'w')
     f.write(content)
     f.close()
+
+def debug(text):
+    if debug_enabled:
+        print(text)

@@ -34,7 +34,8 @@ import apt_pkg
 apt_pkg.init_system()
 
 from packages import package_info, package_sets, DEBIAN, TANGLU, UNTRACKED, germinate_tags
-from utils import compare_versions, debug, load_germinate
+from utils import compare_versions, load_germinate
+from rapidumo.utils import debug
 
 if 'PACKAGE_SET' in os.environ:
     PACKAGE_SET = os.environ['PACKAGE_SET']

@@ -2,13 +2,8 @@
 # coding: utf-8
 
 import apt_pkg
-import os
 import urllib
-
-debug_enabled = False
-
-if 'DEBUG' in os.environ:
-    debug_enabled = True
+from rapidumo.utils import debug
 
 # Strip epoch from version number
 def non_epoch_version(version):
@@ -23,10 +18,6 @@ def compare_versions(versionA, versionB):
     if versionB is None or versionB == '':
         return 1
     return apt_pkg.version_compare(non_epoch_version(versionA), non_epoch_version(versionB))
-
-def debug(text):
-    if debug_enabled == True:
-        print text
 
 url_cache = {}
 def get_url(url):
