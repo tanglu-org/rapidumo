@@ -42,7 +42,7 @@ Fedmsg:
     sign: false
     environment: "dev"
     endpoints:
-        "rapidumolib.curie":
+        "rapidumo.curie":
             - "tcp://localhost:3000"
             - "tcp://localhost:3001"
             - "tcp://localhost:3002"

@@ -22,6 +22,7 @@ import apt_pkg
 import subprocess
 import re
 import time
+import yaml
 from optparse import OptionParser
 
 from rapidumo.pkginfo import *
@@ -64,6 +65,14 @@ class SyncPackage:
         if self._freeze_exceptions_fname:
             self._pkg_freeze_exceptions = self._read_synclist(self._freeze_exceptions_fname)
 
+        # determine if the to-be-synced packages are buildable
+        bcheck = BuildCheck()
+        ydata = bcheck.get_package_states_yaml_sources(target_suite, component, "amd64",
+                        self._momArchivePath + "/dists/debian-%s/%s/source/Sources" % (source_suite, component))
+        self.bcheck_data = yaml.safe_load(ydata)['report']
+        if not self.bcheck_data:
+            self.bcheck_data = list()
+
     def _read_synclist(self, filename):
         if not os.path.isfile(filename):
             return []
@@ -82,6 +91,12 @@ class SyncPackage:
 
                 sl.append(line)
         return sl
+
+    def _get_package_depwait_report(self, pkg):
+        for nbpkg in self.bcheck_data:
+            if (nbpkg['package'] == ("src:" + pkg.pkgname) and (nbpkg['version'] == pkg.version)):
+                return nbpkg
+        return None
 
     def _import_debian_package(self, pkg):
         print("Attempt to import package: %s" % (pkg))
@@ -140,16 +155,42 @@ class SyncPackage:
 
         if (self._destDistro in dest_pkg.version) and (not forceSync):
             print("Package %s contains Tanglu-specific modifications. Please merge the package instead of syncing it. (Version in target: %s, source is %s)" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version))
-            pkg_merge = dict()
-            pkg_merge['name'] = dest_pkg.pkgname
-            pkg_merge['dest_version'] = dest_pkg.version
-            pkg_merge['src_version'] = src_pkg.version
-            return False, pkg_merge
+            info = dict()
+            info['name'] = dest_pkg.pkgname
+            info['dest_version'] = dest_pkg.version
+            info['src_version'] = src_pkg.version
+            info['fail_type'] = "merge-required"
+            info['details'] = "Package contains Tanglu-specific modifications. It needs a manual merge."
+            return False, info
+
+        report = self._get_package_depwait_report(src_pkg)
+        dose_report = None
+        if report and report['status'] != "ok":
+            dose_report = "Unknown problem"
+            for reason in report["reasons"]:
+                if "missing" in reason:
+                    dose_report = ("Unsat dependency %s" %
+                        (reason["missing"]["pkg"]["unsat-dependency"]))
+                    break
+                elif "conflict" in reason:
+                    dose_report = ("Conflict between %s and %s" %
+                            (reason["conflict"]["pkg1"]["package"],
+                            reason["conflict"]["pkg2"]["package"]))
+                    break
+        if dose_report and not forceSync:
+            print("Package %s can not be built in Tanglu, it will not be synced: %s" % (dest_pkg.pkgname, dose_report))
+            info = dict()
+            info['name'] = dest_pkg.pkgname
+            info['dest_version'] = dest_pkg.version
+            info['src_version'] = src_pkg.version
+            info['fail_type'] = "unbuildable"
+            info['details'] = dose_report
+            return False, info
 
         return True, None
 
     def _can_sync_package_simple(self, src_pkg, dest_pkg, quiet=False, forceSync=False):
-        ret, mpkg = self._can_sync_package(src_pkg, dest_pkg, quiet, forceSync)
+        ret, sinfo = self._can_sync_package(src_pkg, dest_pkg, quiet, forceSync)
         return ret
 
     def sync_package(self, package_name, force=False):
@@ -213,33 +254,33 @@ class SyncPackage:
 
 
     def sync_all_packages(self):
-        merge_required = list()
+        sync_fails = list()
 
         if not self._sync_enabled:
             print("INFO: Package syncs are currently disabled. Will only sync packages with permanent freeze exceptions.")
 
         for src_pkg in self._pkgs_src.values():
             if not src_pkg.pkgname in self._pkgs_dest:
-                ret, mpkg = self._can_sync_package(src_pkg, None, True)
-                if not ret and mpkg != None:
-                    merge_required.append(mpkg)
+                ret, sinfo = self._can_sync_package(src_pkg, None, True)
+                if not ret and sinfo != None:
+                    sync_fails.append(sinfo)
                 if ret:
                     if self.dryRun:
                         print("Sync: %s" % (src_pkg))
                     elif self._sync_allowed(src_pkg):
                         self._import_debian_package(src_pkg)
                 continue
-            ret, mpkg = self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True)
-            if not ret and mpkg != None:
-                    merge_required.append(mpkg)
+            ret, sinfo = self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True)
+            if not ret and sinfo != None:
+                    sync_fails.append(sinfo)
             if ret:
                 if self.dryRun:
                     print("Sync: %s" % (src_pkg))
                 elif self._sync_allowed(src_pkg):
                     self._import_debian_package(src_pkg)
 
-        render_template("merge-list.html", "merge-todo_%s.html" % (self._component),
-                merge_required=merge_required, time=time.strftime("%c"))
+        render_template("synchrotron-issues.html", "sync-issues_%s.html" % (self._component),
+                sync_failures=sync_fails, time=time.strftime("%c"))
 
     def _get_packages_not_in_debian(self):
         debian_pkg_list = self._pkgs_src.values()

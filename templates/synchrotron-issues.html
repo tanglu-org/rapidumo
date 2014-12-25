@@ -13,12 +13,14 @@
     <th>Package Name</th>
     <th>Tanglu Version</th>
     <th>Debian Version</th>
+    <th>Issue Details</th>
   </tr>
-  {% for item in merge_required %}
+  {% for item in sync_failures %}
     <tr>
       <td>{{item.name}}</td>
       <td>{{item.dest_version}}</td>
       <td>{{item.src_version}}</td>
+      <td>{{item.details}}</td>
     </tr>
   {% endfor %}
 </table>

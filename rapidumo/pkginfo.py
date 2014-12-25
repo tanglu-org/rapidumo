@@ -19,8 +19,9 @@
 import glob
 import gzip
 import re
+import subprocess
 from apt_pkg import TagFile, version_compare
-
+from rapidumo.config import RapidumoConfig
 
 def package_list_to_dict(pkg_list):
     pkg_dict = {}
@@ -77,7 +78,6 @@ class PackageInfo():
     def __str__(self):
         return "Package: name: %s | version: %s | suite: %s | comp.: %s" % (self.pkgname, self.version, self.suite, self.component)
 
-
 class SourcePackageInfoRetriever():
     """
      Retrieve information about source packages available
@@ -93,7 +93,7 @@ class SourcePackageInfoRetriever():
 
     def _get_packages_for(self, suite, component):
         if self.useMOMCache:
-            source_path = self._archivePath + "/dists/%s-%s/%s/source/Sources.gz" % (self._distroName, suite, component)
+            source_path = self._archivePath + "/dists/%s-%s/%s/source/Sources" % (self._distroName, suite, component)
         else:
             source_path = self._archivePath + "/%s/dists/%s/%s/source/Sources.gz" % (self._distroName, suite, component)
         f = gzip.open(source_path, 'rb')
@@ -235,3 +235,48 @@ class PackageBuildInfoRetriever():
                     break
 
         return pkg_dict
+
+class BuildCheck:
+    def __init__(self):
+        self._conf = RapidumoConfig()
+        self._archive_path = "%s/%s" % (self._conf.archive_config['path'], self._conf.distro_name)
+
+    def _get_binary_indices_list(self, suite, comp, arch):
+        base_suite = self._conf.get_base_suite(suite)
+
+        suites = [suite]
+        if base_suite != suite:
+            suites += [base_suite]
+
+        comps = ["main"]
+        if comp in ["contrib", "non-free"]:
+            comps += ["contrib", "non-free"]
+        elif comp != "main":
+            comps += [comp]
+
+        if arch == "all":
+            arch = "amd64"
+
+        binary_indices = []
+        for suite in suites:
+            for comp in comps:
+                binary_indices += [self._archive_path + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, comp, arch)]
+
+        return binary_indices
+
+    def get_package_states_yaml_sources(self, suite, comp, arch, source_gz_path):
+        dose_cmd = ["dose-builddebcheck", "--quiet", "-e", "-f", "--summary", "--deb-native-arch=%s" % (arch)]
+        dose_cmd += self._get_binary_indices_list(suite, comp, arch)
+        dose_cmd += [source_gz_path]
+
+        proc = subprocess.Popen(dose_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        if (proc.returncode != 0):
+            # FIXME: hack to ignore this particular error...
+            if not "Unable to get real version for mplayer2" in stderr:
+                raise Exception(stderr)
+        return stdout
+
+    def get_package_states_yaml(self, suite, comp, arch):
+        source_gz_path = self._archive_path + "/dists/%s/%s/source/Sources.gz" % (suite, comp)
+        return self.get_package_states_yaml_sources(suite, comp, arch, source_gz_path)
