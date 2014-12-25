@@ -177,6 +177,7 @@ class SyncPackage:
                             (reason["conflict"]["pkg1"]["package"],
                             reason["conflict"]["pkg2"]["package"]))
                     break
+
         if dose_report and not forceSync:
             print("Package %s can not be built in Tanglu, it will not be synced: %s" % (dest_pkg.pkgname, dose_report))
             info = dict()
@@ -280,7 +281,7 @@ class SyncPackage:
                     self._import_debian_package(src_pkg)
 
         render_template("synchrotron-issues.html", "sync-issues_%s.html" % (self._component),
-                sync_failures=sync_fails, time=time.strftime("%c"))
+                sync_failures=sync_fails, time=time.strftime("%c"), component=self._component, import_freeze=not self._sync_enabled)
 
     def _get_packages_not_in_debian(self):
         debian_pkg_list = self._pkgs_src.values()
@@ -312,7 +313,7 @@ class SyncPackage:
                 print(pkgname)
 
         render_template("removed-debian.html", "removed-debian_%s.html" % (self._component),
-                rm_items=rm_items, time=time.strftime("%c"))
+                rm_items=rm_items, time=time.strftime("%c"), component=self._component, import_freeze=not self._sync_enabled)
 
 def main():
     # init Apt, we need it later
