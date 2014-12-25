@@ -21,8 +21,8 @@ Synchrotron:
 Janitor:
     hints_file: /srv/dak/archive-hints/britney/janitor
 
-Templates:
-    package_watch:
+Rapidumo:
+    html_output: /srv/dak/export/qa-pages
 
 Suites:
     - name: aequorea

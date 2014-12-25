@@ -14,10 +14,17 @@
     <th>Tanglu Version</th>
     <th>Debian Version</th>
   </tr>
-  {{MERGE_TODO_PACKAGES_HTML}}
+  {% for item in merge_required %}
+    <li><a href="{{ item.href }}">{{ item.caption }}</a></li>
+    <tr>
+      <td>{{item.name}}</td>
+      <td>{{item.dest_version}}</td>
+      <td>{{item.src_version}}</td>
+    </tr>
+  {% endfor %}
 </table>
 <br/>
-<p>{{TIME}}</p>
+<p>{{time}}</p>
 <br/>
 </body>
 </html>

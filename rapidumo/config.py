@@ -17,7 +17,6 @@
 
 import yaml
 
-
 class RapidumoConfig():
     def __init__(self):
         self._conf = yaml.safe_load(open('/srv/dak/tanglu-archive.yml', 'r'))
@@ -34,7 +33,6 @@ class RapidumoConfig():
     def archive_config(self):
         return self._conf["Archive"]
 
-
     @property
     def synchrotron_config(self):
         return self._conf["Synchrotron"]
@@ -48,8 +46,8 @@ class RapidumoConfig():
         return self._conf["Janitor"]
 
     @property
-    def templates_config(self):
-        return self._conf["Templates"]
+    def general_config(self):
+        return self._conf["Rapidumo"]
 
     @property
     def suites_config(self):

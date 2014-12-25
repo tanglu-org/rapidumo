@@ -28,7 +28,7 @@ import tempfile
 from itertools import islice
 import shutil
 import hashlib
-from rapidumolib.pkginfo import noEpoch
+from rapidumo.pkginfo import noEpoch
 
 class Checksum:
     Unknown, Sha1, Sha256, MD5 = range(4)

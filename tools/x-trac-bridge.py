@@ -20,7 +20,7 @@ import os
 import sys
 import subprocess
 import apt_pkg
-from rapidumolib.pkginfo import *
+from rapidumo.pkginfo import *
 from optparse import OptionParser
 
 # settings

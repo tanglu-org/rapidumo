@@ -46,9 +46,9 @@ else:
 
 debug ('Starting')
 
-from rapidumolib.pkginfo import *
-from rapidumolib.utils import *
-from rapidumolib.config import *
+from rapidumo.pkginfo import *
+from rapidumo.utils import *
+from rapidumo.config import *
 
 class Package:
     def __init__(self, name, stable_url, unstable_url):

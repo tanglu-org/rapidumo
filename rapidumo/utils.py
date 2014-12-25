@@ -17,19 +17,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from ConfigParser import SafeConfigParser
+from rapidumo.config import RapidumoConfig
+from jinja2 import Environment, FileSystemLoader
 
+template_dir = os.path.dirname(os.path.realpath(__file__))
+template_dir = os.path.realpath(os.path.join(template_dir, "..", "templates"))
+j2_env = Environment(loader=FileSystemLoader(template_dir))
 
-def get_template_dir():
-    dir_str = os.path.dirname(os.path.realpath(__file__)) + "/../templates"
-    return dir_str
-
-
-def replace_template_var(tpl, varname, varvalue):
-    return tpl.replace("{{%s}}" % (varname), varvalue)
-
-
-def get_archive_config_parser():
-    parser = SafeConfigParser()
-    parser.read(['/srv/dak/tanglu-archive.conf', 'tanglu-archive.conf'])
-    return parser
+def render_template(name, out_name = None, *args, **kwargs):
+    config = RapidumoConfig()
+    gcfg = config.general_config
+    out_dir = gcfg['html_output']
+    if not out_name:
+        out_path = os.path.join(out_dir, name)
+    else:
+        out_path = os.path.join(out_dir, out_name)
+    template = j2_env.get_template(name)
+    content = template.render(*args, **kwargs)
+    f = open(out_path, 'w')
+    f.write(content)
+    f.close()

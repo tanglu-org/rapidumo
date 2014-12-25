@@ -25,8 +25,8 @@ import shutil
 from update_source import bump_source_version
 from apt_pkg import TagFile, TagSection
 from optparse import OptionParser
-from rapidumolib.pkginfo import *
-from rapidumolib.config import *
+from rapidumo.pkginfo import *
+from rapidumo.config import *
 
 #REPO_POOL ="http://archive.tanglu.org/tanglu/pool"
 REPO_POOL = "file:///srv/dak/ftp/pool"

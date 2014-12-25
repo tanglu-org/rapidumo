@@ -24,10 +24,10 @@ import re
 import time
 from optparse import OptionParser
 
-from rapidumolib.pkginfo import *
-from rapidumolib.utils import *
-from rapidumolib.config import *
-from rapidumolib.messaging import *
+from rapidumo.pkginfo import *
+from rapidumo.utils import render_template
+from rapidumo.config import *
+from rapidumo.messaging import *
 
 def emit(modname, topic, message):
     emit_raw("synchrotron", modname, topic, message)
@@ -140,13 +140,16 @@ class SyncPackage:
 
         if (self._destDistro in dest_pkg.version) and (not forceSync):
             print("Package %s contains Tanglu-specific modifications. Please merge the package instead of syncing it. (Version in target: %s, source is %s)" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version))
-            mergeTodoHtml = "<tr>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version)
-            return False, mergeTodoHtml
+            pkg_merge = dict()
+            pkg_merge['name'] = dest_pkg.pkgname
+            pkg_merge['dest_version'] = dest_pkg.version
+            pkg_merge['src_version'] = src_pkg.version
+            return False, pkg_merge
 
         return True, None
 
     def _can_sync_package_simple(self, src_pkg, dest_pkg, quiet=False, forceSync=False):
-        ret, html = self._can_sync_package(src_pkg, dest_pkg, quiet, forceSync)
+        ret, mpkg = self._can_sync_package(src_pkg, dest_pkg, quiet, forceSync)
         return ret
 
     def sync_package(self, package_name, force=False):
@@ -210,37 +213,33 @@ class SyncPackage:
 
 
     def sync_all_packages(self):
-        mergeTodoHtml = list()
+        merge_required = list()
 
         if not self._sync_enabled:
             print("INFO: Package syncs are currently disabled. Will only sync packages with permanent freeze exceptions.")
 
         for src_pkg in self._pkgs_src.values():
             if not src_pkg.pkgname in self._pkgs_dest:
-                ret, html = self._can_sync_package(src_pkg, None, True)
-                if not ret and html != None:
-                    mergeTodoHtml.append(html)
+                ret, mpkg = self._can_sync_package(src_pkg, None, True)
+                if not ret and mpkg != None:
+                    merge_required.append(mpkg)
                 if ret:
                     if self.dryRun:
                         print("Sync: %s" % (src_pkg))
                     elif self._sync_allowed(src_pkg):
                         self._import_debian_package(src_pkg)
                 continue
-            ret, html = self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True)
-            if not ret and html != None:
-                    mergeTodoHtml.append(html)
+            ret, mpkg = self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True)
+            if not ret and mpkg != None:
+                    merge_required.append(mpkg)
             if ret:
                 if self.dryRun:
                     print("Sync: %s" % (src_pkg))
                 elif self._sync_allowed(src_pkg):
                     self._import_debian_package(src_pkg)
 
-        mergeListPage = open(get_template_dir() + "/merge-list.html.tmpl", 'r').read()
-        mergeListPage = mergeListPage.replace("{{MERGE_TODO_PACKAGES_HTML}}", "\n".join(mergeTodoHtml))
-        mergeListPage = mergeListPage.replace("{{TIME}}", time.strftime("%c"))
-        f = open('/srv/dak/export/package-watch/merge-todo_%s.html' % (self._component), 'w')
-        f.write(mergeListPage)
-        f.close()
+        render_template("merge-list.html", "merge-todo_%s.html" % (self._component),
+                merge_required=merge_required, time=time.strftime("%c"))
 
     def _get_packages_not_in_debian(self):
         debian_pkg_list = self._pkgs_src.values()

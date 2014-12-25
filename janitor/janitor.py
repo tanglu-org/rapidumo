@@ -23,9 +23,9 @@ import subprocess
 import re
 from optparse import OptionParser
 
-from rapidumolib.pkginfo import *
-from rapidumolib.utils import *
-from rapidumolib.config import *
+from rapidumo.pkginfo import *
+from rapidumo.utils import *
+from rapidumo.config import *
 from janitor_utils import *
 from debian_removals import DebianRemovals
 from installability_test import JanitorDebcheck
