@@ -259,19 +259,19 @@ class SyncPackage:
 
     def list_not_in_debian(self, quiet=False):
         dest_pkg_list = self._get_packages_not_in_debian()
-        pkgListHtml = list()
+        rm_items = list()
         for pkgname in dest_pkg_list:
-            linksHtml = "<a href=\"http://packages.qa.debian.org/%s\">Debian PTS</a><br/><a href=\"http://packages.tanglu.org/%s\">Tanglu Archive</a>" % (pkgname, pkgname)
-            dakRmCmd = "dak rm -m \"[auto-cruft] RID (removed in Debian and unmaintained)\" -s %s -R %s" % (self._target_suite, pkgname)
-            pkgListHtml.append("<tr>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>" % (pkgname, linksHtml, dakRmCmd))
+            item = dict()
+            item['name'] = pkgname
+            item['debian_pts'] = "https://tracker.debian.org/pkg/%s" % (pkgname)
+            item['tanglu_tracker'] = "http://packages.tanglu.org/%s" % (pkgname)
+            item['dak'] = "dak rm -m \"[auto-cruft] RID (removed in Debian and unmaintained)\" -s %s -R %s" % (self._target_suite, pkgname)
+            rm_items.append(item)
             if not quiet:
                 print(pkgname)
 
-        debianRemovedPage = open(get_template_dir() + "/removed-debian.html.tmpl", 'r').read()
-        debianRemovedPage = debianRemovedPage.replace("{{DEBIAN_REMOVED_HTML}}", "\n".join(pkgListHtml))
-        f = open('/srv/dak/export/package-watch/removed-debian_%s.html' % (self._component), 'w')
-        f.write(debianRemovedPage)
-        f.close()
+        render_template("removed-debian.html", "removed-debian_%s.html" % (self._component),
+                rm_items=rm_items, time=time.strftime("%c"))
 
 def main():
     # init Apt, we need it later

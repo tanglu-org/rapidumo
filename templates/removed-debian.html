@@ -14,8 +14,20 @@
     <th>Links</th>
     <th>dak rm</th>
   </tr>
-  {{DEBIAN_REMOVED_HTML}}
+  {% for item in rm_items %}
+    <tr>
+      <td>{{item.name}}</td>
+      <td>
+        <a href="{{item.debian_pts}}">Debian PTS</a><br/>
+        <a href="{{item.tanglu_tracker}}">Tanglu Tracker</a>
+      </td>
+      <td>{{item.dak}}</td>
+    </tr>
+  {% endfor %}
 </table>
+<br/>
+<p>{{time}}</p>
+<br/>
 
 </body>
 </html>
