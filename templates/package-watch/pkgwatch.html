@@ -12,7 +12,88 @@
   <title>Tanglu QA - Package Watch</title>
 </head>
 <body>
-  {{extra_css}}
+  <style type="text/css">
+:link, :visited
+{
+   color: #0033aa;
+   text-decoration: none;
+}
+
+:link.versionlink, :visited.versionlink
+{
+   color: black;
+   text-decoration: none;
+}
+
+:link:hover, :visited:hover
+{
+    text-decoration: underline;
+}
+
+img
+{
+    padding-right: 4px;
+    border: none;
+}
+
+table
+{
+    border-collapse: collapse;
+}
+
+th
+{
+    border: 1px solid #d2d2d2;
+    padding: 6px;
+}
+
+tr
+{
+    border-top: 1px dotted #d2d2d2;
+}
+tr.hidden
+{
+    visibility: collapse;
+}
+tr.spacing
+{
+    border-top: none;
+}
+tr.newboth
+{
+    background-color: #ffa17e; /* orangered, #ff4500 */
+}
+tr.newupstream
+{
+    background-color: #ffb97f;
+}
+tr.syncnewupstream
+{
+    background-color: #ffd280; /* orange, #ffa500 */
+}
+tr.newdebian
+{
+    background-color: #ffff80; /* yellow, #ffff00 */
+}
+tr.newunstable
+{
+    background-color: #ddfd7f;
+}
+tr.uptodate
+{
+    background-color: #bcfc7e; /* lawngreen, #7cfc00 */
+}
+tr.untracked
+{
+    background-color: #e0e0e0;
+}
+
+td
+{
+    padding: 3px;
+}
+</style>
+
   <div class="tgl-g-r" id="layout">
     <a href="#menu" id="menuLink" class="menu-link">
       <span></span>

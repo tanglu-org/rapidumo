@@ -28,10 +28,16 @@ def render_template(name, out_name = None, *args, **kwargs):
     config = RapidumoConfig()
     gcfg = config.general_config
     out_dir = gcfg['html_output']
+
     if not out_name:
         out_path = os.path.join(out_dir, name)
     else:
         out_path = os.path.join(out_dir, out_name)
+    # create subdirectories if necessary
+    out_dir = os.path.dirname(os.path.realpath(__file__))
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
     template = j2_env.get_template(name)
     content = template.render(*args, **kwargs)
     f = open(out_path, 'w')
