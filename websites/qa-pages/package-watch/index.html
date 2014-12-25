@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="static/css/pure-min.css">
+  <link rel="stylesheet" href="static/css/style.css">
+
+  <link rel="shortcut icon" href="static/img/favicon.png">
+
+  <title>Tanglu QA - Package Watch</title>
+</head>
+<body>
+
+<style scoped>
+
+        .pure-button-kde,
+        .pure-button-gnome,
+        .pure-button-base,
+        .pure-button-merge {
+            color: white;
+            border-radius: 4px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .pure-button-gnome {
+            background: rgb(28, 184, 65);
+        }
+
+        .pure-button-kde {
+            background: rgb(66, 184, 221);
+        }
+
+        .pure-button-base {
+            background: #333;
+            color: #fff;
+        }
+
+        .pure-button-merge {
+            background: rgb(223, 117, 20);
+        }
+</style>
+
+
+  <div class="tgl-g-r" id="layout">
+    <a href="#menu" id="menuLink" class="menu-link">
+      <span></span>
+    </a>
+
+    <div class="tgl-u" id="menu">
+      <div class="pure-menu pure-menu-open">
+        <a class="pure-menu-heading" href="/">Tanglu QA</a>
+
+        <ul>
+          <li class=" ">
+            <a href="http://qa.tanglu.org">Overview</a>
+          </li>
+
+          <li class=" ">
+            <a href="http://qa.tanglu.org/transitions/">Transition Tracker</a>
+          </li>
+
+          <li class=" ">
+            <a href="http://qa.tanglu.org/staging-report/update_excuses.html">Staging Update Excuses</a>
+          </li>
+
+          <li class=" ">
+            <a href="http://qa.tanglu.org/needs-build/">Missing Build-Dependencies</a>
+          </li>
+
+          <li class="pure-menu-selected">
+            <a href="#">Package Watch</a>
+          </li>
+
+          <li class=" ">
+            <a href="http://qa.tanglu.org/germinate/">Germinator</a>
+          </li>
+
+          <li class="menu-item-divided">
+            <a href="http://ftp-master.tanglu.org">&#8611; FTP Masters</a>
+          </li>
+
+        </ul>
+    </div>
+  </div>
+
+  <div class="pure-u-1" id="main">
+
+  <div class="header">
+    <img src="static/img/tanglu-devlogo.png" alt="Tanglu Development" />
+    <h2>Tanglu developer resources.</h2>
+
+  </div>
+
+  <div class="content">
+    <h1>Tanglu Package-Watch</h1>
+    <p>This resource shows the merge-status of Tanglu core packages (which are in the base-suite or in an officially supported desktop, which we use to build
+     installation media).</p>
+    <p>It shows whether the packages are in sync with Debian, and if newer upstream releases are avaliable.</p>
+
+    <h2>Merge Required</h2>
+    <p>
+      <a class="pure-button pure-button-merge" href="merge-todo_main.html">Main</a>
+      <a class="pure-button pure-button-merge" href="merge-todo_contrib.html">Contrib</a>
+      <a class="pure-button pure-button-merge" href="merge-todo_non-free.html">Non-Free</a>
+    </p>
+
+    <h2>Base OS Status</h2>
+    <p>
+      <a class="pure-button pure-button-base" href="base.html">Base</a>
+      <a class="pure-button pure-button-base" href="minimal.html">Minimal</a>
+      <a class="pure-button pure-button-base" href="standard.html">Standard</a>
+    </p>
+    <p>
+      <a class="pure-button pure-button-base" href="desktop-common.html">Desktop-Common</a>
+    </p>
+
+    <h2>KDE Status</h2>
+    <p>
+      <a class="pure-button pure-button-kde" href="kde.html">KDE</a>
+    </p>
+
+    <h2>GNOME Status</h2>
+    <p>
+       <a class="pure-button pure-button-gnome" href="gnome.html">GNOME</a>
+    </p>
+
+    <br/><hr/><br/>
+    <a class="pure-button" href="untagged.html">Untagged</a>
+    <a class="pure-button" href="versions.html">Versions</a>
+
+
+
+  </div>
+
+
+  <div class="legal pure-g-r">
+    <div class="pure-u-2-5">
+        <div class="l-box">
+            <p class="legal-license">
+                This site is built using Pure v0.3<br>
+            </p>
+        </div>
+    </div>
+
+    <div class="pure-u-1-5">
+        <div class="l-box legal-logo">
+            <a href="http://tanglu.org/">
+                <img src="static/img/tanglu-small-mono.png" alt="Tanglu logo">
+            </a>
+        </div>
+    </div>
+
+    <div class="pure-u-2-5">
+        <div class="l-box">
+            <ul class="legal-links">
+                <li>Pages provided by <a href="https://gitorious.org/tanglu/rapidumo/source/master:">Rapidumo</a></li>
+            </ul>
+
+            <p class="legal-copyright">
+                &copy; 2014 Tanglu Project
+            </p>
+        </div>
+    </div>
+  </div>
+
+    </div>
+  </div>
+</body>
+</html>
