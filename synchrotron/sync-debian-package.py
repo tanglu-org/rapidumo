@@ -280,7 +280,7 @@ class SyncPackage:
                 elif self._sync_allowed(src_pkg):
                     self._import_debian_package(src_pkg)
 
-        render_template("synchrotron-issues.html", "sync-issues_%s.html" % (self._component),
+        render_template("synchrotron/synchrotron-issues.html", "synchrotron/sync-issues_%s.html" % (self._component),
                 sync_failures=sync_fails, time=time.strftime("%c"), component=self._component, import_freeze=not self._sync_enabled)
 
     def _get_packages_not_in_debian(self):
@@ -312,7 +312,7 @@ class SyncPackage:
             if not quiet:
                 print(pkgname)
 
-        render_template("removed-debian.html", "removed-debian_%s.html" % (self._component),
+        render_template("synchrotron/removed-debian.html", "synchrotron/removed-debian_%s.html" % (self._component),
                 rm_items=rm_items, time=time.strftime("%c"), component=self._component, import_freeze=not self._sync_enabled)
 
 def main():
