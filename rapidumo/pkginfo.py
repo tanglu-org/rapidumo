@@ -237,8 +237,8 @@ class PackageBuildInfoRetriever():
         return pkg_dict
 
 class BuildCheck:
-    def __init__(self):
-        self._conf = RapidumoConfig()
+    def __init__(self, conf):
+        self._conf = conf
         self._archive_path = "%s/%s" % (self._conf.archive_config['path'], self._conf.distro_name)
 
     def _get_binary_indices_list(self, suite, comp, arch):

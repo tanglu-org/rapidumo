@@ -38,15 +38,15 @@ class SyncPackage:
         self.debugMode = False
         self.dryRun = False
 
-        conf = RapidumoConfig()
-        self._momArchivePath = conf.mom_config['path']
-        self._destDistro = conf.distro_name
-        self._extra_suite = conf.archive_config['devel_suite']
+        self._conf = RapidumoConfig()
+        self._momArchivePath = self._conf.mom_config['path']
+        self._destDistro = self._conf.distro_name
+        self._extra_suite = self._conf.archive_config['devel_suite']
 
-        self._supportedArchs = conf.get_supported_archs(self._extra_suite).split (" ")
-        self._unsupportedArchs = conf.syncsource_config['archs'].split (" ")
-        self._sync_enabled = conf.synchrotron_config['sync_enabled']
-        self._freeze_exceptions_fname = conf.synchrotron_config.get('freeze_exceptions')
+        self._supportedArchs = self._conf.get_supported_archs(self._extra_suite).split (" ")
+        self._unsupportedArchs = self._conf.syncsource_config['archs'].split (" ")
+        self._sync_enabled = self._conf.synchrotron_config['sync_enabled']
+        self._freeze_exceptions_fname = self._conf.synchrotron_config.get('freeze_exceptions')
 
         for arch in self._supportedArchs:
             self._unsupportedArchs.remove(arch)
@@ -66,7 +66,7 @@ class SyncPackage:
             self._pkg_freeze_exceptions = self._read_synclist(self._freeze_exceptions_fname)
 
         # determine if the to-be-synced packages are buildable
-        bcheck = BuildCheck()
+        bcheck = BuildCheck(self._conf)
         ydata = bcheck.get_package_states_yaml_sources(target_suite, component, "amd64",
                         self._momArchivePath + "/dists/debian-%s/%s/source/Sources" % (source_suite, component))
         self.bcheck_data = yaml.safe_load(ydata)['report']
