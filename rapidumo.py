@@ -20,11 +20,14 @@ import os
 import sys
 import codecs
 import re
+import yaml
+import time
 from optparse import OptionParser
 
 from rapidumo.pkginfo import *
 from rapidumo.utils import *
 from rapidumo.config import *
+from janitor.installability_test import JanitorDebcheck
 
 class RapidumoPageRenderer:
     def __init__(self, suite = ""):
@@ -60,6 +63,65 @@ class RapidumoPageRenderer:
         render_template("migrations/britney_excuses.html", page_name="migrations", britney_result="excuses",
                     britney_excuses=exc_html)
 
+    def _create_debcheck_yml(self):
+        devel_suite = self._conf.archive_config['devel_suite']
+        out_dir = self._conf.general_config['pkg_issues_dir']
+        jd = JanitorDebcheck()
+        for arch in self._conf.get_supported_archs(devel_suite).split(" "):
+            fname = os.path.join(out_dir, "brokenpkg-%s_%s.yml" % (devel_suite, arch))
+            yaml_data = jd.get_debcheck_yaml(devel_suite, arch)
+            yaml_file = open(fname, 'w')
+            yaml_file.write(yaml_data)
+            yaml_file.close()
+
+    def _render_debcheck_pages(self):
+        devel_suite = self._conf.archive_config['devel_suite']
+        out_dir = self._conf.general_config['pkg_issues_dir']
+        for arch in self._conf.get_supported_archs(devel_suite).split(" "):
+            fname = os.path.join(out_dir, "brokenpkg-%s_%s.yml" % (devel_suite, arch))
+            if not os.path.exists(fname):
+                continue
+            f = open(fname, 'r')
+            yaml_data = yaml.safe_load(f.read())
+            f.close()
+
+            pkg_list = list()
+            for report in yaml_data['report']:
+                if report['status'] != "ok":
+                    dose_report = "Unknown problem"
+                    issue_type = "unknown"
+                    for reason in report["reasons"]:
+                        if "missing" in reason:
+                            dose_report = ("Unsat dependency %s" %
+                                (reason["missing"]["pkg"]["unsat-dependency"]))
+                            issue_type = "pkg-missing"
+                            break
+                        elif "conflict" in reason:
+                            issue_type = "pkg-conflict"
+                            if reason["conflict"].get("pkg2"):
+                                dose_report = ("Conflict between %s and %s" %
+                                        (reason["conflict"]["pkg1"]["package"],
+                                        reason["conflict"]["pkg2"]["package"]))
+                            else:
+                                dose_report = ("Conflict involving %s (%s)" %
+                                        (reason["conflict"]["pkg1"]["package"],
+                                        reason["conflict"]["pkg1"]["version"]))
+                            break
+                    pkgname = report.get('package', '')
+                    if ":" in pkgname:
+                        pkgname = pkgname.split(":")[1]
+                    info = dict()
+                    info['source'] = report.get('source', '')
+                    info['package'] = pkgname
+                    info['version'] = report.get('version', '')
+                    info['architecture'] = report.get('architecture', '')
+                    info['issue_details'] = dose_report
+                    info['issue_type'] = issue_type
+                    pkg_list.append(info)
+
+            render_template("debcheck/brokenpkg.html", "debcheck/brokenpkg_%s.html" % (arch),
+                page_name="debcheck", architecture=arch, broken_packages=pkg_list, time=time.strftime("%c"), suite=devel_suite)
+
     def refresh_page(self, page_name):
         if page_name == "static":
             render_template("index.html", page_name="start")
@@ -68,12 +130,17 @@ class RapidumoPageRenderer:
         elif page_name == "migrations":
             self._render_britney_output()
             self._render_britney_excuses()
+        elif page_name == "debcheck":
+            # we generate YAML and HTML pages, to be friendly to humans and
+            # machines which consume the YAML data
+            self._create_debcheck_yml()
+            self._render_debcheck_pages()
         else:
             print("Unknown page name: %s" % (page_name))
 
 def main():
     parser = OptionParser()
-    parser.add_option("-r", "--refresh-page",
+    parser.add_option("--refresh-page",
                   type="string", dest="refresh_page", default=None,
                   help="refresh a GUI page")
 

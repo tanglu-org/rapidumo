@@ -71,7 +71,20 @@
                         </li>
 
                         <li>
-                            <a href="http://qa.tanglu.org/needs-build/"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Missing Build Dependencies</a>
+                            <a href="http://qa.tanglu.org/pkg-issues/needs-build/"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Missing Build Dependencies</a>
+                        </li>
+
+                        <li {% if page_name == "debcheck" %}class="active"{% endif %}>
+                            <a href="#"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Broken Packages<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a {% if architecture == "amd64" %}class="active"{% endif %} href="http://qa.tanglu.org/debcheck/brokenpkg_amd64.html">amd64</a>
+                                </li>
+                                <li>
+                                    <a {% if architecture == "i386" %}class="active"{% endif %} href="http://qa.tanglu.org/debcheck/brokenpkg_i386.html">i386</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
                         </li>
 
                         <li {% if page_name == "sync-report" %}class="active"{% endif %}>

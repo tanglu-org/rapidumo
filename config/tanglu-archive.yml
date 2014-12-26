@@ -24,6 +24,7 @@ Janitor:
 Rapidumo:
     html_output: /srv/dak/export/qa-pages
     britney_output_dir: /srv/qa.tanglu.org/staging-report/
+    pkg_issues_dir: /srv/dak/export/pkg-issues/
 
 Suites:
     - name: aequorea

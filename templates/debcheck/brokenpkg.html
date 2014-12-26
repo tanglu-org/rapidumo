@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Broken packages in {{suite}} [{{architecture}}]{% endblock %}
+
+{% block bottom_postscript %}
+<script type="text/javascript">
+$(window).load(function(){
+$(document).ready(function () {
+
+    (function ($) {
+
+        $('#filter').keyup(function () {
+
+            var rex = new RegExp($(this).val(), 'i');
+            $('.searchable tr').hide();
+            $('.searchable tr').filter(function () {
+                return rex.test($(this).text());
+            }).show();
+
+        })
+
+    }(jQuery));
+
+});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+    <h1>Broken packages in {{suite}} [{{architecture}}]</h1>
+    <p>This page shows all broken packages in our current development suite. These issues should be fixed with high priority and as soon as possible.</p>
+    <p>Please note that someone might have fixed the issues in staging already, but the changed packages fail to migrate. In that case, the migration issue needs to be fixed,
+      so check the Britney reports first before taking any further action.</p>
+
+    <br/>
+    <div class="input-group"> <span class="input-group-addon">Filter</span>
+        <input id="filter" type="text" class="form-control" placeholder="Type here...">
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>Affected Package</th>
+          <th>Version</th>
+          <th>Issue Details</th>
+          <th>Arch</th>
+        </tr>
+      </thead>
+      <tbody class="searchable">
+        {% for item in broken_packages %}
+        {% if item.issue_type == "pkg-conflict" %}
+          <tr style="background-color: plum;">
+        {% else %}
+          <tr>
+        {% endif %}
+           <td>{{item.source}}</td>
+           <td>{{item.package}}</td>
+           <td>{{item.version}}</td>
+           <td>{{item.issue_details}}</td>
+           <td>{{item.architecture}}</td>
+         </tr>
+       {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}
+
+{% block page_details %}
+<p><small>Last updated on: {{time}}</small></p>
+{% endblock %}

@@ -19,5 +19,8 @@ $RAPIDUMO_PATH/cron/run-ben.sh
 # update the package-watch pages
 $RAPIDUMO_PATH/cron/package-watch.sh
 
+# update the debcheck reports & pages
+python $RAPIDUMO_PATH/rapidumo.py --refresh-page debcheck
+
 # now just update our static pages
 python $RAPIDUMO_PATH/rapidumo.py --refresh-page static
