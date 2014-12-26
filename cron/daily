@@ -18,3 +18,6 @@ $RAPIDUMO_PATH/cron/run-ben.sh
 
 # update the package-watch pages
 $RAPIDUMO_PATH/cron/package-watch.sh
+
+# now just update our static pages
+python $RAPIDUMO_PATH/rapidumo.py --refresh-page static
