@@ -9,12 +9,22 @@ UNTRACKED = 'UNTRACKED'
 
 def GNOME_FTP_URL (name, version = '([0-9.]+)'):
     return ('http://ftp.gnome.org/pub/gnome/sources/%s/%s' % (name, version), '%s-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+' % re.escape (name))
+GNOME_STABLE_SERIES = '3.14'
 
 def KDE_FTP_URL (name, subdir = ''):
     return ('http://ftp.kde.org/stable/%s([0-9.]+)/src/' % subdir, '%s-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+' % name)
 
 def GSTREAMER_URL (name, series='1.0'):
     return ('http://gstreamer.freedesktop.org/src/%s/' % name, '%s-(%s\.[0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+' % (name, series))
+
+def PYPI_URL (name):
+    return ('https://pypi.python.org/packages/source/%s/%s/' % (name[0], name), '%s-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+' % name)
+
+def CPAN_URL (name):
+    return ('http://search.cpan.org/dist/%s/' % name, '%s-v?([0-9][a-zA-Z0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+' % name)
+
+def LIBREOFFICE_URL (name):
+    return ('http://dev-www.libreoffice.org/src/', '%s-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+' % name)
 
 tanglu_base_package_info = [
  ('aalib',                 ('http://sourceforge.net/projects/aa-project/files/aa-lib/([0-9.]+)', 'aalib-([0-9][0-9a-zA-Z.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -124,7 +134,7 @@ tanglu_base_package_info = [
  ('ebook-tools',           UNTRACKED, None),
  ('ecryptfs-utils',        ('https://launchpad.net/ecryptfs/+download', 'ecryptfs-utils_([0-9][0-9.]*).orig.(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('ed',                    ('http://ftp.gnu.org/gnu/ed/', 'ed-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('eglibc',                ('http://ftp.gnu.org/gnu/glibc/', 'glibc-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None), # eglibc is just a patch on glibc
+ ('glibc',                ('http://ftp.gnu.org/gnu/glibc/', 'glibc-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('ekiga',                 GNOME_FTP_URL ('ekiga'), None),
  ('elfutils',              ('https://fedorahosted.org/releases/e/l/elfutils/', 'elfutils-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None), # FIXME: Releases in subdirs
  ('empathy',               GNOME_FTP_URL ('empathy'), GNOME_FTP_URL ('empathy')),
@@ -397,8 +407,6 @@ tanglu_base_package_info = [
  ('libgee-0.8',            GNOME_FTP_URL ('libgee', '0.8'), None),
  ('libgee',                GNOME_FTP_URL ('libgee', '0.6'), None),
  ('libgksu',               ('http://people.debian.org/~kov/gksu/', 'libgksu-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('libglade2',             GNOME_FTP_URL ('libglade'), None),
- ('libglademm2.4',         GNOME_FTP_URL ('libglademm'), None),
  ('libglib-perl',          ('http://search.cpan.org/dist/Glib/', 'Glib-([0-9][a-zA-Z0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('libgnomecups',          GNOME_FTP_URL ('libgnomecups'), None),
  ('libgnome',              GNOME_FTP_URL ('libgnome'), None),
@@ -820,6 +828,19 @@ tanglu_base_package_info = [
  ('pyxdg',                 ('http://people.freedesktop.org/~lanius/', 'pyxdg-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('qt4-x11',               ('http://releases.qt-project.org/qt4/source/', 'qt-everywhere-opensource-src-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('qt-at-spi',             ('http://gitorious.org/qt-at-spi/qt-at-spi/trees', '>v([0-9][0-9.]*)<'), None), # Note using hack to work out tags
+# ('qt3d-opensource-src',   ('', ''), None),
+# ('qtdeclarative-opensource-src', ('', ''), None),
+# ('qtfeedback-opensource-src', ('', ''), None),
+ ('qtgraphicaleffects-opensource-src', ('http://download.qt-project.org/official_releases/qt/5.2/([0-9.]*)/submodules/', 'qtgraphicaleffects-opensource-src-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+# ('qtjsbackend-opensource-src', ('', ''), None),
+ ('qtlocation-opensource-src', ('http://download.qt-project.org/official_releases/qt/5.2/([0-9.]*)/submodules/', 'qtlocation-opensource-src-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('qtmultimedia-opensource-src', ('http://download.qt-project.org/official_releases/qt/5.2/([0-9.]*)/submodules/', 'qtmultimedia-opensource-src-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+# ('qtpim-opensource-src',  ('', ''), None),
+# ('qtscript-opensource-src', ('http://download.qt-project.org/official_releases/qt/5.2/([0-9.]*)/submodules/', 'qtscript-opensource-src-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+# ('qtsensors-opensource-src', ('http://download.qt-project.org/official_releases/qt/5.2/([0-9.]*)/submodules/', 'qtsensors-opensource-src-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('qtsvg-opensource-src',  ('http://download.qt-project.org/official_releases/qt/5.2/([0-9.]*)/submodules/', 'qtsvg-opensource-src-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+ ('qtwebkit-opensource-src', ('http://download.qt-project.org/official_releases/qt/5.2/([0-9.]*)/submodules/', 'qtwebkit-opensource-src-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
+# ('qtxmlpatterns-opensource-src', ('http://download.qt-project.org/official_releases/qt/5.2/([0-9.]*)/submodules/', 'qtxmlpatterns-opensource-src-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('quadrapassel',          GNOME_FTP_URL ('quadrapassel'), None),
  ('quassel',               ('http://quassel-irc.org/pub/', 'quassel-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('radeontool',            ('http://people.freedesktop.org/~airlied/radeontool/', 'radeontool-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
@@ -980,7 +1001,7 @@ tanglu_base_package_info = [
  ('webaccounts-browser-extension', ('https://launchpad.net/webaccounts-browser-extension/+download', 'webaccounts-browser-extension-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('webapps-applications',  ('https://launchpad.net/webapps-applications/+download', 'webapps-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('webapps-greasemonkey',  ('https://launchpad.net/webapps-greasemonkey/+download', 'webapps-greasemonkey-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
- ('webkit',                ('http://webkitgtk.org/releases', 'webkitgtk-([0-9]+.[0-9]*[02468].[0-9]+).(tar.(gz|bz2|xz)|tgz|zip)+'), ('http://webkitgtk.org/releases', 'webkitgtk-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+')),
+ ('webkitgtk',                ('http://webkitgtk.org/releases', 'webkitgtk-([0-9]+.[0-9]*[02468].[0-9]+).(tar.(gz|bz2|xz)|tgz|zip)+'), ('http://webkitgtk.org/releases', 'webkitgtk-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+')),
  ('weston',                ('http://wayland.freedesktop.org/releases/', 'weston-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('wget',                  ('http://ftp.gnu.org/gnu/wget/', 'wget-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
  ('wildmidi',              ('http://sourceforge.net/projects/wildmidi/files/wildmidi/', 'wildmidi-([0-9][0-9.]*).(tar.(gz|bz2|xz)|tgz|zip)+'), None),
