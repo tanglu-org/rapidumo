@@ -26,7 +26,7 @@ import yaml
 from optparse import OptionParser
 
 from rapidumo.pkginfo import *
-from rapidumo.utils import render_template, render_static_pages
+from rapidumo.utils import render_template
 from rapidumo.config import *
 from rapidumo.messaging import *
 
