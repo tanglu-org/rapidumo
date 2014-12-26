@@ -10,11 +10,11 @@ $RAPIDUMO_PATH/cron/sync-hints.sh
 # fetch stuff from Debian and Tanglu archives
 $RAPIDUMO_PATH/synchrotron/prepare-sync.sh
 
-# update the package-watch pages
-$RAPIDUMO_PATH/cron/package-watch.sh
-
 # create new germinator output
 $RAPIDUMO_PATH/cron/germinate-update.sh
 
 # run Ben (the transition tracker)
 $RAPIDUMO_PATH/cron/run-ben.sh
+
+# update the package-watch pages
+$RAPIDUMO_PATH/cron/package-watch.sh
