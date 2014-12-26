@@ -619,10 +619,10 @@ def generate_page (tags = [], invert = False):
 
     return html, foot_html
 
-def write_page (name, tags = [], invert = False):
+def write_page (name, tags = [], section_label, invert = False):
     html, foot_html = generate_page (tags, invert)
     render_template("package-watch/pkgwatch.html", name,
-                content=html, extra_footer=foot_html)
+                page_name="pkg-watch", content=html, extra_footer=foot_html, section_label=section_label)
     debug('Wrote %s' % name)
 
 tags = []
@@ -631,11 +631,11 @@ for p in packages:
         if not t in tags:
             tags.append (t)
 
-write_page ('package-watch/versions.html', [], True)
-write_page ('package-watch/base.html', ['minimal', 'standard'])
-write_page ('package-watch/minimal.html', ['minimal'])
-write_page ('package-watch/standard.html', ['standard'])
-write_page ('package-watch/desktop-common.html', ['desktop-common', 'desktop-common.build-depends'])
-write_page ('package-watch/gnome.html', ['gnome'])
-write_page ('package-watch/kde.html', ['kde'])
-write_page ('package-watch/untagged.html', tags, True)
+write_page ('package-watch/versions.html', [], "versions", True)
+write_page ('package-watch/base.html', ['minimal', 'standard'], "base")
+write_page ('package-watch/minimal.html', ['minimal'], "minimal")
+write_page ('package-watch/standard.html', ['standard'], "standard")
+write_page ('package-watch/desktop-common.html', ['desktop-common', 'desktop-common.build-depends'], "desktop-common")
+write_page ('package-watch/gnome.html', ['gnome'], "gnome")
+write_page ('package-watch/kde.html', ['kde'], "kde")
+write_page ('package-watch/untagged.html', tags, "untagged", True)

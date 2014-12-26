@@ -1,82 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
+{% block title %}Synchrotron Report for "{{component}}"{% endblock %}
 
-  <link rel="stylesheet" href="../static/css/pure-min.css">
-  <link rel="stylesheet" href="../static/css/style.css">
+{% block bottom_postscript %}
+<script type="text/javascript">
+$(window).load(function(){
+$(document).ready(function () {
 
-  <link rel="shortcut icon" href="../static/img/favicon.png">
+    (function ($) {
 
-  <title>Tanglu QA - Synchrotron Report for "{{component}}"</title>
-</head>
-<body>
+        $('#filter').keyup(function () {
 
-  <div class="tgl-g-r" id="layout">
-    <a href="#menu" id="menuLink" class="menu-link">
-      <span></span>
-    </a>
+            var rex = new RegExp($(this).val(), 'i');
+            $('.searchable tr').hide();
+            $('.searchable tr').filter(function () {
+                return rex.test($(this).text());
+            }).show();
 
-    <div class="tgl-u" id="menu">
-      <div class="pure-menu pure-menu-open">
-        <a class="pure-menu-heading" href="/">Tanglu QA</a>
+        })
 
-        <ul>
-          <li class=" ">
-            <a href="http://qa.tanglu.org">Overview</a>
-          </li>
+    }(jQuery));
 
-          <li class=" ">
-            <a href="http://qa.tanglu.org/transitions/">Transition Tracker</a>
-          </li>
+});
+});
+</script>
+{% endblock %}
 
-          <li class=" ">
-            <a href="http://qa.tanglu.org/staging-report/update_excuses.html">Staging Update Excuses</a>
-          </li>
-
-          <li class=" ">
-            <a href="http://qa.tanglu.org/needs-build/">Missing Build-Dependencies</a>
-          </li>
-
-          <li class="pure-menu-selected">
-            <a href="http://qa.tanglu.org/pkg-watch.html">Package Watch</a>
-          </li>
-
-          <li class=" ">
-            <a href="http://qa.tanglu.org/germinate/">Germinator</a>
-          </li>
-
-          <li class="menu-item-divided">
-            <a href="http://ftp-master.tanglu.org">&#8611; FTP Masters</a>
-          </li>
-
-        </ul>
-    </div>
-  </div>
-
-  <div class="pure-u-1" id="main">
-
-  <div class="header">
-    <img src="../static/img/tanglu-devlogo.png" alt="Tanglu Development" />
-    <h2>Tanglu developer resources.</h2>
-
-  </div>
-
-  <div class="content">
+{% block content %}
     <h1>Sync Report for "{{component}}"</h1>
     <p>This page shows the synchronization status with Debian, and which packages need manual intervention to be available in Tanglu as well.</p>
 
     {% if import_freeze %}
-      <aside>
+      <div class="alert alert-info alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <strong>Info</strong>
           <p>We are currently in import freeze! These pages will still be updated to see which packages have issues in being synced,
           but packages which can be synchronized with Debian will not be pulled in automatically.</p>
           <p>Please get a sync-freeze exception to get these packages merged with Debian.</p>
-      </aside>
+      </div>
       <br/>
     {% endif %}
 
-    <table class="pure-table pure-table-bordered">
+    <div class="input-group"> <span class="input-group-addon">Filter</span>
+        <input id="filter" type="text" class="form-control" placeholder="Type here...">
+    </div>
+    <br/>
+    <table class="table">
       <thead>
         <tr>
           <th>Package Name</th>
@@ -85,9 +53,8 @@
           <th>Issue Details</th>
         </tr>
       </thead>
-
-      <tbody>
-       {% for item in sync_failures %}
+      <tbody class="searchable">
+        {% for item in sync_failures %}
         {% if item.fail_type == "unbuildable" %}
           <tr style="background-color: #f2f2f2;">
         {% elif item.fail_type == "merge-required" %}
@@ -102,42 +69,9 @@
          </tr>
        {% endfor %}
       </tbody>
-   </table>
+    </table>
+{% endblock %}
 
-  </div>
-
-  <div class="legal pure-g-r">
-    <div class="pure-u-2-5">
-        <div class="l-box">
-            <p class="legal-license">
-                This site is built using Pure v0.3<br>
-            </p>
-            <p>Last updated on: {{time}}</p>
-        </div>
-    </div>
-
-    <div class="pure-u-1-5">
-        <div class="l-box legal-logo">
-            <a href="http://tanglu.org/">
-                <img src="../static/img/tanglu-small-mono.png" alt="Tanglu logo">
-            </a>
-        </div>
-    </div>
-
-    <div class="pure-u-2-5">
-        <div class="l-box">
-            <ul class="legal-links">
-                <li>Pages provided by <a href="https://gitorious.org/tanglu/rapidumo/source/master:">Rapidumo</a></li>
-            </ul>
-
-            <p class="legal-copyright">
-                &copy; 2014 Tanglu Project
-            </p>
-        </div>
-    </div>
-  </div>
-
-    </div>
-  </div>
-</body>
-</html>
+{% block page_details %}
+<p><small>Last updated on: {{time}}</small></p>
+{% endblock %}

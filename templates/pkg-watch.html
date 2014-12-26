@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Package Watch{% endblock %}
+
+{% block head %}
+    {{ super() }}
+<style scoped>
+
+        .pure-button-kde,
+        .pure-button-gnome,
+        .pure-button-base,
+        .pure-button-merge {
+            color: white;
+            border-radius: 4px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .pure-button-gnome {
+            background: rgb(28, 184, 65);
+        }
+
+        .pure-button-kde {
+            background: rgb(66, 184, 221);
+        }
+
+        .pure-button-base {
+            background: #333;
+            color: #fff;
+        }
+
+        .pure-button-merge {
+            background: rgb(223, 117, 20);
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>Tanglu Package-Watch</h1>
+    <p>This resource shows the merge-status of Tanglu core packages (which are in the base-suite or in an officially supported desktop, which we use to build
+     installation media).</p>
+    <p>It shows whether the packages are in sync with Debian, and if newer upstream releases are avaliable.</p>
+
+    <h2>Base OS Status</h2>
+    <p>
+      <a class="pure-button pure-button-base" href="package-watch/base.html">Base</a>
+      <a class="pure-button pure-button-base" href="package-watch/minimal.html">Minimal</a>
+      <a class="pure-button pure-button-base" href="package-watch/standard.html">Standard</a>
+    </p>
+    <p>
+      <a class="pure-button pure-button-base" href="package-watch/desktop-common.html">Desktop-Common</a>
+    </p>
+
+    <h2>KDE Status</h2>
+    <p>
+      <a class="pure-button pure-button-kde" href="package-watch/kde.html">KDE</a>
+    </p>
+
+    <h2>GNOME Status</h2>
+    <p>
+       <a class="pure-button pure-button-gnome" href="package-watch/gnome.html">GNOME</a>
+    </p>
+
+    <br/><hr/><br/>
+    <a class="pure-button" href="package-watch/untagged.html">Untagged</a>
+    <a class="pure-button" href="package-watch/versions.html">Versions</a>
+{% endblock %}

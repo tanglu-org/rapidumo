@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h1>Synchrotron Reports</h1>
+    <p>Display the package which need to ber merged with Debian, or can not be synced due to build-dependency issues</p>
+    <p>
+      <a class="pure-button pure-button-merge" href="http://qa.tanglu.org/synchrotron/sync-issues_main.html">Main</a>
+      <a class="pure-button pure-button-merge" href="http://qa.tanglu.org/synchrotron/sync-issues_contrib.html">Contrib</a>
+      <a class="pure-button pure-button-merge" href="http://qa.tanglu.org/synchrotron/sync-issues_non-free.html">Non-Free</a>
+    </p>
+{% endblock %}

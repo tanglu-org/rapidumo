@@ -50,6 +50,11 @@ def render_template(name, out_name = None, *args, **kwargs):
     f.write(content)
     f.close()
 
+def render_static_pages():
+    render_template("index.html", page_name="start")
+    render_template("pkg-watch.html", page_name="pkg-watch")
+    render_template("synchrotron/index.html", page_name="sync-report")
+
 def debug(text):
     if debug_enabled:
         print(text)

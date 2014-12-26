@@ -26,7 +26,7 @@ import yaml
 from optparse import OptionParser
 
 from rapidumo.pkginfo import *
-from rapidumo.utils import render_template
+from rapidumo.utils import render_template, render_static_pages
 from rapidumo.config import *
 from rapidumo.messaging import *
 
@@ -281,7 +281,10 @@ class SyncPackage:
                     self._import_debian_package(src_pkg)
 
         render_template("synchrotron/synchrotron-issues.html", "synchrotron/sync-issues_%s.html" % (self._component),
-                sync_failures=sync_fails, time=time.strftime("%c"), component=self._component, import_freeze=not self._sync_enabled)
+                page_name="sync-report", sync_failures=sync_fails, time=time.strftime("%c"), component=self._component,
+                import_freeze=not self._sync_enabled)
+
+        render_static_pages()
 
     def _get_packages_not_in_debian(self):
         debian_pkg_list = self._pkgs_src.values()
@@ -313,7 +316,8 @@ class SyncPackage:
                 print(pkgname)
 
         render_template("synchrotron/removed-debian.html", "synchrotron/removed-debian_%s.html" % (self._component),
-                rm_items=rm_items, time=time.strftime("%c"), component=self._component, import_freeze=not self._sync_enabled)
+                page_name="debian-rm", rm_items=rm_items, time=time.strftime("%c"), component=self._component,
+                import_freeze=not self._sync_enabled)
 
 def main():
     # init Apt, we need it later

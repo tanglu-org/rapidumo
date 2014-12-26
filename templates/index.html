@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block page_wrapper %}
+<div>
+<center>
+<img src="static/img/tanglu-devlogo.png" alt="Tanglu Development" style="display: block;padding-bottom: 8px;"/>
+
+<a href="http://xkcd.com/797/"><img src="static/img/debian_main.png" alt="" style="display: block;"/></a>
+</center>
+</div>
+<hr/>
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+    <p>These pages provide QA information about the Tanglu package archive, to help finding issues early and to make the
+    life of Tanglu developers easier.</p>
+    <p>All the services we currently provide are listed below.</p>
+
+
+    <h2>Build-needing packages &amp; dependencies</h2>
+    <p>This resource provides information about packages which need to be built as well as about their dependency-state in staging.</p>
+    <p>It also lists all uninstallable packages in Tanglu's current development version (aequorea)</p>
+    <a class="btn btn-default" role="button" href="needs-build/">Info</a>
+
+
+    <h2>Transition Tracker</h2>
+    <p>We track package transitions in the Tanglu archive. You can take a look at their state via the transition tracker, which is very helpful to find
+    out why a package has not left <i>staging</i> yet.</p>
+    <a class="btn btn-default" role="button" href="transitions/">Info</a>
+
+
+    <h2>Staging migration status</h2>
+    <p>This resource lists the state of all packages in the staging suite, showing excuses why the packages can't migrate to the development suite.</p>
+    <a class="btn btn-default" role="button" href="staging-report/update_excuses.html">Update Excuses</a>
+    <a class="btn btn-default" role="button" href="staging-report/update_output.txt">Britney Output</a>
+
+
+    <h2>Package merge status (package-watch)</h2>
+    <p>This resource shows the merge-status of Tanglu core packages (which are in the base-suite or in an officially supported desktop, which we use to build
+     installation media).</p>
+    <p>It shows whether the packages are in sync with Debian, and if newer upstream releases are avaliable.</p>
+    <p>
+      <a class="btn btn-default" role="button" href="package-watch/base.html">Base</a>
+      <a class="btn btn-default" role="button" href="package-watch/minimal.html">Minimal</a>
+      <a class="btn btn-default" role="button" href="package-watch/standard.html">Standard</a>
+      <a class="btn btn-default" role="button" href="package-watch/desktop-common.html">Desktop-Common</a>
+      <a class="btn btn-default" role="button" href="package-watch/gnome.html">GNOME</a>
+      <a class="btn btn-default" role="button" href="package-watch/kde.html">KDE</a>
+    </p>
+    <p>
+      <a class="btn btn-default" role="button" href="package-watch/untagged.html">Untagged</a>
+      <a class="btn btn-default" role="button" href="package-watch/versions.html">Versions</a>
+    </p>
+
+
+    <h2>Germinate</h2>
+
+    <p>The Germinate results for Tanglu can be viewed on these pages.</p>
+    <a class="btn btn-default" role="button" href="germinate/">Info</a>
+{% endblock %}
