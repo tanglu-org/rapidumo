@@ -344,7 +344,7 @@ package_names.sort ()
 
 queue = Queue.Queue ()
 count = 0
-MAX_THREADS = 8
+MAX_THREADS = 10
 for name in package_names:
     package = packages[name]
     thread = PackageThread (queue, package)
