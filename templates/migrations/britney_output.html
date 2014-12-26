@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Britney Output{% endblock %}
+
+{% block content %}
+    <h1>Britney Output for staging migrations</h1>
+
+    <div class="well well-lg">
+      <span style="font-family: monospace;">
+        {{britney_output}}
+      </span>
+    </div>
+{% endblock %}

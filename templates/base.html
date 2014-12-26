@@ -56,14 +56,14 @@
                             <a href="http://qa.tanglu.org/transitions/"><span class="glyphicon glyphicon-tower" aria-hidden="true"></span> Transition Tracker</a>
                         </li>
 
-                        <li>
+                        <li {% if page_name == "migrations" %}class="active"{% endif %}>
                             <a href="#"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Package Migrations<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="http://qa.tanglu.org/staging-report/update_excuses.html">Staging Update Excuses</a>
+                                    <a {% if britney_result == "excuses" %}class="active"{% endif %} href="http://qa.tanglu.org/migrations/britney_excuses.html">Staging Update Excuses</a>
                                 </li>
                                 <li>
-                                    <a href="http://qa.tanglu.org/staging-report/update_output.txt">Britney Output</a>
+                                    <a {% if britney_result == "output" %}class="active"{% endif %} href="http://qa.tanglu.org/migrations/britney_output.html">Britney Output</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->

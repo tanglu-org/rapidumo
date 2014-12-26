@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import codecs
 from rapidumo.config import RapidumoConfig
 from jinja2 import Environment, FileSystemLoader
 
@@ -46,14 +47,8 @@ def render_template(name, out_name = None, *args, **kwargs):
 
     template = j2_env.get_template(name)
     content = template.render(*args, **kwargs)
-    f = open(out_path, 'w')
-    f.write(content)
-    f.close()
-
-def render_static_pages():
-    render_template("index.html", page_name="start")
-    render_template("pkg-watch.html", page_name="pkg-watch")
-    render_template("synchrotron/index.html", page_name="sync-report")
+    with codecs.open(out_path, 'w', encoding='utf-8') as f:
+        f.write(content)
 
 def debug(text):
     if debug_enabled:

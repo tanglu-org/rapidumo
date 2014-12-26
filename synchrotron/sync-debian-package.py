@@ -284,8 +284,6 @@ class SyncPackage:
                 page_name="sync-report", sync_failures=sync_fails, time=time.strftime("%c"), component=self._component,
                 import_freeze=not self._sync_enabled)
 
-        render_static_pages()
-
     def _get_packages_not_in_debian(self):
         debian_pkg_list = self._pkgs_src.values()
         dest_pkg_list = self._pkgs_dest.keys()
