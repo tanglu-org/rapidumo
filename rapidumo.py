@@ -107,6 +107,8 @@ class RapidumoPageRenderer:
                                         (reason["conflict"]["pkg1"]["package"],
                                         reason["conflict"]["pkg1"]["version"]))
                             break
+
+                    dose_report = dose_report.replace("%3a", ":") # compatibility with older dose3 releases
                     pkgname = report.get('package', '')
                     if ":" in pkgname:
                         pkgname = pkgname.split(":")[1]

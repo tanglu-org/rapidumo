@@ -173,10 +173,16 @@ class SyncPackage:
                         (reason["missing"]["pkg"]["unsat-dependency"]))
                     break
                 elif "conflict" in reason:
-                    dose_report = ("Conflict between %s and %s" %
-                            (reason["conflict"]["pkg1"]["package"],
-                            reason["conflict"]["pkg2"]["package"]))
+                    if reason["conflict"].get("pkg2"):
+                        dose_report = ("Conflict between %s and %s" %
+                               (reason["conflict"]["pkg1"]["package"],
+                               reason["conflict"]["pkg2"]["package"]))
+                    else:
+                        dose_report = ("Conflict involving %s (%s)" %
+                                (reason["conflict"]["pkg1"]["package"],
+                                reason["conflict"]["pkg1"]["version"]))
                     break
+            dose_report = dose_report.replace("%3a", ":") # compatibility with older dose3 releases
 
         if dose_report and not forceSync:
             print("Package %s can not be built in Tanglu, it will not be synced: %s" % (dest_pkg.pkgname, dose_report))
