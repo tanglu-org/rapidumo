@@ -275,7 +275,8 @@ class BuildCheck:
             # FIXME: hack to ignore this particular error...
             if not "Unable to get real version for mplayer2" in stderr:
                 raise Exception(stderr)
-        return stdout
+        ydata = stdout.replace("%3a", ":")  # Support for wheezy version of dose-builddebcheck
+        return ydata
 
     def get_package_states_yaml(self, suite, comp, arch):
         source_gz_path = self._archive_path + "/dists/%s/%s/source/Sources.gz" % (suite, comp)
