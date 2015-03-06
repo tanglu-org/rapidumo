@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright (C) 2013 Matthias Klumpp <mak@debian.org>
+# Copyright (C) 2013-2015 Matthias Klumpp <mak@debian.org>
 #
 # Licensed under the GNU General Public License Version 3
 #
@@ -23,6 +23,7 @@ import subprocess
 import re
 import time
 import yaml
+import glob
 from optparse import OptionParser
 
 from rapidumo.pkginfo import *
@@ -46,7 +47,7 @@ class SyncPackage:
         self._supportedArchs = self._conf.get_supported_archs(self._extra_suite).split (" ")
         self._unsupportedArchs = self._conf.syncsource_config['archs'].split (" ")
         self._sync_enabled = self._conf.synchrotron_config['sync_enabled']
-        self._freeze_exceptions_fname = self._conf.synchrotron_config.get('freeze_exceptions')
+        self._autosync_dir = self._conf.synchrotron_config.get('autosync_lists')
 
         for arch in self._supportedArchs:
             self._unsupportedArchs.remove(arch)
@@ -55,23 +56,30 @@ class SyncPackage:
         self._sourceSuite = source_suite
         self._component = component
         self._target_suite = target_suite
-        pkginfo_src = SourcePackageInfoRetriever(self._momArchivePath, "debian", source_suite, momCache=True)
+
         pkginfo_dest = SourcePackageInfoRetriever(self._momArchivePath, self._destDistro, target_suite, momCache=True)
         pkginfo_dest.extra_suite = self._extra_suite
-        self._pkgs_src = pkginfo_src.get_packages_dict(component)
         self._pkgs_dest = pkginfo_dest.get_packages_dict(component)
         self._pkg_blacklist = self._read_synclist("%s/sync-blacklist.txt" % self._momArchivePath)
-        self._pkg_freeze_exceptions = list()
-        if self._freeze_exceptions_fname:
-            self._pkg_freeze_exceptions = self._read_synclist(self._freeze_exceptions_fname)
+        self._pkg_autosync_overrides = dict()
+        if self._autosync_dir:
+            self._pkg_autosync_overrides = self._load_autosync_data(self._autosync_dir)
 
-        # determine if the to-be-synced packages are buildable
-        bcheck = BuildCheck(self._conf)
-        ydata = bcheck.get_package_states_yaml_sources(target_suite, component, "amd64",
-                        self._momArchivePath + "/dists/debian-%s/%s/source/Sources" % (source_suite, component))
-        self.bcheck_data = yaml.safe_load(ydata)['report']
-        if not self.bcheck_data:
-            self.bcheck_data = list()
+        # load Debian suite data
+        self._pkgs_src = dict()
+        self.bcheck_data = dict()
+        suites = ["experimental", "unstable", "testing"]
+        if source_suite not in suites:
+            suites.append(source_suite)
+        for suite in suites:
+            pkginfo_src = SourcePackageInfoRetriever(self._momArchivePath, "debian", source_suite, momCache=True)
+            self._pkgs_src[suite] = pkginfo_src.get_packages_dict(component)
+
+            # determine if the to-be-synced packages are buildable
+            bcheck = BuildCheck(self._conf)
+            ydata = bcheck.get_package_states_yaml_sources(target_suite, component, "amd64",
+                            self._momArchivePath + "/dists/debian-%s/%s/source/Sources" % (suite, component))
+            self.bcheck_data[suite] = yaml.safe_load(ydata)['report']
 
     def _read_synclist(self, filename):
         if not os.path.isfile(filename):
@@ -92,8 +100,31 @@ class SyncPackage:
                 sl.append(line)
         return sl
 
+    def _load_autosync_data(self, directory):
+        hints = dict()
+        for fname in os.listdir(directory):
+            fname = os.path.join(directory, fname)
+            if fname.endswith(".list"):
+                with open(fname) as slist:
+                    for line in slist:
+                        try:
+                            line = line[:line.index("#")]
+                        except ValueError:
+                            pass
+
+                    line = line.strip()
+                    if not line:
+                        continue
+                    # sync lines are in the format <suite>/<srcpkg>, for
+                    # example "experimental/packagekit"
+                    parts = line.split('/', 1);
+                    hints[parts[1]] = parts[0]
+
+        return hints
+
+
     def _get_package_depwait_report(self, pkg):
-        for nbpkg in self.bcheck_data:
+        for nbpkg in self.bcheck_data[self._sourceSuite]:
             if (nbpkg['package'] == ("src:" + pkg.pkgname) and (nbpkg['version'] == pkg.version)):
                 return nbpkg
         return None
@@ -201,10 +232,10 @@ class SyncPackage:
         return ret
 
     def sync_package(self, package_name, force=False):
-        if not package_name in self._pkgs_src:
+        if not package_name in self._pkgs_src[self._sourceSuite]:
             print("Cannot sync %s, package doesn't exist in Debian (%s/%s)!" % (package_name, self._sourceSuite, self._component))
             return False
-        src_pkg = self._pkgs_src[package_name]
+        src_pkg = self._pkgs_src[self._sourceSuite][package_name]
 
         if not package_name in self._pkgs_dest:
             ret = False
@@ -232,7 +263,7 @@ class SyncPackage:
         return ret
 
     def sync_package_regex(self, package_regex, force=False):
-        for src_pkg in self._pkgs_src.values():
+        for src_pkg in self._pkgs_src[self._sourceSuite].values():
             # check if source-package matches regex, if yes, sync package
             if re.match(package_regex, src_pkg.pkgname):
                 if not src_pkg.pkgname in self._pkgs_dest:
@@ -255,10 +286,9 @@ class SyncPackage:
         """
         Return true if the package is freeze-exempt
         """
-        if src_pkg.pkgname in self._pkg_freeze_exceptions:
+        if src_pkg.pkgname in self._pkg_autosync_overrides:
             return True
         return self._sync_enabled
-
 
     def sync_all_packages(self):
         sync_fails = list()
@@ -266,7 +296,7 @@ class SyncPackage:
         if not self._sync_enabled:
             print("INFO: Package syncs are currently disabled. Will only sync packages with permanent freeze exceptions.")
 
-        for src_pkg in self._pkgs_src.values():
+        def perform_sync(src_pkg):
             if not src_pkg.pkgname in self._pkgs_dest:
                 ret, sinfo = self._can_sync_package(src_pkg, None, True)
                 if not ret and sinfo != None:
@@ -276,7 +306,7 @@ class SyncPackage:
                         print("Sync: %s" % (src_pkg))
                     elif self._sync_allowed(src_pkg):
                         self._import_debian_package(src_pkg)
-                continue
+                return
             ret, sinfo = self._can_sync_package(src_pkg, self._pkgs_dest[src_pkg.pkgname], True)
             if not ret and sinfo != None:
                     sync_fails.append(sinfo)
@@ -286,12 +316,25 @@ class SyncPackage:
                 elif self._sync_allowed(src_pkg):
                     self._import_debian_package(src_pkg)
 
+        # sync all packages where no rule exists
+        for src_pkg in self._pkgs_src[self._sourceSuite].values():
+            perform_sync(src_pkg)
+
+        # now sync the stuff which has explicit auto-sync hints
+        for pkgname, suite in self._pkg_autosync_overrides.items():
+            if suite == self._sourceSuite:
+                # we already synced this (if possible) in the previous step
+                continue
+            src_pkg = self._pkgs_src[suite].get(pkgname)
+            if src_pkg:
+                perform_sync(src_pkg)
+
         render_template("synchrotron/synchrotron-issues.html", "synchrotron/sync-issues_%s.html" % (self._component),
                 page_name="sync-report", sync_failures=sync_fails, time=time.strftime("%c"), component=self._component,
                 import_freeze=not self._sync_enabled)
 
     def _get_packages_not_in_debian(self):
-        debian_pkg_list = self._pkgs_src.values()
+        debian_pkg_list = self._pkgs_src[self._sourceSuite].values()
         dest_pkg_list = self._pkgs_dest.keys()
         for src_pkg in debian_pkg_list:
             pkgname = src_pkg.pkgname
