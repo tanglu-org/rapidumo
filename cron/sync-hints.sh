@@ -20,7 +20,7 @@
 
 # Update the blacklist
 if [ ! -d /srv/dak/archive-hints ]; then
-  git clone git://gitorious.org/tanglu/archive-hints.git /srv/dak/archive-hints
+  git clone https://gitlab.com/tanglu/archive-hints.git /srv/dak/archive-hints
 else
   cd /srv/dak/archive-hints/
   git pull --quiet
