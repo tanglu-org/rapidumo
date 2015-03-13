@@ -112,12 +112,18 @@ class RapidumoPageRenderer:
                     pkgname = report.get('package', '')
                     if ":" in pkgname:
                         pkgname = pkgname.split(":")[1]
+                    dose_details = yaml.dump(report["reasons"], default_flow_style=False, indent=2, width=200)
+                    if dose_details:
+                        dose_details = dose_details.replace("\n", "<br/>").replace(" ", "&nbsp;")
+                    else:
+                        dose_details = "I don't have more information on this. Sorry."
                     info = dict()
                     info['source'] = report.get('source', '')
                     info['package'] = pkgname
                     info['version'] = report.get('version', '')
                     info['architecture'] = report.get('architecture', '')
-                    info['issue_details'] = dose_report
+                    info['issue_summary'] = dose_report
+                    info['issue_details'] = dose_details
                     info['issue_type'] = issue_type
                     pkg_list.append(info)
 

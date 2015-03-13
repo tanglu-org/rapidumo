@@ -55,7 +55,18 @@ $(document).ready(function () {
            <td>{{item.source}}</td>
            <td>{{item.package}}</td>
            <td>{{item.version}}</td>
-           <td>{{item.issue_details}}</td>
+           <td>
+             <div class="accordion-heading">
+               <a class="accordion-toggle" data-toggle="collapse" href="#collapse{{ loop.index0 }}" style="text-decoration: none !important;color: black;">
+                 {{item.issue_summary}}
+               </a>
+             </div>
+             <div id="collapse{{ loop.index0 }}" class="accordion-body collapse">
+               <div class="accordion-inner">
+                 {{item.issue_details}}
+               </div>
+             </div>
+           </td>
            <td>{{item.architecture}}</td>
          </tr>
        {% endfor %}
