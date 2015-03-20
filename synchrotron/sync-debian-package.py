@@ -130,7 +130,7 @@ class SyncPackage:
         return None
 
     def _import_debian_package(self, pkg):
-        print("Attempt to import package: %s" % (pkg))
+        print("Attempt to import package: %s (%s)" % (pkg, pkg.getVersionNoEpoch()))
         # make 100% sure that we never import any package by accident in dry-run mode
         if self.dryRun:
             return
@@ -140,7 +140,6 @@ class SyncPackage:
             pkg_dir = pkg_dir[pkg_dir.index("/")+1:]
             pkg_dir = pkg_dir[pkg_dir.index("/")+1:]
         pkg_path = self._momArchivePath + "/pool/debian/" + pkg_dir + "/%s_%s.dsc" % (pkg.pkgname, pkg.getVersionNoEpoch())
-        print("(Import path: %s)" % (pkg_path))
 
         cmd = ["dak", "import", "-s", "-a", self._target_suite, self._component, pkg_path]
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -263,11 +262,12 @@ class SyncPackage:
         return ret
 
     def sync_packages(self, package_names, force=False):
+        success = True
         for pkgname in package_names:
             ret = self.sync_package(pkgname, force)
             if not ret:
-                return False
-        return True
+                success = False
+        return success
 
     def sync_package_regex(self, package_regex, force=False):
         for src_pkg in self._pkgs_src[self._sourceSuite].values():
