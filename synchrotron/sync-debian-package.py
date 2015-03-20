@@ -262,6 +262,13 @@ class SyncPackage:
                 ret = self._import_debian_package(src_pkg)
         return ret
 
+    def sync_packages(self, package_names, force=False):
+        for pkgname in package_names:
+            ret = self.sync_package(pkgname, force)
+            if not ret:
+                return False
+        return True
+
     def sync_package_regex(self, package_regex, force=False):
         for src_pkg in self._pkgs_src[self._sourceSuite].values():
             # check if source-package matches regex, if yes, sync package
@@ -397,20 +404,30 @@ def main():
 
     if options.import_pkg:
         sync = SyncPackage()
-        if len(args) != 4:
-            print("Invalid number of arguments (need source-suite, target-suite, component, package-name)")
+        if len(args) < 4:
+            print("Invalid number of arguments (need source-suite, target-suite, component, package-name(s))")
             sys.exit(1)
+        if options.import_pkg_regex:
+            if len(args) != 4:
+                print("Invalid number of arguments for regex query (need source-suite, target-suite, component, package-regex)")
+                sys.exit(1)
+
         source_suite = args[0]
         target_suite = args[1]
         component = args[2]
-        package_name = args[3]
+        package_names = list()
+        if len(args) > 4:
+            for pkg in args[4:]:
+                package_names.append(pkg)
+        else:
+            package_names.append(args[3])
         sync.initialize(source_suite, target_suite, component)
         sync.dryRun = options.dry_run
         ret = False
         if options.import_pkg_regex:
             ret = sync.sync_package_regex(package_name, force=options.force_import)
         else:
-            ret = sync.sync_package(package_name, force=options.force_import)
+            ret = sync.sync_packages(package_names, force=options.force_import)
         if not ret:
             sys.exit(2)
     elif options.sync_everything:
