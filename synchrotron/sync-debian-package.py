@@ -124,6 +124,9 @@ class SyncPackage:
 
 
     def _get_package_depwait_report(self, pkg):
+        if not self.bcheck_data[self._sourceSuite]:
+            return None
+
         for nbpkg in self.bcheck_data[self._sourceSuite]:
             if (nbpkg['package'] == ("src:" + pkg.pkgname) and (nbpkg['version'] == pkg.version)):
                 return nbpkg
@@ -417,7 +420,7 @@ def main():
         component = args[2]
         package_names = list()
         if len(args) > 4:
-            for pkg in args[4:]:
+            for pkg in args[3:]:
                 package_names.append(pkg)
         else:
             package_names.append(args[3])
