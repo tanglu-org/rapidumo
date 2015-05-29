@@ -11,7 +11,7 @@ cd $TMP_DATA_DIR
 
 # update the tanglu-meta copy
 if [ ! -d "$TMP_DATA_DIR/tanglu-meta" ]; then
-  git clone --quiet --depth=1 git://gitorious.org/tanglu/tanglu-meta.git tanglu-meta
+  git clone --quiet --depth=1 https://github.com/tanglu-org/tanglu-meta.git tanglu-meta
 fi
 cd $TMP_DATA_DIR/tanglu-meta
 git pull --quiet
