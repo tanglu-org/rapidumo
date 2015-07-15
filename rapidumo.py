@@ -117,6 +117,13 @@ class RapidumoPageRenderer:
                         dose_details = dose_details.replace("\n", "<br/>").replace(" ", "&nbsp;")
                     else:
                         dose_details = "I don't have more information on this. Sorry."
+
+                    # FIXME: Workaround for dose multiarch bug - this dependency is perfectly fine,
+                    # but dose detects it as issue.
+                    if pkgname == "lib32nss-mdns":
+                        if dose_report.startswith("Unsat dependency amd64:libnss-mdns-i386"):
+                            continue
+
                     info = dict()
                     info['source'] = report.get('source', '')
                     info['package'] = pkgname
