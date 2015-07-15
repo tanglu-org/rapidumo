@@ -86,7 +86,10 @@ class RapidumoPageRenderer:
             f.close()
 
             pkg_list = list()
-            for report in yaml_data.get('report', list()):
+            reports = yaml_data.get('report')
+            if not reports:
+                reports = list()
+            for report in reports:
                 if report['status'] != "ok":
                     dose_report = "Unknown problem"
                     issue_type = "unknown"
