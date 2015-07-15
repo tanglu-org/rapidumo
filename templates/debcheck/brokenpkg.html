@@ -28,10 +28,13 @@ $(document).ready(function () {
 {% block content %}
     <h1>Broken packages in {{suite}} [{{architecture}}]</h1>
     <p>This page shows all broken packages in our current development suite. These issues should be fixed with high priority and as soon as possible.</p>
-    <p>Please note that someone might have fixed the issues in staging already, but the changed packages fail to migrate. In that case, the migration issue needs to be fixed,
-      so check the Britney reports first before taking any further action.</p>
-
+    <p>
+      Please note that someone might have fixed the issues in staging already, but the changed packages fail to migrate. In that case, the migration issue needs to be fixed,
+      so check the Britney reports first before taking any further action.
+    </p>
     <br/>
+
+    {% if broken_packages|length %}
     <div class="input-group"> <span class="input-group-addon">Filter</span>
         <input id="filter" type="text" class="form-control" placeholder="Type here...">
     </div>
@@ -72,6 +75,15 @@ $(document).ready(function () {
        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+      <div role="alert" class="alert alert-success">
+        <table>
+          <th><div style="padding-right: 16px;"><span style="font-size: 42px;">☼</span></div></th>
+          <th><span style="font-size: 18px">Everything looks fine!</span></th>
+        </table>
+      </div>
+    {% endif %}
+
 {% endblock %}
 
 {% block page_details %}
