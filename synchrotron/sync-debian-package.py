@@ -37,7 +37,7 @@ def emit(modname, topic, message):
 class SyncPackage:
     def __init__(self):
         self.debugMode = False
-        self.dryRun = False
+        self.dry_run = False
 
         self._conf = RapidumoConfig()
         self._momArchivePath = self._conf.mom_config['path']
@@ -47,7 +47,7 @@ class SyncPackage:
         self._supportedArchs = self._conf.get_supported_archs(self._extra_suite).split (" ")
         self._unsupportedArchs = self._conf.syncsource_config['archs'].split (" ")
         self._sync_enabled = self._conf.synchrotron_config['sync_enabled']
-        self._autosync_dir = self._conf.synchrotron_config.get('autosync_lists')
+        self._synchints_root = self._conf.synchrotron_config.get('synchints_root')
 
         for arch in self._supportedArchs:
             self._unsupportedArchs.remove(arch)
@@ -62,8 +62,11 @@ class SyncPackage:
         self._pkgs_dest = pkginfo_dest.get_packages_dict(component)
         self._pkg_blacklist = self._read_synclist("%s/sync-blacklist.txt" % self._momArchivePath)
         self._pkg_autosync_overrides = dict()
-        if self._autosync_dir:
-            self._pkg_autosync_overrides = self._load_autosync_data(self._autosync_dir)
+        self._pkg_sets_dir = None
+        if self._synchints_root:
+            autosync_dir = os.path.join(self._synchints_root, "autosync")
+            self._pkg_sets_dir = os.path.join(self._synchints_root, "sets")
+            self._pkg_autosync_overrides = self._load_syncset_data(autosync_dir)
 
         # load Debian suite data
         self._pkgs_src = dict()
@@ -83,9 +86,9 @@ class SyncPackage:
 
     def _read_synclist(self, filename):
         if not os.path.isfile(filename):
-            return []
+            return list()
 
-        sl = []
+        sl = list()
         with open(filename) as blacklist:
             for line in blacklist:
                 try:
@@ -100,25 +103,31 @@ class SyncPackage:
                 sl.append(line)
         return sl
 
-    def _load_autosync_data(self, directory):
+    def _load_pkgset_file(self, fname):
+        hints = dict()
+        with open(fname) as slist:
+            for line in slist:
+                try:
+                    line = line[:line.index("#")]
+                except ValueError:
+                    pass
+
+                line = line.strip()
+                if not line:
+                    continue
+                # sync lines are in the format <suite>/<srcpkg>, for
+                # example "experimental/packagekit"
+                parts = line.split('/', 1);
+                hints[parts[1]] = parts[0]
+        return hints
+
+    def _load_syncset_data(self, directory):
         hints = dict()
         for fname in os.listdir(directory):
             fname = os.path.join(directory, fname)
             if fname.endswith(".list"):
-                with open(fname) as slist:
-                    for line in slist:
-                        try:
-                            line = line[:line.index("#")]
-                        except ValueError:
-                            pass
-
-                    line = line.strip()
-                    if not line:
-                        continue
-                    # sync lines are in the format <suite>/<srcpkg>, for
-                    # example "experimental/packagekit"
-                    parts = line.split('/', 1);
-                    hints[parts[1]] = parts[0]
+                h = self._load_pkgset_file(fname)
+                hints.update(h)
 
         return hints
 
@@ -135,7 +144,7 @@ class SyncPackage:
     def _import_debian_package(self, pkg):
         print("Attempt to import package: %s (%s)" % (pkg, pkg.getVersionNoEpoch()))
         # make 100% sure that we never import any package by accident in dry-run mode
-        if self.dryRun:
+        if self.dry_run:
             return
         # adjust the pkg-dir (we need to remove pool/main, pool/non-free etc. from the string)
         pkg_dir = pkg.directory
@@ -242,7 +251,7 @@ class SyncPackage:
         if not package_name in self._pkgs_dest:
             ret = False
             if self._can_sync_package_simple(src_pkg, None):
-                if self.dryRun:
+                if self.dry_run:
                     print("Import: %s (%s) [new!]" % (src_pkg.pkgname, src_pkg.version))
                     ret = True
                 else:
@@ -257,7 +266,7 @@ class SyncPackage:
         # we can now sync the package
         dest_pkg = self._pkgs_dest[src_pkg.pkgname]
         if self._can_sync_package_simple(src_pkg, dest_pkg, quiet=True, forceSync=force):
-            if self.dryRun:
+            if self.dry_run:
                 print("Import: %s (%s -> %s)" % (src_pkg.pkgname, dest_pkg.version, src_pkg.version))
                 ret = True
             else:
@@ -278,7 +287,7 @@ class SyncPackage:
             if re.match(package_regex, src_pkg.pkgname):
                 if not src_pkg.pkgname in self._pkgs_dest:
                     if self._can_sync_package_simple(src_pkg, None, True):
-                        if self.dryRun:
+                        if self.dry_run:
                             print("Import: %s (%s) [new!]" % (src_pkg.pkgname, src_pkg.version))
                             ret = True
                         else:
@@ -286,7 +295,7 @@ class SyncPackage:
                     continue
                 dest_pkg = self._pkgs_dest[src_pkg.pkgname]
                 if self._can_sync_package_simple(src_pkg, dest_pkg, quiet=True, forceSync=force):
-                    if self.dryRun:
+                    if self.dry_run:
                         print("Import: %s (%s -> %s)" % (src_pkg.pkgname, dest_pkg.version, src_pkg.version))
                         ret = True
                     else:
@@ -300,6 +309,19 @@ class SyncPackage:
             return True
         return self._sync_enabled
 
+    def sync_by_set(self, set_name):
+        if not self._pkg_sets_dir:
+            print("No sets directory defined!")
+            return False
+        fname = os.path.join(self._pkg_sets_dir, set_name + ".list")
+        if not os.path.isfile(fname):
+            print("Found no setfile for set '%s'!" % (set_name))
+            return False
+
+        hints = self._load_pkgset_file(fname)
+
+        return self.sync_packages(hints.keys())
+
     def sync_all_packages(self):
         sync_fails = list()
 
@@ -312,7 +334,7 @@ class SyncPackage:
                 if not ret and sinfo != None:
                     sync_fails.append(sinfo)
                 if ret:
-                    if self.dryRun:
+                    if self.dry_run:
                         print("Sync: %s" % (src_pkg))
                     elif self._sync_allowed(src_pkg):
                         self._import_debian_package(src_pkg)
@@ -321,7 +343,7 @@ class SyncPackage:
             if not ret and sinfo != None:
                     sync_fails.append(sinfo)
             if ret:
-                if self.dryRun:
+                if self.dry_run:
                     print("Sync: %s" % (src_pkg))
                 elif self._sync_allowed(src_pkg):
                     self._import_debian_package(src_pkg)
@@ -393,6 +415,9 @@ def main():
     parser.add_option("--import-all",
                   action="store_true", dest="sync_everything", default=False,
                   help="sync all packages with newer versions")
+    parser.add_option("--import-set",
+                  action="store_true", dest="import_set", default=False,
+                  help="import a set of packages")
     parser.add_option("--dry",
                   action="store_true", dest="dry_run", default=False,
                   help="don't do anything, just simulate what would happen (some meta-information will still be written to disk)")
@@ -425,7 +450,7 @@ def main():
         else:
             package_names.append(args[3])
         sync.initialize(source_suite, target_suite, component)
-        sync.dryRun = options.dry_run
+        sync.dry_run = options.dry_run
         ret = False
         if options.import_pkg_regex:
             ret = sync.sync_package_regex(package_name, force=options.force_import)
@@ -442,7 +467,7 @@ def main():
         target_suite = args[1]
         component = args[2]
         sync.initialize(source_suite, target_suite, component)
-        sync.dryRun = options.dry_run
+        sync.dry_run = options.dry_run
         sync.sync_all_packages()
     elif options.list_nodebian:
         sync = SyncPackage()
@@ -453,8 +478,20 @@ def main():
         target_suite = args[1]
         component = args[2]
         sync.initialize(source_suite, target_suite, component)
-        sync.dryRun = options.dry_run
+        sync.dry_run = options.dry_run
         sync.list_not_in_debian(options.quiet)
+    elif options.import_set:
+        if len(args) != 4:
+            print("Invalid number of arguments (need source-suite, target-suite, component, set-name)")
+        source_suite = args[0]
+        target_suite = args[1]
+        component = args[2]
+        set_name = component = args[3]
+        sync.initialize(source_suite, target_suite, component)
+        sync.dry_run = options.dry_run
+        ret = sync.sync_by_set(set_name)
+        if not ret:
+            sys.exit(2)
     else:
         print("Run with -h for a list of available command-line options!")
 
