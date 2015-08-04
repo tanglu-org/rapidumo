@@ -7,7 +7,7 @@ MOM:
 
 Archive:
     path: /srv/archive.tanglu.org
-    devel_suite: chromodoris
+    devel_suite: dasyatis
     staging_suite: staging
     export_dir: /srv/dak/export
     incoming: /pub/ftp/incoming
@@ -36,6 +36,10 @@ Suites:
       archs: amd64 i386
 
     - name: chromodoris
+      components: main contrib non-free
+      archs: amd64 i386
+
+    - name: dasyatis
       components: main contrib non-free
       archs: amd64 i386
 

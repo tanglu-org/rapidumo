@@ -4,7 +4,7 @@ export SCRIPTVARS=/srv/dak/config/tanglu/vars
 
 RAPIDUMO_PATH=/var/archive-kit/rapidumo
 
-CURRENT_DEV_SUITE=chromodoris
+CURRENT_DEV_SUITE=dasyatis
 DEBIAN_SOURCE_SUITE=testing
 TMP_DATA_DIR="/srv/dak/tmp/synchrotron-data"
 
