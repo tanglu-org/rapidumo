@@ -483,10 +483,12 @@ def main():
     elif options.import_set:
         if len(args) != 4:
             print("Invalid number of arguments (need source-suite, target-suite, component, set-name)")
+            sys.exit(1)
+        sync = SyncPackage()
         source_suite = args[0]
         target_suite = args[1]
         component = args[2]
-        set_name = component = args[3]
+        set_name = args[3]
         sync.initialize(source_suite, target_suite, component)
         sync.dry_run = options.dry_run
         ret = sync.sync_by_set(set_name)
