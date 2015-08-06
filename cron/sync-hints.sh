@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2013 Matthias Klumpp <mak@debian.org>
+# Copyright (C) 2013-2015 Matthias Klumpp <mak@debian.org>
 #
 # Licensed under the GNU General Public License Version 3
 #
@@ -20,7 +20,7 @@
 
 # Update the blacklist
 if [ ! -d /srv/dak/archive-hints ]; then
-  git clone https://gitlab.com/tanglu/archive-hints.git /srv/dak/archive-hints
+  git clone https://github.com/tanglu-org/archive-hints.git /srv/dak/archive-hints
 else
   cd /srv/dak/archive-hints/
   git pull --quiet
