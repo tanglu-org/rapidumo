@@ -30,13 +30,13 @@ from rapidumo.pkginfo import *
 from rapidumo.utils import render_template
 from rapidumo.config import *
 from rapidumo.messaging import *
+from rapidumo.debian_mirror import DebianMirror
 
 def emit(modname, topic, message):
     emit_raw("synchrotron", modname, topic, message)
 
 class SyncPackage:
     def __init__(self):
-        self.debugMode = False
         self.dry_run = False
 
         self._conf = RapidumoConfig()
@@ -418,6 +418,9 @@ def main():
     parser.add_option("--import-set",
                   action="store_true", dest="import_set", default=False,
                   help="import a set of packages")
+    parser.add_option("--update-data",
+                  action="store_true", dest="update_data", default=False,
+                  help="update information about Debian sources")
     parser.add_option("--dry",
                   action="store_true", dest="dry_run", default=False,
                   help="don't do anything, just simulate what would happen (some meta-information will still be written to disk)")
@@ -492,6 +495,11 @@ def main():
         sync.initialize(source_suite, target_suite, component)
         sync.dry_run = options.dry_run
         ret = sync.sync_by_set(set_name)
+        if not ret:
+            sys.exit(2)
+    elif options.update_data:
+        mirror = DebianMirror()
+        ret = mirror.update()
         if not ret:
             sys.exit(2)
     else:

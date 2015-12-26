@@ -16,10 +16,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import yaml
+import os
+
 
 class RapidumoConfig():
     def __init__(self):
         self._conf = yaml.safe_load(open('/srv/dak/tanglu-archive.yml', 'r'))
+
+        self.debug_enabled = False
+        if 'DEBUG' in os.environ:
+            self.debug_enabled = True
 
     @property
     def distro_name(self):
