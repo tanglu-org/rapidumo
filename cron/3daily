@@ -6,6 +6,3 @@
 
 # perform autoJanitor
 $RAPIDUMO_PATH/cron/auto-janitor.sh
-
-# sync Debian packages
-$RAPIDUMO_PATH/cron/sync-packages.sh

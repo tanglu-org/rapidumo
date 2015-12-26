@@ -32,8 +32,8 @@ class RapidumoConfig():
         return self._conf["General"]["distro_name"]
 
     @property
-    def mom_config(self):
-        return self._conf["MOM"]
+    def general_config(self):
+        return self._conf["General"]
 
     @property
     def archive_config(self):
@@ -50,10 +50,6 @@ class RapidumoConfig():
     @property
     def janitor_config(self):
         return self._conf["Janitor"]
-
-    @property
-    def general_config(self):
-        return self._conf["Rapidumo"]
 
     @property
     def suites_config(self):

@@ -1,9 +1,10 @@
 ---
 General:
     distro_name: tanglu
-
-MOM:
-    path: /srv/patches.tanglu.org
+    html_output: /srv/dak/export/qa-pages
+    britney_output_dir: /srv/qa.tanglu.org/staging-report/
+    pkg_issues_dir: /srv/dak/export/pkg-issues/
+    packages_mirror: /srv/archive.tanglu.org/
 
 Archive:
     path: /srv/archive.tanglu.org
@@ -17,15 +18,10 @@ Synchrotron:
         archs: amd64 armel armhf i386 ia64 mips mipsel powerpc s390 s390x sparc kfreebsd-amd64 kfreebsd-i386 m68k
     sync_enabled: true
     synchints_root: /srv/dak/archive-hints/synchrotron/
+    debian_mirror: /srv/debian-src/
 
 Janitor:
     hints_file: /srv/dak/archive-hints/britney/janitor
-
-Rapidumo:
-    html_output: /srv/dak/export/qa-pages
-    britney_output_dir: /srv/qa.tanglu.org/staging-report/
-    pkg_issues_dir: /srv/dak/export/pkg-issues/
-    debian_mirror: /srv/debian-src/
 
 Suites:
     - name: aequorea

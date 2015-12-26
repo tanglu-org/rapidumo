@@ -40,27 +40,28 @@ class SyncPackage:
         self.dry_run = False
 
         self._conf = RapidumoConfig()
-        self._momArchivePath = self._conf.mom_config['path']
-        self._destDistro = self._conf.distro_name
+        self._debian_mirror = self._conf.synchrotron_config['debian_mirror']
+        self._pkgs_mirror = self._conf.general_config['packages_mirror']
+        self._dest_distro = self._conf.distro_name
         self._extra_suite = self._conf.archive_config['devel_suite']
 
-        self._supportedArchs = self._conf.get_supported_archs(self._extra_suite).split (" ")
-        self._unsupportedArchs = self._conf.syncsource_config['archs'].split (" ")
+        self._supported_archs = self._conf.get_supported_archs(self._extra_suite).split (" ")
+        self._unsupported_archs = self._conf.syncsource_config['archs'].split (" ")
         self._sync_enabled = self._conf.synchrotron_config['sync_enabled']
         self._synchints_root = self._conf.synchrotron_config.get('synchints_root')
 
-        for arch in self._supportedArchs:
-            self._unsupportedArchs.remove(arch)
+        for arch in self._supported_archs:
+            self._unsupported_archs.remove(arch)
 
     def initialize(self, source_suite, target_suite, component):
         self._sourceSuite = source_suite
         self._component = component
         self._target_suite = target_suite
 
-        pkginfo_dest = SourcePackageInfoRetriever(self._momArchivePath, self._destDistro, target_suite, momCache=True)
+        pkginfo_dest = SourcePackageInfoRetriever(self._pkgs_mirror, self._dest_distro, target_suite)
         pkginfo_dest.extra_suite = self._extra_suite
         self._pkgs_dest = pkginfo_dest.get_packages_dict(component)
-        self._pkg_blacklist = self._read_synclist("%s/sync-blacklist.txt" % self._momArchivePath)
+        self._pkg_blacklist = self._read_synclist("%s/sync-blacklist.txt" % self._synchints_root)
         self._pkg_autosync_overrides = dict()
         self._pkg_sets_dir = None
         if self._synchints_root:
@@ -75,13 +76,13 @@ class SyncPackage:
         if source_suite not in suites:
             suites.append(source_suite)
         for suite in suites:
-            pkginfo_src = SourcePackageInfoRetriever(self._momArchivePath, "debian", source_suite, momCache=True)
+            pkginfo_src = SourcePackageInfoRetriever(self._debian_mirror, "", source_suite)
             self._pkgs_src[suite] = pkginfo_src.get_packages_dict(component)
 
             # determine if the to-be-synced packages are buildable
             bcheck = BuildCheck(self._conf)
             ydata = bcheck.get_package_states_yaml_sources(target_suite, component, "amd64",
-                            self._momArchivePath + "/dists/debian-%s/%s/source/Sources" % (suite, component))
+                            self._debian_mirror + "/dists/%s/%s/source/Sources.gz" % (suite, component))
             self.bcheck_data[suite] = yaml.safe_load(ydata)['report']
 
     def _read_synclist(self, filename):
@@ -151,7 +152,7 @@ class SyncPackage:
         if pkg_dir.startswith("pool"):
             pkg_dir = pkg_dir[pkg_dir.index("/")+1:]
             pkg_dir = pkg_dir[pkg_dir.index("/")+1:]
-        pkg_path = self._momArchivePath + "/pool/debian/" + pkg_dir + "/%s_%s.dsc" % (pkg.pkgname, pkg.getVersionNoEpoch())
+        pkg_path = self._debian_mirror + "/pool/%s/%s/%s_%s.dsc" % (pkg.component, pkg_dir, pkg.pkgname, pkg.getVersionNoEpoch())
 
         cmd = ["dak", "import", "-s", "-a", self._target_suite, self._component, pkg_path]
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -177,7 +178,7 @@ class SyncPackage:
         else:
             archs = [src_pkg.archs]
         supported = False
-        for arch in self._supportedArchs:
+        for arch in self._supported_archs:
                 if ('any' in archs) or ('linux-any' in archs) or (("any-"+arch) in archs) or (arch in archs):
                     supported = True
         if ("all" in archs):
@@ -195,7 +196,7 @@ class SyncPackage:
                 print("Package %s has a newer/equal version in the target distro. (Version in target: %s, source is %s)" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version))
             return False, None
 
-        if (self._destDistro in dest_pkg.version) and (not forceSync):
+        if (self._dest_distro in dest_pkg.version) and (not forceSync):
             print("Package %s contains Tanglu-specific modifications. Please merge the package instead of syncing it. (Version in target: %s, source is %s)" % (dest_pkg.pkgname, dest_pkg.version, src_pkg.version))
             info = dict()
             info['name'] = dest_pkg.pkgname

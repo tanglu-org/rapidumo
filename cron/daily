@@ -7,8 +7,8 @@
 # sync the archive manipulation hints
 $RAPIDUMO_PATH/cron/sync-hints.sh
 
-# fetch stuff from Debian and Tanglu archives
-$RAPIDUMO_PATH/synchrotron/prepare-sync.sh
+# synchronize the Debian and Tanglu archives
+$RAPIDUMO_PATH/cron/sync-packages.sh
 
 # create new germinator output
 $RAPIDUMO_PATH/cron/germinate-update.sh
@@ -16,11 +16,11 @@ $RAPIDUMO_PATH/cron/germinate-update.sh
 # run Ben (the transition tracker)
 $RAPIDUMO_PATH/cron/run-ben.sh
 
-# update the package-watch pages
-$RAPIDUMO_PATH/cron/package-watch.sh
-
 # update the debcheck reports & pages
 python $RAPIDUMO_PATH/rapidumo.py --refresh-page debcheck
+
+# update the package-watch pages
+$RAPIDUMO_PATH/cron/package-watch.sh
 
 # now just update our static pages
 python $RAPIDUMO_PATH/rapidumo.py --refresh-page static

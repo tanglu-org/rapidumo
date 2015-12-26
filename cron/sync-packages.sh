@@ -44,6 +44,9 @@ if ! qoption allowdaklock; then
 	done
 fi
 
+# Update the local Debian package mirror
+sync-debian-package --update-data
+
 # sync packages
 sync-debian-package --import-all $DEBIAN_SOURCE_SUITE staging main
 sync-debian-package --import-all $DEBIAN_SOURCE_SUITE staging contrib

@@ -25,7 +25,7 @@ class DebianMirror:
 
     def __init__(self):
         self._conf = RapidumoConfig()
-        self._mirrordir = self._conf.general_config.get('debian_mirror')
+        self._mirrordir = self._conf.synchrotron_config.get('debian_mirror')
 
     def update(self):
         targetdir = self._mirrordir
@@ -35,7 +35,7 @@ class DebianMirror:
 
         host = 'ftp.de.debian.org'
         method = 'rsync'
-        dists = 'unstable,testing'
+        dists = 'testing,unstable,experimental'
         sections = 'main,contrib,non-free'
         debug = self._conf.debug_enabled
 
