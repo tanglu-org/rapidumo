@@ -4,5 +4,5 @@
 # import the global variable set.
 . /var/archive-kit/rapidumo/cron/vars
 
-# perform autoJanitor
-$RAPIDUMO_PATH/cron/auto-janitor.sh
+# update the package-watch pages
+$RAPIDUMO_PATH/cron/package-watch.sh
