@@ -68,7 +68,7 @@ class CruftReport:
                 item = dict()
                 item['name'] = pkg.pkgname
                 item['debian_pts'] = "https://tracker.debian.org/pkg/%s" % (pkg.pkgname)
-                item['tanglu_tracker'] = "http://packages.tanglu.org/%s" % (pkg.pkgname)
+                item['tanglu_tracker'] = "http://packages.tanglu.org/search?keywords=%s&searchon=sourcenames" % (pkg.pkgname)
 
                 item['tanglu_changes'] = False
                 if "tanglu" in pkg.version:

@@ -43,7 +43,16 @@ $(document).ready(function () {
       <br/>
     {% endif %}
 
+    <hr/>
+
+    <a class="btn btn-primary" role="button" href="http://qa.tanglu.org/pkg-issues/janitor-britney-hints">Janitor Britney Hints</a>
+    <a class="btn btn-primary" role="button" href="#devel">Devel Suite Cruft</a>
+    <a class="btn btn-primary" role="button" href="#staging">Staging Suite Cruft</a>
+
+    <hr/>
+
     <h2>Development suite ({{devel_suite}})<a name="devel"></a></h2>
+    {% if rmitems_staging|length %}
     <div class="input-group"> <span class="input-group-addon">Filter</span>
         <input id="filter" type="text" class="form-control" placeholder="Type here...">
     </div>
@@ -63,19 +72,28 @@ $(document).ready(function () {
         {% else %}
           <tr>
         {% endif %}
-           <td>{{item.name}}</td>
+           <td style="vertical-align: middle;">{{item.name}}</td>
            <td>
              <a href="{{item.debian_pts}}">Debian PTS</a><br/>
              <a href="{{item.tanglu_tracker}}">Tanglu Tracker</a>
            </td>
-           <td>{{item.remove_hint}}</td>
+           <td style="vertical-align: middle;">{{item.remove_hint}}</td>
          </tr>
        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+      <div role="alert" class="alert alert-success">
+        <table>
+          <th><div style="padding-right: 16px;"><span style="font-size: 42px;">☼</span></div></th>
+          <th><span style="font-size: 18px">No suspicious packages in the development suite!</span></th>
+        </table>
+      </div>
+    {% endif %}
 
     <hr/>
 
+    {% if rmitems_staging|length %}
     <h2>Staging/incoming suite ({{staging_suite}})<a name="staging"></a></h2>
     <table class="table">
       <thead>
@@ -92,16 +110,26 @@ $(document).ready(function () {
         {% else %}
           <tr>
         {% endif %}
-           <td>{{item.name}}</td>
+           <td style="vertical-align: middle;">{{item.name}}</td>
            <td>
              <a href="{{item.debian_pts}}">Debian PTS</a><br/>
              <a href="{{item.tanglu_tracker}}">Tanglu Tracker</a>
            </td>
-           <td>{{item.remove_hint}}</td>
+           <td style="vertical-align: middle;">{{item.remove_hint}}</td>
          </tr>
        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+      <a name="staging"></a>
+      <div role="alert" class="alert alert-success">
+        <table>
+          <th><div style="padding-right: 16px;"><span style="font-size: 42px;">☼</span></div></th>
+          <th><span style="font-size: 18px">No suspicious packages in the staging suite!</span></th>
+        </table>
+      </div>
+    {% endif %}
+
 {% endblock %}
 
 {% block page_details %}
