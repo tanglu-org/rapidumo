@@ -52,6 +52,9 @@ synchrotron --import-all $DEBIAN_SOURCE_SUITE staging main
 synchrotron --import-all $DEBIAN_SOURCE_SUITE staging contrib
 synchrotron --import-all $DEBIAN_SOURCE_SUITE staging non-free
 
+# update cruft information
+synchrotron --update-cruft-report --quiet
+
 # update archive
 dak generate-packages-sources2 -s staging
 dak generate-releases -s staging
