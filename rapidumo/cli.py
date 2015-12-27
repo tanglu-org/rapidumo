@@ -25,10 +25,10 @@ import yaml
 import time
 from optparse import OptionParser
 
-from rapidumo.pkginfo import *
-from rapidumo.utils import *
-from rapidumo.config import *
-from janitor.installability_test import JanitorDebcheck
+from .pkginfo import *
+from .utils import *
+from .config import *
+from .janitor.installability_test import JanitorDebcheck
 
 class RapidumoPageRenderer:
     def __init__(self, suite = ""):
