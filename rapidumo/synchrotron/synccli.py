@@ -26,11 +26,11 @@ import yaml
 import glob
 from optparse import OptionParser
 
-from rapidumo.pkginfo import *
-from rapidumo.utils import render_template
-from rapidumo.config import *
-from rapidumo.messaging import *
-from rapidumo.debian_mirror import DebianMirror
+from ..pkginfo import *
+from ..utils import render_template
+from .. import RapidumoConfig
+from ..messaging import *
+from .debian_mirror import DebianMirror
 
 def emit(modname, topic, message):
     emit_raw("synchrotron", modname, topic, message)
@@ -505,8 +505,3 @@ def main():
             sys.exit(2)
     else:
         print("Run with -h for a list of available command-line options!")
-
-if __name__ == "__main__":
-    os.environ['LANG'] = 'C'
-    os.environ['LC_ALL'] = 'C'
-    main()

@@ -1,6 +1,6 @@
-# Copyright (C) 2014 Matthias Klumpp <mak@debian.org>
+#!/usr/bin/env python3
 #
-# Licensed under the GNU General Public License Version 3
+# Copyright (C) 2014-2015 Matthias Klumpp <mak@debian.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ try:
 except ImportError:
     fedmsg = None
 
-from rapidumo.config import RapidumoConfig
+from .config import RapidumoConfig
 
 if fedmsg:
     config = RapidumoConfig()

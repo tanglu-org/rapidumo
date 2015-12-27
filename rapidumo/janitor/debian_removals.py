@@ -18,13 +18,13 @@
 
 import os
 from apt_pkg import TagFile, TagSection
-import httplib
+import http.client
 import tempfile
-from janitor_utils import PackageRemovalItem
+from .janitor_utils import PackageRemovalItem
 
 class DebianRemovals:
     def __init__(self):
-        c = httplib.HTTPSConnection("ftp-master.debian.org")
+        c = http.client.HTTPSConnection("ftp-master.debian.org")
         c.request("GET", "/removals.822")
         response = c.getresponse()
         data = response.read()

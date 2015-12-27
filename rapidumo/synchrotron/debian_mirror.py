@@ -18,7 +18,7 @@
 
 import sys
 import subprocess
-from config import RapidumoConfig
+from .. import RapidumoConfig
 
 
 class DebianMirror:

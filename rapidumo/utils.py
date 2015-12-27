@@ -1,7 +1,6 @@
-#!/usr/bin/python
-# Copyright (C) 2013-2014 Matthias Klumpp <mak@debian.org>
+#!/usr/bin/env python3
 #
-# Licensed under the GNU General Public License Version 3
+# Copyright (C) 2013-2014 Matthias Klumpp <mak@debian.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

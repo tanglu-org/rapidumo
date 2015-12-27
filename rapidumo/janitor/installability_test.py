@@ -20,7 +20,7 @@ from rapidumo.config import *
 import subprocess
 import yaml
 import re
-from janitor_utils import PackageRemovalItem
+from .janitor_utils import PackageRemovalItem
 
 class JanitorDebcheck:
     def __init__(self):
