@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import glob
 import gzip
 import re
@@ -274,7 +275,11 @@ class BuildCheck:
             # FIXME: hack to ignore this particular error...
             if not "Unable to get real version for mplayer2" in stderr:
                 raise Exception(stderr)
-        stdout = str(stdout, 'utf-8')
+
+        # make this work on Python2 as well
+        if sys.version_info >= (3,):
+            stdout = str(stdout, 'utf-8')
+
         ydata = stdout.replace("%3a", ":")  # Support for wheezy version of dose-builddebcheck
         return ydata
 
