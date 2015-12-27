@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Synchrotron Cruft Report{% endblock %}
+
+{% block bottom_postscript %}
+<script type="text/javascript">
+$(window).load(function(){
+$(document).ready(function () {
+
+    (function ($) {
+
+        $('#filter').keyup(function () {
+
+            var rex = new RegExp($(this).val(), 'i');
+            $('.searchable tr').hide();
+            $('.searchable tr').filter(function () {
+                return rex.test($(this).text());
+            }).show();
+
+        })
+
+    }(jQuery));
+
+});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+    <h1>Cruft report for the Tanglu development suites</h1>
+    <p>
+        This page shows packages Tanglu has, but Debian has dropped.
+        Packages which are Tanglu-only are explicitly excluded.
+    </p>
+
+    {% if import_freeze %}
+      <div class="alert alert-info alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <strong>Info</strong>
+          <p>We are currently in import freeze! These pages will still be updated to see which packages may be cruft,
+          but no automatic actions are being taken.</p>
+          <p>Please get a sync-freeze exception to get packages removed from Tanglu.</p>
+      </div>
+      <br/>
+    {% endif %}
+
+    <h2>Development suite ({{devel_suite}})</h2>
+    <div class="input-group"> <span class="input-group-addon">Filter</span>
+        <input id="filter" type="text" class="form-control" placeholder="Type here...">
+    </div>
+    <br/>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Package Name</th>
+          <th>Details</th>
+          <th>Removal Hint</th>
+        </tr>
+      </thead>
+      <tbody class="searchable">
+        {% for item in rmitems_devel %}
+        {% if item.tanglu_changes %}
+          <tr style="background-color: #66ff99;">
+        {% else %}
+          <tr>
+        {% endif %}
+           <td>{{item.name}}</td>
+           <td>
+             <a href="{{item.debian_pts}}">Debian PTS</a><br/>
+             <a href="{{item.tanglu_tracker}}">Tanglu Tracker</a>
+           </td>
+           <td>{{item.remove_hint}}</td>
+         </tr>
+       {% endfor %}
+      </tbody>
+    </table>
+
+    <hr/>
+
+    <h2>Staging/incoming suite ({{staging_suite}})</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Package Name</th>
+          <th>Details</th>
+          <th>Removal Hint</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in rmitems_staging %}
+        {% if item.tanglu_changes %}
+          <tr style="background-color: #66ff99;">
+        {% else %}
+          <tr>
+        {% endif %}
+           <td>{{item.name}}</td>
+           <td>
+             <a href="{{item.debian_pts}}">Debian PTS</a><br/>
+             <a href="{{item.tanglu_tracker}}">Tanglu Tracker</a>
+           </td>
+           <td>{{item.remove_hint}}</td>
+         </tr>
+       {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}
+
+{% block page_details %}
+<p><small>Last updated on: {{time}}</small></p>
+{% endblock %}

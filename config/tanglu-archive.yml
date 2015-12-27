@@ -15,6 +15,7 @@ Archive:
 
 Synchrotron:
     sync_source:
+        suite: testing
         archs: amd64 armel armhf i386 ia64 mips mipsel powerpc s390 s390x sparc kfreebsd-amd64 kfreebsd-i386 m68k
     sync_enabled: true
     synchints_root: /srv/dak/archive-hints/synchrotron/
@@ -24,6 +25,10 @@ Janitor:
     hints_file: /srv/dak/archive-hints/britney/janitor
 
 Suites:
+    - name: staging
+      components: main contrib non-free
+      archs: amd64 i386
+
     - name: aequorea
       components: main contrib non-free
       archs: amd64 i386

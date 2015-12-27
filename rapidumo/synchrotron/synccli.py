@@ -26,11 +26,12 @@ import yaml
 import glob
 from optparse import OptionParser
 
+from .. import RapidumoConfig
 from ..pkginfo import *
 from ..utils import render_template
-from .. import RapidumoConfig
 from ..messaging import *
 from .debian_mirror import DebianMirror
+from .cruft_report import CruftReport
 
 def emit(modname, topic, message):
     emit_raw("synchrotron", modname, topic, message)
@@ -366,38 +367,6 @@ class SyncPackage:
                 page_name="sync-report", sync_failures=sync_fails, time=time.strftime("%c"), component=self._component,
                 import_freeze=not self._sync_enabled)
 
-    def _get_packages_not_in_debian(self):
-        debian_pkg_list = self._pkgs_src[self._sourceSuite].values()
-        dest_pkg_list = list(self._pkgs_dest.keys())
-        for src_pkg in debian_pkg_list:
-            pkgname = src_pkg.pkgname
-            if pkgname in dest_pkg_list:
-                dest_pkg_list.remove(pkgname)
-                continue
-        # we don't want Tanglu-only packages to be listed here
-        for pkgname in dest_pkg_list:
-            if ("-0tanglu" in self._pkgs_dest[pkgname].version) or (pkgname == "tanglu-archive-keyring"):
-                dest_pkg_list.remove(pkgname)
-                continue
-
-        return dest_pkg_list
-
-    def list_not_in_debian(self, quiet=False):
-        dest_pkg_list = self._get_packages_not_in_debian()
-        rm_items = list()
-        for pkgname in dest_pkg_list:
-            item = dict()
-            item['name'] = pkgname
-            item['debian_pts'] = "https://tracker.debian.org/pkg/%s" % (pkgname)
-            item['tanglu_tracker'] = "http://packages.tanglu.org/%s" % (pkgname)
-            item['dak'] = "dak rm -m \"[auto-cruft] RID (removed in Debian and unmaintained)\" -s %s -R %s" % (self._target_suite, pkgname)
-            rm_items.append(item)
-            if not quiet:
-                print(pkgname)
-
-        render_template("synchrotron/removed-debian.html", "synchrotron/removed-debian_%s.html" % (self._component),
-                page_name="debian-rm", rm_items=rm_items, time=time.strftime("%c"), component=self._component,
-                import_freeze=not self._sync_enabled)
 
 def main():
     # init Apt, we need it later
@@ -425,9 +394,9 @@ def main():
     parser.add_option("--dry",
                   action="store_true", dest="dry_run", default=False,
                   help="don't do anything, just simulate what would happen (some meta-information will still be written to disk)")
-    parser.add_option("--list-not-in-debian",
-                  action="store_true", dest="list_nodebian", default=False,
-                  help="show a list of packages which are not in Debian")
+    parser.add_option("--update-cruft-report",
+                  action="store_true", dest="cruft_report", default=False,
+                  help="update cruft report of packages which are not in Debian")
     parser.add_option("--quiet",
                   action="store_true", dest="quiet", default=False,
                   help="don't show output (except for errors)")
@@ -473,17 +442,6 @@ def main():
         sync.initialize(source_suite, target_suite, component)
         sync.dry_run = options.dry_run
         sync.sync_all_packages()
-    elif options.list_nodebian:
-        sync = SyncPackage()
-        if len(args) != 3:
-            print("Invalid number of arguments (need debian-suite, distro-suite, component)")
-            sys.exit(1)
-        source_suite = args[0]
-        target_suite = args[1]
-        component = args[2]
-        sync.initialize(source_suite, target_suite, component)
-        sync.dry_run = options.dry_run
-        sync.list_not_in_debian(options.quiet)
     elif options.import_set:
         if len(args) != 4:
             print("Invalid number of arguments (need source-suite, target-suite, component, set-name)")
@@ -498,6 +456,9 @@ def main():
         ret = sync.sync_by_set(set_name)
         if not ret:
             sys.exit(2)
+    elif options.cruft_report:
+        cr = CruftReport()
+        cr.update(options.quiet)
     elif options.update_data:
         mirror = DebianMirror()
         ret = mirror.update()
