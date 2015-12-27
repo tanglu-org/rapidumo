@@ -368,7 +368,7 @@ class SyncPackage:
 
     def _get_packages_not_in_debian(self):
         debian_pkg_list = self._pkgs_src[self._sourceSuite].values()
-        dest_pkg_list = self._pkgs_dest.keys()
+        dest_pkg_list = list(self._pkgs_dest.keys())
         for src_pkg in debian_pkg_list:
             pkgname = src_pkg.pkgname
             if pkgname in dest_pkg_list:

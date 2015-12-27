@@ -274,6 +274,7 @@ class BuildCheck:
             # FIXME: hack to ignore this particular error...
             if not "Unable to get real version for mplayer2" in stderr:
                 raise Exception(stderr)
+        stdout = str(stdout, 'utf-8')
         ydata = stdout.replace("%3a", ":")  # Support for wheezy version of dose-builddebcheck
         return ydata
 
