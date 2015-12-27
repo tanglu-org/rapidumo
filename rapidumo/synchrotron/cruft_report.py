@@ -87,7 +87,7 @@ class CruftReport:
         rm_items_devel = pkg_rmlist_to_templatelist(rmlist_devel, False)
 
         rmlist_staging = self._get_packages_not_in_debian(self._staging_suite)
-        rm_items_staging = pkg_rmlist_to_templatelist(rmlist_devel)
+        rm_items_staging = pkg_rmlist_to_templatelist(rmlist_staging)
 
 
         render_template("synchrotron/cruft-report.html", "synchrotron/cruft-report.html", page_name="synchrotron",

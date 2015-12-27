@@ -21,7 +21,7 @@ import gzip
 import re
 import subprocess
 from apt_pkg import TagFile, version_compare
-from rapidumo.config import RapidumoConfig
+
 
 def package_list_to_dict(pkg_list):
     pkg_dict = {}
