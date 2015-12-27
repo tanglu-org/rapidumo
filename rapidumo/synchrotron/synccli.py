@@ -364,7 +364,7 @@ class SyncPackage:
                 perform_sync(src_pkg)
 
         render_template("synchrotron/synchrotron-issues.html", "synchrotron/sync-issues_%s.html" % (self._component),
-                page_name="sync-report", sync_failures=sync_fails, time=time.strftime("%c"), component=self._component,
+                page_name="synchrotron", sync_failures=sync_fails, time=time.strftime("%c"), component=self._component,
                 import_freeze=not self._sync_enabled)
 
 

@@ -90,7 +90,7 @@ class CruftReport:
         rm_items_staging = pkg_rmlist_to_templatelist(rmlist_devel)
 
 
-        render_template("synchrotron/cruft-report.html", "synchrotron/cruft-report.html",
+        render_template("synchrotron/cruft-report.html", "synchrotron/cruft-report.html", page_name="synchrotron",
                 section_label="synchrotron-cruft", rmitems_devel=rm_items_devel, rmitems_staging=rm_items_staging,
                 devel_suite=self._devel_suite, staging_suite=self._staging_suite, time=time.strftime("%c"),
                 import_freeze=not self._sync_enabled)
