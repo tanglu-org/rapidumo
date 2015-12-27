@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+#
 # Copyright (C) 2014 Matthias Klumpp <mak@debian.org>
 #
 # Licensed under the GNU General Public License Version 3
@@ -169,8 +170,3 @@ def main():
         helper.refresh_page(options.refresh_page)
     else:
         print("Run with --help for a list of available command-line options!")
-
-if __name__ == "__main__":
-    os.environ['LANG'] = 'C'
-    os.environ['LC_ALL'] = 'C'
-    main()

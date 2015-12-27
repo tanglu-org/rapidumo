@@ -18,8 +18,9 @@
 import os
 import sys
 
-# Run local rapidumo from this helper
-root_dir = os.path.dirname(os.path.dirname(__file__))
+# Use local rapidumo from this helper
+root_dir = os.path.realpath(__file__)
+root_dir = os.path.dirname(os.path.dirname(root_dir))
 sys.path.insert(0, root_dir)
 
 from rapidumo.synchrotron.synccli import main

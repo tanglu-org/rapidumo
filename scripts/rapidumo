@@ -23,7 +23,7 @@ root_dir = os.path.realpath(__file__)
 root_dir = os.path.dirname(os.path.dirname(root_dir))
 sys.path.insert(0, root_dir)
 
-from rapidumo.janitor.janitorcli import main
+from rapidumo.cli import main
 
 if __name__ == '__main__':
     os.environ['LANG'] = 'C'
