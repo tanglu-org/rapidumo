@@ -53,9 +53,15 @@ class CruftReport:
             else:
                 removed_pkgs.append(pkgs_dest[pkgname])
 
-        # we don't want Tanglu-only packages to be listed here
+        # we don't want Tanglu-only packages to be listed here,
+        # also Debian-native packages with Tanglu changes are excluded.
         for pkg in removed_pkgs[:]:
-            if ("-0tanglu" in pkg.version) or ("tanglu" in pkg.pkgname):
+            if "-0tanglu" in pkg.version or ("tanglu" in pkg.version and not "-" in pkg.version):
+                removed_pkgs.remove(pkg)
+                continue
+            # ignore Tanglu-specific packages (poorly determined by having "tanglu" in their
+            # source package names...
+            if "tanglu" in pkg.pkgname:
                 removed_pkgs.remove(pkg)
                 continue
 
