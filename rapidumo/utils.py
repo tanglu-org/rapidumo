@@ -52,3 +52,22 @@ def render_template(name, out_name = None, *args, **kwargs):
 def debug(text):
     if debug_enabled:
         print(text)
+
+def read_commented_listfile(filename):
+    if not os.path.isfile(filename):
+        return list()
+
+    sl = list()
+    with open(filename) as blacklist:
+        for line in blacklist:
+            try:
+                line = line[:line.index("#")]
+            except ValueError:
+                pass
+
+            line = line.strip()
+            if not line:
+                continue
+
+            sl.append(line)
+    return sl

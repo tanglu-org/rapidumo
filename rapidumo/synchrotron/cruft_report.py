@@ -16,10 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
+import os
 import time
 from .. import RapidumoConfig, SourcePackageInfoRetriever
-from ..utils import render_template
+from ..utils import render_template, read_commented_listfile
 
 
 class CruftReport:
@@ -31,6 +31,10 @@ class CruftReport:
         self._devel_suite = self._conf.archive_config['devel_suite']
         self._staging_suite = self._conf.archive_config['staging_suite']
         self._sync_enabled = self._conf.synchrotron_config['sync_enabled']
+
+        synchints_root = self._conf.synchrotron_config.get('synchints_root')
+        self._private_pkgs = read_commented_listfile(os.path.join(synchints_root, "private-packages.txt"))
+        self._private_pkgs = set(self._private_pkgs)
 
         debian_suite = self._conf.syncsource_config['suite']
         pkginfo_src = SourcePackageInfoRetriever(self._debian_mirror, "", debian_suite)
@@ -53,15 +57,14 @@ class CruftReport:
             else:
                 removed_pkgs.append(pkgs_dest[pkgname])
 
-        # we don't want Tanglu-only packages to be listed here,
-        # also Debian-native packages with Tanglu changes are excluded.
+        # we don't want Tanglu-only packages on the removal list,
+        # so we exclude them here.
         for pkg in removed_pkgs[:]:
-            if "-0tanglu" in pkg.version or ("tanglu" in pkg.version and not "-" in pkg.version):
+            if "-0tanglu" in pkg.version:
                 removed_pkgs.remove(pkg)
                 continue
-            # ignore Tanglu-specific packages (poorly determined by having "tanglu" in their
-            # source package names...
-            if "tanglu" in pkg.pkgname:
+            # ignore Tanglu-specific packages
+            if pkg.pkgname in self._private_pkgs:
                 removed_pkgs.remove(pkg)
                 continue
 

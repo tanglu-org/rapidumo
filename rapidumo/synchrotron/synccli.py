@@ -28,7 +28,7 @@ from optparse import OptionParser
 
 from .. import RapidumoConfig
 from ..pkginfo import *
-from ..utils import render_template
+from ..utils import render_template, read_commented_listfile
 from ..messaging import *
 from .debian_mirror import DebianMirror
 from .cruft_report import CruftReport
@@ -62,7 +62,7 @@ class SyncPackage:
         pkginfo_dest = SourcePackageInfoRetriever(self._pkgs_mirror, self._dest_distro, target_suite)
         pkginfo_dest.extra_suite = self._extra_suite
         self._pkgs_dest = pkginfo_dest.get_packages_dict(component)
-        self._pkg_blacklist = self._read_synclist("%s/sync-blacklist.txt" % self._synchints_root)
+        self._pkg_blacklist = read_commented_listfile("%s/sync-blacklist.txt" % self._synchints_root)
         self._pkg_autosync_overrides = dict()
         self._pkg_sets_dir = None
         if self._synchints_root:
@@ -85,25 +85,6 @@ class SyncPackage:
             ydata = bcheck.get_package_states_yaml_sources(target_suite, component, "amd64",
                             self._debian_mirror + "/dists/%s/%s/source/Sources.gz" % (suite, component))
             self.bcheck_data[suite] = yaml.safe_load(ydata)['report']
-
-    def _read_synclist(self, filename):
-        if not os.path.isfile(filename):
-            return list()
-
-        sl = list()
-        with open(filename) as blacklist:
-            for line in blacklist:
-                try:
-                    line = line[:line.index("#")]
-                except ValueError:
-                    pass
-
-                line = line.strip()
-                if not line:
-                    continue
-
-                sl.append(line)
-        return sl
 
     def _load_pkgset_file(self, fname):
         hints = dict()
