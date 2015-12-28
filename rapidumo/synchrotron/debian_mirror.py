@@ -18,6 +18,7 @@
 
 import sys
 import subprocess
+import select
 from .. import RapidumoConfig
 
 
@@ -39,7 +40,6 @@ class DebianMirror:
         sections = 'main,contrib,non-free'
         debug = self._conf.debug_enabled
 
-
         cmd = ['debmirror', '--source', "--section="+sections,
                 '--host='+host, '--dist='+dists,
                 '--arch=none', '--root=/debian', '--diff=none',
@@ -48,13 +48,22 @@ class DebianMirror:
                 targetdir]
 
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        for line in iter(proc.stdout.readline, ''):
-            if debug:
-                sys.stdout.write(str(line, 'utf-8'))
-        for line in iter(proc.stderr.readline, ''):
-            if debug:
-                sys.stderr.write(str(line, 'utf-8'))
-        proc.wait()
+        while True:
+            reads = [proc.stdout.fileno(), proc.stderr.fileno()]
+            ret = select.select(reads, [], [])
+
+            for fd in ret[0]:
+                if fd == proc.stdout.fileno():
+                    read = proc.stdout.readline()
+                    if debug:
+                        sys.stdout.write(str(read, 'utf-8'))
+                if fd == proc.stderr.fileno():
+                    read = proc.stderr.readline()
+                    if debug:
+                        sys.stderr.write(str(read, 'utf-8'))
+
+            if proc.poll() != None:
+                break
 
         if proc.returncode == 0:
             return True
