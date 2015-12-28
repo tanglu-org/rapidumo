@@ -72,7 +72,7 @@ class RapidumoPageRenderer:
             fname = os.path.join(out_dir, "brokenpkg-%s_%s.yml" % (devel_suite, arch))
             yaml_data = jd.get_debcheck_yaml(devel_suite, arch)
             yaml_file = open(fname, 'w')
-            yaml_file.write(yaml_data)
+            yaml_file.write(str(yaml_data, 'utf-8'))
             yaml_file.close()
 
     def _render_debcheck_pages(self):

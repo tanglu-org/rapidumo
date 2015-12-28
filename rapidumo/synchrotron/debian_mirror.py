@@ -50,10 +50,10 @@ class DebianMirror:
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         for line in iter(proc.stdout.readline, ''):
             if debug:
-                sys.stdout.write(line)
+                sys.stdout.write(str(line, 'utf-8'))
         for line in iter(proc.stderr.readline, ''):
             if debug:
-                sys.stderr.write(line)
+                sys.stderr.write(str(line, 'utf-8'))
         proc.wait()
 
         if proc.returncode == 0:
