@@ -41,11 +41,12 @@ class DebianMirror:
         debug = self._conf.debug_enabled
 
         cmd = ['debmirror', '--source', "--section="+sections,
-                '--host='+host, '--dist='+dists,
-                '--arch=none', '--root=/debian', '--diff=none',
-                '--method='+method, '--verbose' if debug else '',
-                '--keyring=/usr/share/keyrings/debian-archive-keyring.gpg',
-                targetdir]
+                '--host='+host, '--dist='+dists, '--arch=none',
+                '--root=/debian', '--diff=none', '--method='+method,
+                '--keyring=/usr/share/keyrings/debian-archive-keyring.gpg']
+        if debug:
+            cmd.append('--verbose')
+        cmd.append(targetdir)
 
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         while True:
