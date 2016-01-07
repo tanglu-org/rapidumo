@@ -29,7 +29,7 @@ from rapidumo.pkginfo import *
 from rapidumo.config import *
 
 #REPO_POOL ="http://archive.tanglu.org/tanglu/pool"
-REPO_POOL = "file:///srv/dak/ftp/pool"
+REPO_POOL = "file:///srv/dak/ftp/tanglu/pool"
 
 class Autorebuild():
     def __init__(self, suite):
