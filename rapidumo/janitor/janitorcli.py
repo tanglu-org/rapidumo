@@ -39,7 +39,7 @@ class Janitor:
         self._distro_name = conf.distro_name
         self._staging_suite = conf.archive_config['staging_suite']
         self._archive_path = conf.archive_config['path']
-        base_suite = conf.get_base_suite(suite)
+        base_suite = conf.get_base_suite(self._current_suite)
         self._supportedArchs = conf.get_supported_archs(base_suite).split(" ")
 
         self._hints_file = conf.janitor_config['hints_file']
