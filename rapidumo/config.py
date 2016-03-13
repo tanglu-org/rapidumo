@@ -59,11 +59,22 @@ class RapidumoConfig():
     def fedmsg_config(self):
         return self._conf["Fedmsg"]
 
-    def get_base_suite(self, suite):
-        base_suite, _, _ = suite.partition("-")
-        if base_suite == self.archive_config['staging_suite']:
-            base_suite = self.archive_config['devel_suite']
+    def get_base_suite(self, suite_name):
+        base_suite, _, apnd = suite_name.partition('-')
+        if base_suite == 'buildq':
+            base_suite = apnd
         return base_suite
+
+    def get_build_queue(self, suite_name):
+        sdict = None
+        for s in self.suites_config:
+            if s['name'] == suite_name:
+                sdict = s
+        if not sdict:
+            return None
+
+        bqueue = sdict.get('incoming_queue')
+        return bqueue
 
     def get_supported_archs(self, suite):
         for s in self.suites_config:

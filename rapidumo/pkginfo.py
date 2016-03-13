@@ -85,7 +85,7 @@ class SourcePackageInfoRetriever():
     """
 
     def __init__(self, path, distro, suite, momCache=False):
-        self._archivePath = path
+        self._archive_path = path
         self._distroName = distro
         self._suiteName = suite
         self.extra_suite = ""
@@ -93,9 +93,12 @@ class SourcePackageInfoRetriever():
 
     def _get_packages_for(self, suite, component):
         if self.useMOMCache:
-            source_path = self._archivePath + "/dists/%s-%s/%s/source/Sources" % (self._distroName, suite, component)
+            source_path = self._archive_path + "/dists/%s-%s/%s/source/Sources" % (self._distroName, suite, component)
         else:
-            source_path = self._archivePath + "/%s/dists/%s/%s/source/Sources.gz" % (self._distroName, suite, component)
+            aroot = self._archive_path
+            if suite.startswith("buildq"):
+                aroot = self._bqueue_path
+            source_path = aroot + "/%s/dists/%s/%s/source/Sources.gz" % (self._distroName, suite, component)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile(f)
         packageList = []
@@ -115,9 +118,8 @@ class SourcePackageInfoRetriever():
 
             packageList.append(pkg)
 
-        if suite == "staging":
-            if self.extra_suite != "":
-                packageList.extend(self._get_packages_for(self.extra_suite, component))
+        if self.extra_suite:
+            packageList.extend(self._get_packages_for(self.extra_suite, component))
 
         return packageList
 
@@ -137,10 +139,15 @@ class PackageBuildInfoRetriever():
 
     def __init__(self, conf):
         self._conf = conf
-        self._archivePath = "%s/%s" % (self._conf.archive_config['path'], self._conf.distro_name)
+        self._archive_path = "%s/%s" % (self._conf.archive_config['path'], self._conf.distro_name)
+        self._bqueue_path = self._conf.archive_config['build_queues_path']
 
-    def _get_package_list(self, suite, component):
-        source_path = self._archivePath + "/dists/%s/%s/source/Sources.gz" % (suite, component)
+    def _get_package_list(self, suite, component, is_build_queue=False):
+        source_path = None
+        if is_build_queue:
+            source_path = self._bqueue_path + "/dists/%s/%s/source/Sources.gz" % (suite, component)
+        else:
+            source_path = self._archive_path + "/dists/%s/%s/source/Sources.gz" % (suite, component)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile(f)
         packageList = []
@@ -169,13 +176,20 @@ class PackageBuildInfoRetriever():
 
             packageList += [pkg]
 
+        bqueue = self._conf.get_build_queue(suite)
+        if bqueue:
+            packageList.extend(self._get_package_list(bqueue, component, is_build_queue=True))
+
         return packageList
 
     def _add_binaries_to_dict(self, pkg_dict, suite, component, arch, udeb=False):
+        aroot = self._archive_path
+        if suite.startswith("buildq"):
+            aroot = self._bqueue_path
         if udeb:
-            source_path = self._archivePath + "/dists/%s/%s/debian-installer/binary-%s/Packages.gz" % (suite, component, arch)
+            source_path = aroot + "/dists/%s/%s/debian-installer/binary-%s/Packages.gz" % (suite, component, arch)
         else:
-            source_path = self._archivePath + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, component, arch)
+            source_path = aroot + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, component, arch)
         f = gzip.open(source_path, 'rb')
         tagf = TagFile(f)
         for section in tagf:
@@ -223,7 +237,7 @@ class PackageBuildInfoRetriever():
         for name, pkg in pkg_dict.items():
             for arch in archs:
                 if (arch not in pkg.installed_archs and
-                        glob.glob(self._archivePath + "/%s/*_%s_%s.deb" %
+                        glob.glob(self._archive_path + "/%s/*_%s_%s.deb" %
                                   (pkg.directory, noEpoch(pkg.version), arch))):
                     # There are *.deb files in the pool, but no entries in Packages.gz
                     # We don't want spurious build jobs if this is a temporary error,
@@ -240,13 +254,13 @@ class BuildCheck:
     def __init__(self, conf):
         self._conf = conf
         self._archive_path = "%s/%s" % (self._conf.archive_config['path'], self._conf.distro_name)
+        self._bqueue_path = self._conf.archive_config['build_queues_path']
 
-    def _get_binary_indices_list(self, suite, comp, arch):
-        base_suite = self._conf.get_base_suite(suite)
-
-        suites = [suite]
-        if base_suite != suite:
-            suites += [base_suite]
+    def _get_pkg_indices_list(self, suite_name, comp, arch, add_sources=False, is_build_queue=False):
+        build_queue = self._conf.get_build_queue(suite_name)
+        suites = [{'name': suite_name, 'apath': self._archive_path}]
+        if build_queue:
+            suites += [{'name': build_queue, 'apath': self._bqueue_path}]
 
         comps = ["main"]
         if comp in ["contrib", "non-free"]:
@@ -257,17 +271,21 @@ class BuildCheck:
         if arch == "all":
             arch = "amd64"
 
-        binary_indices = []
+        pkg_indices = list()
         for suite in suites:
             for comp in comps:
-                binary_indices += [self._archive_path + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, comp, arch)]
+                pkg_indices.append(suite['apath'] + "/dists/%s/%s/binary-%s/Packages.gz" % (suite['name'], comp, arch))
+                if add_sources:
+                    pkg_indices.append(suite['apath'] + "/dists/%s/%s/source/Sources.gz" % (suite['name'], comp))
 
-        return binary_indices
+        return pkg_indices
 
-    def get_package_states_yaml_sources(self, suite, comp, arch, source_gz_path):
+    def get_package_states_yaml_sources(self, suite, comp, arch, source_gz_path=None):
+        add_sources = not source_gz_path
         dose_cmd = ["dose-builddebcheck", "--quiet", "--latest", "-e", "-f", "--summary", "--deb-native-arch=%s" % (arch)]
-        dose_cmd += self._get_binary_indices_list(suite, comp, arch)
-        dose_cmd += [source_gz_path]
+        dose_cmd += self._get_pkg_indices_list(suite, comp, arch, add_sources)
+        if source_gz_path:
+            dose_cmd += [source_gz_path]
 
         proc = subprocess.Popen(dose_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
@@ -284,5 +302,4 @@ class BuildCheck:
         return ydata
 
     def get_package_states_yaml(self, suite, comp, arch):
-        source_gz_path = self._archive_path + "/dists/%s/%s/source/Sources.gz" % (suite, comp)
-        return self.get_package_states_yaml_sources(suite, comp, arch, source_gz_path)
+        return self.get_package_states_yaml_sources(suite, comp, arch)

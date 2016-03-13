@@ -8,6 +8,7 @@ General:
 
 Archive:
     path: /srv/archive.tanglu.org
+    build_queues_path: /srv/dak/queue/build
     devel_suite: dasyatis
     staging_suite: staging
     export_dir: /srv/dak/export
@@ -28,6 +29,7 @@ Suites:
     - name: staging
       components: main contrib non-free
       archs: amd64 i386
+      incoming_queue: buildq-staging
 
     - name: aequorea
       components: main contrib non-free
