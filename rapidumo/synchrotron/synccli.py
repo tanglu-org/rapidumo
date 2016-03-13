@@ -44,9 +44,9 @@ class SyncPackage:
         self._debian_mirror = self._conf.synchrotron_config['debian_mirror']
         self._pkgs_mirror = self._conf.general_config['packages_mirror']
         self._dest_distro = self._conf.distro_name
-        self._extra_suite = self._conf.archive_config['devel_suite']
 
-        self._supported_archs = self._conf.get_supported_archs(self._extra_suite).split (" ")
+        staging_suite = self._conf.archive_config['staging_suite']
+        self._supported_archs = self._conf.get_supported_archs(staging_suite).split (" ")
         self._unsupported_archs = self._conf.syncsource_config['archs'].split (" ")
         self._sync_enabled = self._conf.synchrotron_config['sync_enabled']
         self._synchints_root = self._conf.synchrotron_config.get('synchints_root')
@@ -60,7 +60,6 @@ class SyncPackage:
         self._target_suite = target_suite
 
         pkginfo_dest = SourcePackageInfoRetriever(self._pkgs_mirror, self._dest_distro, target_suite)
-        pkginfo_dest.extra_suite = self._extra_suite
         self._pkgs_dest = pkginfo_dest.get_packages_dict(component)
         self._pkg_blacklist = read_commented_listfile("%s/sync-blacklist.txt" % self._synchints_root)
         self._pkg_autosync_overrides = dict()
