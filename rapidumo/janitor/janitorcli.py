@@ -30,11 +30,12 @@ from .janitor_utils import *
 from .debian_removals import DebianRemovals
 from .installability_test import JanitorDebcheck
 
+
 class Janitor:
     def __init__(self, suite = ""):
         conf = RapidumoConfig()
         self._current_suite = suite
-        if self._current_suite == "":
+        if not self._current_suite:
             self._current_suite = conf.archive_config['devel_suite']
         self._distro_name = conf.distro_name
         self._staging_suite = conf.archive_config['staging_suite']

@@ -72,6 +72,8 @@ class PackageInfo():
         self.homepage = None
         self.extra_source_only = False
 
+        self.queue_name = None
+
     def getVersionNoEpoch(self):
         return noEpoch(self.version)
 
