@@ -263,6 +263,10 @@ class BuildCheck:
         suites = [{'name': suite_name, 'apath': self._archive_path}]
         if build_queue:
             suites += [{'name': build_queue, 'apath': self._bqueue_path}]
+        else:
+            base_suite = self._conf.get_base_suite(suite_name)
+            if base_suite != suite_name:
+                suites += [{'name': base_suite, 'apath': self._archive_path}]
 
         comps = ["main"]
         if comp in ["contrib", "non-free"]:
