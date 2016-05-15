@@ -46,6 +46,7 @@ class Autorebuild():
 
         pkginfo_tgl = SourcePackageInfoRetriever(self._archivePath, _dest_distro, suite)
         pkginfo_tgl.extra_suite = extra_suite
+        self._todo_cmds = list()
 
         # get a list of the highest versions of all packages in all components in the archive
         self._pkgs_tanglu = pkginfo_tgl.get_packages_dict("non-free")
@@ -108,7 +109,8 @@ class Autorebuild():
                 skip = True
             else:
                 print("DAK-ERROR: %s\n%s %s" % (cmd, stdout, stderr))
-                raise Exception("Error while running dak!")
+                self._todo_cmds.append(" ".join(cmd))
+                #raise Exception("Error while running dak!")
                 return False
 
         shutil.rmtree(workspace)
@@ -170,6 +172,7 @@ class Autorebuild():
             if not self.trigger_package_rebuild(component, pkg, build_note, False):
                 res = False
 
+        print("\n".join(self._todo_cmds))
         return res
 
 def main():

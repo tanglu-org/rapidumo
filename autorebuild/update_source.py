@@ -71,7 +71,7 @@ def bump_source_version (src_pkg_dir, pkg_name, rebuild_info):
     for fname in glob.glob("*.debian.*"):
         debian_src = fname
         break
-    if debian_src == None:
+    if not debian_src:
         # we might have a native package
         for fname in glob.glob("*.tar.*"):
             debian_src = fname
