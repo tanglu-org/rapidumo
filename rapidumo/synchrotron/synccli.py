@@ -82,7 +82,7 @@ class SyncPackage:
             # determine if the to-be-synced packages are buildable
             bcheck = BuildCheck(self._conf)
             ydata = bcheck.get_package_states_yaml_sources(target_suite, component, "amd64",
-                            self._debian_mirror + "/dists/%s/%s/source/Sources.xz" % (suite, component))
+                            self._debian_mirror + "/dists/%s/%s/source/Sources.gz" % (suite, component))
             self.bcheck_data[suite] = yaml.safe_load(ydata)['report']
 
     def _load_pkgset_file(self, fname):
