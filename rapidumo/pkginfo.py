@@ -296,6 +296,7 @@ class BuildCheck:
         proc = subprocess.Popen(dose_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
         if stderr:
+            stderr = str(stderr, 'utf-8')
             # FIXME: hack to ignore this particular error...
             if not "Unable to get real version for mplayer2" in stderr:
                 raise Exception(stderr)
