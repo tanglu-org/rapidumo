@@ -17,7 +17,7 @@
 
 import sys
 import glob
-import gzip
+import lzma
 import re
 import subprocess
 from apt_pkg import TagFile, version_compare
@@ -100,8 +100,8 @@ class SourcePackageInfoRetriever():
             aroot = self._archive_path
             if suite.startswith("buildq"):
                 aroot = self._bqueue_path
-            source_path = aroot + "/%s/dists/%s/%s/source/Sources.gz" % (self._distroName, suite, component)
-        f = gzip.open(source_path, 'rb')
+            source_path = aroot + "/%s/dists/%s/%s/source/Sources.xz" % (self._distroName, suite, component)
+        f = lzma.open(source_path, 'rb')
         tagf = TagFile(f)
         packageList = []
         for section in tagf:
@@ -147,10 +147,10 @@ class PackageBuildInfoRetriever():
     def _get_package_list(self, suite, component, is_build_queue=False):
         source_path = None
         if is_build_queue:
-            source_path = self._bqueue_path + "/dists/%s/%s/source/Sources.gz" % (suite, component)
+            source_path = self._bqueue_path + "/dists/%s/%s/source/Sources.xz" % (suite, component)
         else:
-            source_path = self._archive_path + "/dists/%s/%s/source/Sources.gz" % (suite, component)
-        f = gzip.open(source_path, 'rb')
+            source_path = self._archive_path + "/dists/%s/%s/source/Sources.xz" % (suite, component)
+        f = lzma.open(source_path, 'rb')
         tagf = TagFile(f)
         packageList = []
         for section in tagf:
@@ -189,10 +189,10 @@ class PackageBuildInfoRetriever():
         if suite.startswith("buildq"):
             aroot = self._bqueue_path
         if udeb:
-            source_path = aroot + "/dists/%s/%s/debian-installer/binary-%s/Packages.gz" % (suite, component, arch)
+            source_path = aroot + "/dists/%s/%s/debian-installer/binary-%s/Packages.xz" % (suite, component, arch)
         else:
-            source_path = aroot + "/dists/%s/%s/binary-%s/Packages.gz" % (suite, component, arch)
-        f = gzip.open(source_path, 'rb')
+            source_path = aroot + "/dists/%s/%s/binary-%s/Packages.xz" % (suite, component, arch)
+        f = lzma.open(source_path, 'rb')
         tagf = TagFile(f)
         for section in tagf:
             # make sure we have the right arch (closes bug in installed-detection)
@@ -241,7 +241,7 @@ class PackageBuildInfoRetriever():
                 if (arch not in pkg.installed_archs and
                         glob.glob(self._archive_path + "/%s/*_%s_%s.deb" %
                                   (pkg.directory, noEpoch(pkg.version), arch))):
-                    # There are *.deb files in the pool, but no entries in Packages.gz
+                    # There are *.deb files in the pool, but no entries in Packages.xz
                     # We don't want spurious build jobs if this is a temporary error,
                     # but without info on the binary packages we can't use them either,
                     # so skip this package for now.
@@ -280,9 +280,9 @@ class BuildCheck:
         pkg_indices = list()
         for suite in suites:
             for comp in comps:
-                pkg_indices.append(suite['apath'] + "/dists/%s/%s/binary-%s/Packages.gz" % (suite['name'], comp, arch))
+                pkg_indices.append(suite['apath'] + "/dists/%s/%s/binary-%s/Packages.xz" % (suite['name'], comp, arch))
                 if add_sources:
-                    pkg_indices.append(suite['apath'] + "/dists/%s/%s/source/Sources.gz" % (suite['name'], comp))
+                    pkg_indices.append(suite['apath'] + "/dists/%s/%s/source/Sources.xz" % (suite['name'], comp))
 
         return pkg_indices
 
