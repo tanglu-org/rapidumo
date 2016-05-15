@@ -16,9 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import sys
 import subprocess
 import select
+import gzip
+import lzma
 from .. import RapidumoConfig
 
 
@@ -67,5 +70,17 @@ class DebianMirror:
                 break
 
         if proc.returncode == 0:
+            # workaround to have GZip files for Debian experimental (until dose3 support XZ natively)
+            for section in sections.split(','):
+                basepath = os.path.join(targetdir, 'dists', 'experimental', section, 'source')
+                sfile = os.path.join(basepath, 'Sources.xz')
+                tfile = os.path.join(basepath, 'Sources.gz')
+                if not os.path.isfile(sfile):
+                    continue
+                sf = lzma.open(sfile, 'r')
+                tf = gzip.open(tfile, 'wb')
+                tf.write(sf.read())
+                tf.close()
+                sf.close()
             return True
         return False
