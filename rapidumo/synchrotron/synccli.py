@@ -50,6 +50,7 @@ class SyncPackage:
         self._unsupported_archs = self._conf.syncsource_config['archs'].split (" ")
         self._sync_enabled = self._conf.synchrotron_config['sync_enabled']
         self._synchints_root = self._conf.synchrotron_config.get('synchints_root')
+        self._debcheck_before_sync = self._conf.synchrotron_config.get('debcheck_before_sync')
 
         for arch in self._supported_archs:
             self._unsupported_archs.remove(arch)
@@ -78,6 +79,11 @@ class SyncPackage:
         for suite in suites:
             pkginfo_src = SourcePackageInfoRetriever(self._debian_mirror, "", source_suite)
             self._pkgs_src[suite] = pkginfo_src.get_packages_dict(component)
+
+            # don't load debcheck data if we are not supposed to use it later
+            if not self._debcheck_before_sync:
+                self.bcheck_data[suite] = None
+                continue
 
             # determine if the to-be-synced packages are buildable
             bcheck = BuildCheck(self._conf)
