@@ -60,7 +60,7 @@ class JanitorDebcheck:
         comp_indices = self._get_binary_indices_list(suite, "non-free", arch)
         archive_indices.extend(comp_indices)
 
-        dose_cmd = ["dose-debcheck", "--quiet", "-e", "-f", "--summary", "--latest", "--deb-native-arch=%s" % (arch)]
+        dose_cmd = ["dose-debcheck", "--quiet", "-e", "-f", "--summary", "--latest=1", "--deb-native-arch=%s" % (arch)]
         # add the archive index files
         dose_cmd.extend(archive_indices)
 

@@ -83,7 +83,7 @@ class CruftReport:
                 if "tanglu" in pkg.version:
                     item['tanglu_changes'] = True
                 if dak_cmds:
-                    item['remove_hint'] = "dak rm -m \"[auto-cruft] RID (removed in Debian and unmaintained)\" -s %s -R %s" % (self._staging_suite, pkg.pkgname)
+                    item['remove_hint'] = "dak rm -C ftpmaster@tanglu.org -m \"RID (removed in Debian and unmaintained)\" -s %s -R %s" % (self._staging_suite, pkg.pkgname)
                 else:
                     item['remove_hint'] = "remove %s/%s" % (pkg.pkgname, pkg.version)
                 rm_items.append(item)

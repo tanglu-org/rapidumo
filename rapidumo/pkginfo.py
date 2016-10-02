@@ -288,7 +288,7 @@ class BuildCheck:
 
     def get_package_states_yaml_sources(self, suite, comp, arch, source_gz_path=None):
         add_sources = not source_gz_path
-        dose_cmd = ["dose-builddebcheck", "--quiet", "--latest", "-e", "-f", "--summary", "--deb-native-arch=%s" % (arch)]
+        dose_cmd = ["dose-builddebcheck", "--quiet", "--latest=1", "-e", "-f", "--summary", "--deb-native-arch=%s" % (arch)]
         dose_cmd += self._get_pkg_indices_list(suite, comp, arch, add_sources)
         if source_gz_path:
             dose_cmd += [source_gz_path]
